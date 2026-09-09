@@ -44,7 +44,7 @@ jobs:
       - name: Install cross compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib libpng-dev libfreetype6-dev pkg-config
       - name: Assign update version
         id: version
         run: |
@@ -122,7 +122,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ninja-build pkg-config libglib2.0-dev libpixman-1-dev libsdl2-dev gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+          sudo apt-get install -y build-essential ninja-build pkg-config libglib2.0-dev libpixman-1-dev libsdl2-dev gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib libpng-dev libfreetype6-dev pkg-config
           python -m pip install -r requirements-dev.txt
       - run: make emulator firmware-vm
       - name: Exercise native touch without private firmware
