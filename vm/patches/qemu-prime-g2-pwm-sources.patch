@@ -1,0 +1,40 @@
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -899,6 +899,22 @@
++static uint64_t prime_pwm_source_hz(IMX6ULLCDIFState *s)
++{
++    switch (extract32(s->prime_pwm_regs[0], 16, 2)) {
++    case 0:
++        return 0;
++    case 3:
++        return 32768;
++    default:
++        /* Existing IPG/IPG-high approximation. Live CCM roots and gates
++         * still need wiring; do not confuse these with the 32 kHz input. */
++        return 66000000;
++    }
++}
++
+ static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
+@@ -906,10 +922,12 @@
+-        uint32_t period = (s->prime_pwm_regs[4] & 0xffff) + 2;
++        /* 0xffff has the same period as 0xfffe: the counter is 16-bit. */
++        uint32_t period = MIN(s->prime_pwm_regs[4] & 0xffff, 0xfffe) + 2;
+         uint64_t elapsed = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
+                            s->prime_pwm_enable_ns;
+-        uint64_t ticks = muldiv64(elapsed, 66000000ULL,
++        uint64_t ticks = muldiv64(elapsed, prime_pwm_source_hz(s),
+-                                  NANOSECONDS_PER_SECOND * prescaler);
++                                  NANOSECONDS_PER_SECOND) / prescaler;
+ 
+         return (s->prime_pwm_regs[5] + ticks) % period;
+@@ -922,6 +940,11 @@
+     IMX6ULLCDIFState *s = opaque;
+ 
++    if (offset == 0x14) {
++        /* PWMCNR is read-only; writes must not seed the counter phase. */
++        return;
++    }
++
+     qemu_log_mask(LOG_UNIMP, "prime-g2-panel: PWM7[0x%02" HWADDR_PRIx

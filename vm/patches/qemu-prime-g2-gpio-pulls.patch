@@ -1,0 +1,41 @@
+diff --git a/include/hw/gpio/imx_gpio.h b/include/hw/gpio/imx_gpio.h
+--- a/include/hw/gpio/imx_gpio.h
++++ b/include/hw/gpio/imx_gpio.h
+@@ -46,6 +46,7 @@ struct IMXGPIOState {
+     uint32_t dr;
+     uint32_t gdir;
+     uint32_t psr;
++    uint32_t reset_psr;
+     uint64_t icr;
+     uint32_t imr;
+     uint32_t isr;
+diff --git a/hw/gpio/imx_gpio.c b/hw/gpio/imx_gpio.c
+--- a/hw/gpio/imx_gpio.c
++++ b/hw/gpio/imx_gpio.c
+@@ -304,7 +304,7 @@ static void imx_gpio_reset(DeviceState *dev)
+ 
+     s->dr       = 0;
+     s->gdir     = 0;
+-    s->psr      = 0;
++    s->psr      = s->reset_psr;
+     s->icr      = 0;
+     s->imr      = 0;
+     s->isr      = 0;
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -742,6 +742,14 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+     qdev_connect_gpio_out(DEVICE(&s->gpio[3]), 23,
+         qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 4));
+ 
++    if (s->lcdif.prime_g2_panel) {
++        /*
++         * Board pull resistors hold the unused half of the serialized LCD
++         * bus high. HP verifies this GPIO2 pad mask during startup.
++         */
++        s->gpio[1].reset_psr = 0x00005554;
++    }
++
+     /*
+      * CSU
+      */

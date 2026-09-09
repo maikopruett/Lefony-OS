@@ -1,0 +1,58 @@
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -12,3 +12,4 @@
+ #include "hw/core/irq.h"
++#include "hw/core/qdev-properties.h"
+ #include "hw/misc/imx6_src.h"
+ #include "migration/vmstate.h"
+@@ -110,3 +111,5 @@
+     s->regs[SRC_SRSR] = 0x1;
+     s->regs[SRC_SIMR] = 0x1F;
++    s->regs[SRC_SBMR1] = s->boot_mode1;
++    s->regs[SRC_SBMR2] = s->boot_mode2;
+     if (watchdog_reset) {
+@@ -207,2 +210,7 @@
+     switch (index) {
++    case SRC_SBMR1:
++    case SRC_SBMR2:
++        /* Boot pins/fuse state are latched by hardware, not writable MMIO.
++         * Software boot overrides belong to SRC_GPR9/10. */
++        break;
+     case SRC_SRSR:
+@@ -340,2 +348,7 @@
+-static void imx6_src_class_init(ObjectClass *klass, const void *data)
++static const Property imx6_src_properties[] = {
++    DEFINE_PROP_UINT32("boot-mode1", IMX6SRCState, boot_mode1, 0),
++    DEFINE_PROP_UINT32("boot-mode2", IMX6SRCState, boot_mode2, 0),
++};
++
++static void imx6_src_class_init(ObjectClass *klass, const void *data)
+ {
+@@ -345,3 +358,4 @@
+     dc->realize = imx6_src_realize;
++    device_class_set_props(dc, imx6_src_properties);
+     device_class_set_legacy_reset(dc, imx6_src_reset);
+     dc->vmsd = &vmstate_imx6_src;
+diff --git a/include/hw/misc/imx6_src.h b/include/hw/misc/imx6_src.h
+--- a/include/hw/misc/imx6_src.h
++++ b/include/hw/misc/imx6_src.h
+@@ -70,3 +70,4 @@
+     uint32_t regs[SRC_MAX];
++    uint32_t boot_mode1, boot_mode2;
+     qemu_irq rom_downloader;
+     bool watchdog_reset_pending;
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -127,3 +127,10 @@
+                              &error_fatal);
++    if (prime_g2_ddr_mirror) {
++        /* Read-only SRC capture from the physical Prime in ROM recovery,
++         * preserved in hardware/prime_g2/reference/rom-src-snapshot.json.
++         * Keep the captured board profile out of the generic EVK. */
++        qdev_prop_set_uint32(DEVICE(&s->src), "boot-mode1", 0x00000893);
++        qdev_prop_set_uint32(DEVICE(&s->src), "boot-mode2", 0x02000001);
++    }
+     qdev_realize(DEVICE(s), NULL, &error_fatal);
+ 

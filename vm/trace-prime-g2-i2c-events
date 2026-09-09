@@ -1,0 +1,5 @@
+i2c_event
+i2c_send
+i2c_recv
+imx_i2c_read
+imx_i2c_write

@@ -1,0 +1,6 @@
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -158,1 +158,2 @@
+                                     ddr_mirror);
++        prime_g2_mmdc_map_ddr_gate(machine->ram);

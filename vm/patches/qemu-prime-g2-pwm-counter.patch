@@ -1,0 +1,80 @@
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+index 7730158..2e914f2 100644
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -900,6 +900,18 @@ static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     IMX6ULLCDIFState *s = opaque;
+ 
++    if (offset == 0x14 && (s->prime_pwm_regs[0] & 1) &&
++        s->prime_pwm_enable_ns >= 0) {
++        uint32_t prescaler = extract32(s->prime_pwm_regs[0], 4, 12) + 1;
++        uint32_t period = (s->prime_pwm_regs[4] & 0xffff) + 2;
++        uint64_t elapsed = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
++                           s->prime_pwm_enable_ns;
++        uint64_t ticks = muldiv64(elapsed, 66000000ULL,
++                                  NANOSECONDS_PER_SECOND * prescaler);
++
++        return (s->prime_pwm_regs[5] + ticks) % period;
++    }
++
+     return s->prime_pwm_regs[offset >> 2];
+ }
+ 
+@@ -910,10 +922,18 @@ static void prime_pwm_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     qemu_log_mask(LOG_UNIMP, "prime-g2-panel: PWM7[0x%02" HWADDR_PRIx
+                   "] = 0x%08" PRIx64 "\n", offset, value);
++    if (offset == 0 && (s->prime_pwm_regs[0] & 1)) {
++        s->prime_pwm_regs[5] = prime_pwm_read(s, 0x14, 4);
++    }
+     s->prime_pwm_regs[offset >> 2] = value;
+     if (offset == 0) {
+         /* i.MX PWM software reset is self-clearing. */
+         s->prime_pwm_regs[0] &= ~(1u << 3);
++        if (value & (1u << 3)) {
++            s->prime_pwm_regs[5] = 0;
++        }
++        s->prime_pwm_enable_ns = (s->prime_pwm_regs[0] & 1) ?
++            qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) : -1;
+     }
+     prime_panel_invalidate(s);
+ }
+@@ -1102,6 +1122,7 @@ static void imx6ul_lcdif_reset(DeviceState *dev)
+     s->prime_spi_shift = 0;
+     prime_ili9322_reset_registers(s);
+     memset(s->prime_pwm_regs, 0, sizeof(s->prime_pwm_regs));
++    s->prime_pwm_enable_ns = -1;
+     memset(s->prime_iomux_regs, 0, sizeof(s->prime_iomux_regs));
+     s->prime_power_timing_bad = false;
+     s->prime_signal_timing_bad = false;
+@@ -1165,7 +1186,7 @@ static int imx6ul_lcdif_post_load(void *opaque, int version_id)
+ 
+ static const VMStateDescription vmstate_imx6ul_lcdif = {
+     .name = TYPE_IMX6UL_LCDIF,
+-    .version_id = 2,
++    .version_id = 3,
+     .minimum_version_id = 1,
+     .post_load = imx6ul_lcdif_post_load,
+     .fields = (const VMStateField[]) {
+@@ -1197,6 +1218,7 @@ static const VMStateDescription vmstate_imx6ul_lcdif = {
+         VMSTATE_INT64_V(prime_panel_white_until_ns, IMX6ULLCDIFState, 2),
+         VMSTATE_UINT8_ARRAY_V(prime_panel_regs, IMX6ULLCDIFState, 256, 2),
+         VMSTATE_UINT32_ARRAY_V(prime_pwm_regs, IMX6ULLCDIFState, 8, 2),
++        VMSTATE_INT64_V(prime_pwm_enable_ns, IMX6ULLCDIFState, 3),
+         VMSTATE_UINT32_ARRAY_V(prime_iomux_regs, IMX6ULLCDIFState,
+                                0x700 / 4, 2),
+         VMSTATE_END_OF_LIST()
+diff --git a/include/hw/display/imx6ul_lcdif.h b/include/hw/display/imx6ul_lcdif.h
+index d912410..9ea0b0b 100644
+--- a/include/hw/display/imx6ul_lcdif.h
++++ b/include/hw/display/imx6ul_lcdif.h
+@@ -66,6 +66,7 @@ struct IMX6ULLCDIFState {
+     int64_t prime_spi_mosi_ns;
+     int64_t prime_panel_display_on_ns;
+     int64_t prime_panel_white_until_ns;
++    int64_t prime_pwm_enable_ns;
+     uint8_t prime_panel_regs[256];
+     uint32_t prime_pwm_regs[8];
+     uint32_t prime_iomux_regs[0x700 / 4];
+

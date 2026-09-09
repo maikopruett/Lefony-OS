@@ -1,0 +1,127 @@
+diff --git a/include/hw/display/imx6ul_lcdif.h b/include/hw/display/imx6ul_lcdif.h
+--- a/include/hw/display/imx6ul_lcdif.h
++++ b/include/hw/display/imx6ul_lcdif.h
+@@ -74,1 +74,3 @@
+     uint8_t prime_pwm_fifo_head, prime_pwm_fifo_count, prime_pwm_repeat_left;
++    qemu_irq prime_pwm_irq;
++    QEMUTimer *prime_pwm_timer;
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -943,1 +943,67 @@
++static void prime_pwm_update_events(IMX6ULLCDIFState *s)
++{
++    /* FE watermark behavior is not implemented by this event path. */
++    bool pending = ((s->prime_pwm_regs[1] >> 3) & s->prime_pwm_regs[2] & 6) != 0;
++    if (!s->prime_pwm_timer) {
++        return;
++    }
++    qemu_set_irq(s->prime_pwm_irq, pending);
++    timer_del(s->prime_pwm_timer);
++    if (!pending && (s->prime_pwm_regs[2] & 6) &&
++        (s->prime_pwm_regs[0] & 1) && s->prime_pwm_hz) {
++        uint32_t period = MIN(s->prime_pwm_regs[4] & 0xffff, 0xfffe) + 2;
++        uint32_t count = s->prime_pwm_regs[5] % period;
++        uint32_t sample = s->prime_pwm_regs[3];
++        uint32_t distance = period - count;
++        uint64_t divisor = extract32(s->prime_pwm_regs[0], 4, 12) + 1;
++        if ((s->prime_pwm_regs[2] & 4) && sample > count && sample < period) {
++            distance = MIN(distance, sample - count);
++        }
++        uint64_t numerator = distance * divisor * NANOSECONDS_PER_SECOND - s->prime_pwm_fraction;
++        uint64_t delay = (numerator + s->prime_pwm_hz - 1) / s->prime_pwm_hz;
++        timer_mod(s->prime_pwm_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + MAX(delay, 1));
++    }
++}
++
++static void prime_pwm_advance(IMX6ULLCDIFState *s, uint64_t ticks, uint32_t period)
++{
++    uint32_t count = s->prime_pwm_regs[5] % period;
++    while (ticks) {
++        uint32_t sample = s->prime_pwm_regs[3];
++        if (!s->prime_pwm_fifo_count && !s->prime_pwm_repeat_left && ticks >= period) {
++            s->prime_pwm_regs[1] |= 0x10;
++            if (sample < period) {
++                s->prime_pwm_regs[1] |= 0x20;
++            }
++            ticks %= period; /* Skip complete identical cycles in bounded time. */
++            if (!ticks) {
++                break;
++            }
++        }
++        uint32_t step = MIN(ticks, period - count);
++        if (sample > count && sample < period && sample <= count + step) {
++            s->prime_pwm_regs[1] |= 0x20;
++        }
++        count += step;
++        ticks -= step;
++        if (count == period) {
++            count = 0;
++            s->prime_pwm_regs[1] |= 0x10;
++            prime_pwm_consume_periods(s, 1);
++            if (s->prime_pwm_regs[3] == 0) {
++                s->prime_pwm_regs[1] |= 0x20;
++            }
++        }
++    }
++    s->prime_pwm_regs[5] = count;
++}
++
+ static void prime_pwm_sync(IMX6ULLCDIFState *s)
+@@ -960,2 +1026,1 @@
+-        prime_pwm_consume_periods(s, (s->prime_pwm_regs[5] + ticks) / period);
+-        s->prime_pwm_regs[5] = (s->prime_pwm_regs[5] + ticks) % period;
++        prime_pwm_advance(s, ticks, period);
+@@ -962,3 +1027,16 @@
+         s->prime_pwm_enable_ns = now;
+     }
++    prime_pwm_update_events(s);
+ }
++
++static void prime_pwm_event(void *opaque)
++{
++    prime_pwm_sync(opaque);
++}
++
++static int prime_pwm_pre_save(void *opaque)
++{
++    prime_pwm_sync(opaque);
++    return 0;
++}
+@@ -971,1 +1049,2 @@
+     s->prime_pwm_hz = prime_pwm_source_hz(s);
++    prime_pwm_update_events(s);
+@@ -998,1 +1077,2 @@
+         s->prime_pwm_regs[1] &= ~(value & 0x78); /* W1C, FIFOAV read-only */
++        prime_pwm_update_events(s);
+@@ -1013,1 +1093,2 @@
+         prime_panel_invalidate(s);
++        prime_pwm_update_events(s);
+@@ -1034,1 +1115,2 @@
+     prime_panel_invalidate(s);
++    prime_pwm_update_events(s);
+@@ -1223,1 +1305,2 @@
+     prime_pwm_fifo_reset(s);
++    prime_pwm_update_events(s);
+@@ -1302,1 +1385,2 @@
+     .post_load = imx6ul_lcdif_post_load,
++    .pre_save = prime_pwm_pre_save,
+@@ -1286,1 +1369,2 @@
+     imx6ul_lcdif_update_irq(s);
++    prime_pwm_update_events(s);
+@@ -1362,1 +1446,3 @@
+     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->prime_pwm_irq);
++    s->prime_pwm_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, prime_pwm_event, s);
+@@ -1373,1 +1459,4 @@
+     timer_del(s->frame_timer);
++    timer_del(s->prime_pwm_timer);
++    timer_free(s->prime_pwm_timer);
++    s->prime_pwm_timer = NULL;
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -748,1 +748,3 @@
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 0, FSL_IMX6UL_LCDIF_ADDR);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->lcdif), 1,
++                      qdev_get_gpio_in(gic, FSL_IMX6UL_PWM7_IRQ));

@@ -1,0 +1,52 @@
+{
+  "schema": "mahalo.prime-g2.emulator-contract.v1",
+  "evidence_capture": "20260831T154107Z",
+  "display": {
+    "width": 320,
+    "height": 240,
+    "serial_rgb_cycles": 3,
+    "horizontal_transfer_count": 960,
+    "vertical_transfer_count": 240,
+    "horizontal_period": 1132,
+    "vertical_period": 264,
+    "pixel_clock_edge": "rising",
+    "outstanding_requests": 5
+  },
+  "kpp": {
+    "rows": 8,
+    "columns": 8,
+    "mapped_keys": 39,
+    "mmio": "0x020b8000"
+  },
+  "touch": {
+    "model": "GT5688/GT928-compatible provisional model",
+    "i2c_bus": 2,
+    "address": "0x14",
+    "irq_gpio": "GPIO1_IO25",
+    "reset_gpio": "GPIO1_IO24",
+    "axes": "provisional-320x240"
+  },
+  "pmic": {
+    "model": "PF1550 skeleton",
+    "i2c_bus": 1,
+    "address": "0x08",
+    "children": ["onkey", "charger", "regulators"]
+  },
+  "nand": {
+    "size": 536870912,
+    "page_size": 2048,
+    "oob_size": 64,
+    "erase_size": 131072,
+    "blocks": 4096,
+    "ecc_strength": 8,
+    "on_flash_bbt": true,
+    "contents": "erased-synthetic-no-HP-firmware",
+    "partitions": [
+      ["boot", 0, 4194304],
+      ["kernel", 4194304, 8388608],
+      ["dtb", 12582912, 1048576],
+      ["misc", 13631488, 1048576],
+      ["rootfs", 14680064, 522190848]
+    ]
+  }
+}

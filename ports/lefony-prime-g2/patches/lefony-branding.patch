@@ -1,0 +1,120 @@
+diff --git a/apps/home/base.en.i18n b/apps/home/base.en.i18n
+--- a/apps/home/base.en.i18n
++++ b/apps/home/base.en.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Applications"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "This application is"
+diff --git a/apps/home/base.fr.i18n b/apps/home/base.fr.i18n
+--- a/apps/home/base.fr.i18n
++++ b/apps/home/base.fr.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Applications"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Cette application est"
+diff --git a/apps/home/base.de.i18n b/apps/home/base.de.i18n
+--- a/apps/home/base.de.i18n
++++ b/apps/home/base.de.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Anwendungen"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Diese Anwendung ist"
+diff --git a/apps/home/base.es.i18n b/apps/home/base.es.i18n
+--- a/apps/home/base.es.i18n
++++ b/apps/home/base.es.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Aplicaciones"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Esta aplicación está"
+diff --git a/apps/home/base.it.i18n b/apps/home/base.it.i18n
+--- a/apps/home/base.it.i18n
++++ b/apps/home/base.it.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Applicazioni"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Questa applicazione è"
+diff --git a/apps/home/base.nl.i18n b/apps/home/base.nl.i18n
+--- a/apps/home/base.nl.i18n
++++ b/apps/home/base.nl.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Applicaties"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Deze applicatie is"
+diff --git a/apps/home/base.pt.i18n b/apps/home/base.pt.i18n
+--- a/apps/home/base.pt.i18n
++++ b/apps/home/base.pt.i18n
+@@ -1,3 +1,3 @@
+ Apps = "Aplicações"
+-AppsCapital = "UPSILON"
++AppsCapital = "LEFONY"
+ ForbiddenAppInExamMode1 = "Esta aplicação é"
+diff --git a/apps/settings/base.en.i18n b/apps/settings/base.en.i18n
+--- a/apps/settings/base.en.i18n
++++ b/apps/settings/base.en.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Upsilon version"
++UpsilonVersion = "Lefony OS version"
+diff --git a/apps/settings/base.fr.i18n b/apps/settings/base.fr.i18n
+--- a/apps/settings/base.fr.i18n
++++ b/apps/settings/base.fr.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Version d'Upsilon"
++UpsilonVersion = "Version de Lefony OS"
+diff --git a/apps/settings/base.de.i18n b/apps/settings/base.de.i18n
+--- a/apps/settings/base.de.i18n
++++ b/apps/settings/base.de.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Upsilon version"
++UpsilonVersion = "Lefony-OS-Version"
+diff --git a/apps/settings/base.es.i18n b/apps/settings/base.es.i18n
+--- a/apps/settings/base.es.i18n
++++ b/apps/settings/base.es.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Versión de Upsilon"
++UpsilonVersion = "Versión de Lefony OS"
+diff --git a/apps/settings/base.it.i18n b/apps/settings/base.it.i18n
+--- a/apps/settings/base.it.i18n
++++ b/apps/settings/base.it.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Versione di Upsilon"
++UpsilonVersion = "Versione di Lefony OS"
+diff --git a/apps/settings/base.nl.i18n b/apps/settings/base.nl.i18n
+--- a/apps/settings/base.nl.i18n
++++ b/apps/settings/base.nl.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Upsilon version"
++UpsilonVersion = "Lefony OS-versie"
+diff --git a/apps/settings/base.pt.i18n b/apps/settings/base.pt.i18n
+--- a/apps/settings/base.pt.i18n
++++ b/apps/settings/base.pt.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Versão do Upsilon"
++UpsilonVersion = "Versão do Lefony OS"
+diff --git a/apps/settings/base.hu.i18n b/apps/settings/base.hu.i18n
+--- a/apps/settings/base.hu.i18n
++++ b/apps/settings/base.hu.i18n
+@@ -37 +37 @@
+-UpsilonVersion = "Upsilon verzió"
++UpsilonVersion = "Lefony OS verzió"
+diff --git a/kandinsky/src/ion_context.cpp b/kandinsky/src/ion_context.cpp
+--- a/kandinsky/src/ion_context.cpp
++++ b/kandinsky/src/ion_context.cpp
+@@ -38,5 +38,11 @@
+ KDIonContext::KDIonContext() :
+ KDContext(KDPointZero,
+-    KDRect(0, 0, Ion::Display::Width, Ion::Display::Height))
++    KDRect(0, 0, Ion::Display::Width, Ion::Display::Height)),
++invertEnabled(false),
++zoomEnabled(false),
++zoomInhibit(false),
++gammaEnabled(false),
++zoomPosition(0),
++rootContext(nullptr)
+ {
+ }

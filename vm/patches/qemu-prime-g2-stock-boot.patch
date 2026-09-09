@@ -1,0 +1,343 @@
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -21,9 +21,30 @@
+ #include "system/qtest.h"
++#include "system/reset.h"
++#include "system/address-spaces.h"
++
++/* i.MX6ULL GIC distributor. Direct-loaded stock OS never runs U-Boot's
++ * gic_init, so SPI ITARGETS stay 0 and pending IRQs never reach CPU0. */
++#define HP_PRIME_G2_GICD_ITARGETSR 0x00A01800
++
++static void hp_prime_g2_route_spis(void *opaque)
++{
++    int irq;
++
++    for (irq = 32; irq < 128; irq++) {
++        uint8_t cpu0 = 0x01;
++
++        address_space_write(&address_space_memory,
++                            HP_PRIME_G2_GICD_ITARGETSR + irq,
++                            MEMTXATTRS_UNSPECIFIED, &cpu0, 1);
++    }
++}
+ 
+-static void mcimx6ul_evk_init(MachineState *machine)
++static void mcimx6ul_evk_common_init(MachineState *machine,
++                                     bool prime_g2_ddr_mirror)
+ {
+     static struct arm_boot_info boot_info;
+     FslIMX6ULState *s;
++    MemoryRegion *ddr_mirror;
+     int i;
+ 
+     if (machine->ram_size > FSL_IMX6UL_MMDC_SIZE) {
+@@ -50,6 +71,75 @@
+     memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_MMDC_ADDR,
+                                 machine->ram);
+ 
++    /*
++     * The Prime G2 fits 256 MiB of DDR in an MMDC aperture wider than the
++     * fitted address lines.  Its stock FreeRTOS startup walks upward until
++     * an address aliases low DDR; an unmapped QEMU hole produces a fatal
++     * data abort instead.  Keep this behavior on the dedicated board type
++     * so the generic evaluation kit retains its upstream memory map.
++     */
++    if (prime_g2_ddr_mirror) {
++        if (machine->ram_size != 256 * 1024 * 1024) {
++            error_report("hp-prime-g2 requires 256 MiB of fitted DDR");
++            exit(1);
++        }
++        ddr_mirror = g_new0(MemoryRegion, 1);
++        memory_region_init_alias(ddr_mirror, OBJECT(machine),
++                                 "hp-prime-g2.ddr-mirror", machine->ram,
++                                 0, machine->ram_size);
++        memory_region_add_subregion(get_system_memory(),
++                                    FSL_IMX6UL_MMDC_ADDR + machine->ram_size,
++                                    ddr_mirror);
++        /*
++         * Direct-loaded stock I2C sometimes uses a small integer as a
++         * controller pointer (0x1e + 8 = 0x26). An unmapped hole there
++         * is a fatal data abort that masks IRQs and deadlocks the
++         * interrupt-driven I2C wait. A 4 KiB RAZ/WI stub matches the
++         * physical vector page without covering real MMIO.
++         */
++        MemoryRegion *low = g_new0(MemoryRegion, 1);
++        memory_region_init_ram(low, NULL, "hp-prime-g2.low-stub",
++                               0x1000, &error_fatal);
++        memory_region_add_subregion(get_system_memory(), 0, low);
++
++        /*
++         * Cortex-A7 MPCore starts its GIC CPU interface at private-region
++         * offset 0x100, but i.MX6ULL software also reads the SCU_CONFIG
++         * register at offset 0x04 to discover that one core is present.
++         * QEMU's single-core A15MPCore container leaves the SCU prefix
++         * unmapped. Overlay a zero-filled prefix: SCU_CONFIG == 0 encodes
++         * exactly one core and lets the real Prime U-Boot identify the SoC.
++         */
++        MemoryRegion *scu = g_new0(MemoryRegion, 1);
++        memory_region_init_ram(scu, NULL, "hp-prime-g2.scu-stub", 0x100,
++                               &error_fatal);
++        memory_region_add_subregion_overlap(get_system_memory(),
++                                            FSL_IMX6UL_A7MPCORE_ADDR,
++                                            scu, 1);
++
++        /* U-Boot opens both AIPS protection blocks before driver init. */
++        MemoryRegion *aips1 = g_new0(MemoryRegion, 1);
++        MemoryRegion *aips2 = g_new0(MemoryRegion, 1);
++        memory_region_init_ram(aips1, NULL, "hp-prime-g2.aips1-stub",
++                               0x1000, &error_fatal);
++        memory_region_init_ram(aips2, NULL, "hp-prime-g2.aips2-stub",
++                               0x1000, &error_fatal);
++        memory_region_add_subregion(get_system_memory(), 0x0207c000, aips1);
++        memory_region_add_subregion(get_system_memory(), 0x0217c000, aips2);
++
++        /* The Prime U-Boot initializes low-power policy through the GPC. */
++        MemoryRegion *gpc = g_new0(MemoryRegion, 1);
++        memory_region_init_ram(gpc, NULL, "hp-prime-g2.gpc-stub", 0x1000,
++                               &error_fatal);
++        memory_region_add_subregion(get_system_memory(), 0x020b0000, gpc);
++
++        /* U-Boot programs the i.MX system-counter control block. */
++        MemoryRegion *syscnt = g_new0(MemoryRegion, 1);
++        memory_region_init_ram(syscnt, NULL, "hp-prime-g2.syscnt-stub",
++                               0x1000, &error_fatal);
++        memory_region_add_subregion(get_system_memory(), 0x021dc000, syscnt);
++    }
++
+     for (i = 0; i < FSL_IMX6UL_NUM_USDHCS; i++) {
+         BusState *bus;
+         DeviceState *carddev;
+@@ -69,6 +159,18 @@
+     }
+ }
+ 
++static void mcimx6ul_evk_init(MachineState *machine)
++{
++    mcimx6ul_evk_common_init(machine, false);
++}
++
++static void hp_prime_g2_init(MachineState *machine)
++{
++    mcimx6ul_evk_common_init(machine, true);
++    qemu_register_reset(hp_prime_g2_route_spis, NULL);
++    hp_prime_g2_route_spis(NULL);
++}
++
+ static void mcimx6ul_evk_machine_init(MachineClass *mc)
+ {
+     mc->desc = "Freescale i.MX6UL Evaluation Kit (Cortex-A7)";
+@@ -78,4 +168,14 @@
+     mc->auto_create_sdcard = true;
+ }
+ 
++static void hp_prime_g2_machine_init(MachineClass *mc)
++{
++    mcimx6ul_evk_machine_init(mc);
++    mc->desc = "HP Prime G2 calculator research model (Cortex-A7)";
++    mc->init = hp_prime_g2_init;
++    mc->default_ram_size = 256 * 1024 * 1024;
++    mc->default_ram_id = "hp-prime-g2.ram";
++}
++
+ DEFINE_MACHINE_ARM("mcimx6ul-evk", mcimx6ul_evk_machine_init)
++DEFINE_MACHINE_ARM("hp-prime-g2", hp_prime_g2_machine_init)
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -178,6 +178,10 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    /* Prime firmware reads CBAR even though this is a uniprocessor SoC. */
++    object_property_set_int(OBJECT(&s->cpu), "reset-cbar",
++                            FSL_IMX6UL_A7MPCORE_ADDR, &error_abort);
++
+     qdev_realize(DEVICE(&s->cpu), NULL, &error_abort);
+ 
+     /*
+
+diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+--- a/hw/misc/imx6ul_ccm.c
++++ b/hw/misc/imx6ul_ccm.c
+@@ -519,6 +519,12 @@ static uint32_t imx6ul_ccm_get_clock_frequency(IMXCCMState *dev, IMXClk clock)
+     case CLK_32k:
+         freq = CKIL_FREQ;
+         break;
++    case CLK_HIGH:
++        freq = CKIH_FREQ;
++        break;
++    case CLK_HIGH_DIV:
++        freq = CKIH_FREQ / 8;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: unsupported clock %d\n",
+                       TYPE_IMX6UL_CCM, __func__, clock);
+@@ -592,7 +592,8 @@ static void imx6ul_ccm_reset(DeviceState *dev)
+     s->analog[PMU_REG_3P0] = 0x00000F74;
+     s->analog[PMU_REG_2P5] = 0x00001073;
+     s->analog[PMU_REG_CORE] = 0x00482012;
+-    s->analog[PMU_MISC0] = 0x04000000;
++    /* ANA_MISC0 bit 7 reports that the analog bandgap is stable. */
++    s->analog[PMU_MISC0] = 0x04000080;
+     s->analog[PMU_MISC1] = 0x00000000;
+     s->analog[PMU_MISC2] = 0x00272727;
+     s->analog[PMU_LOWPWR_CTRL] = 0x00004009;
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -111,7 +111,7 @@ static const IMXClk imx6ul_gpt_clocks[] = {
+     CLK_IPG_HIGH,  /* 010 ipg_clk_highfreq */
+     CLK_EXT,       /* 011 External clock */
+     CLK_32k,       /* 100 ipg_clk_32k */
+-    CLK_NONE,      /* 101 not defined */
++    CLK_HIGH_DIV,  /* 101 reference 24 MHz oscillator / 8 */
+     CLK_NONE,      /* 110 not defined */
+     CLK_NONE,      /* 111 not defined */
+ };
+diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
+--- a/hw/i2c/imx_i2c.c
++++ b/hw/i2c/imx_i2c.c
+@@ -60,6 +60,14 @@ static inline bool imx_i2c_is_master(IMXI2CState *s)
+     return s->i2cr & I2CR_MSTA;
+ }
+ 
++static void imx_i2c_update_irq(IMXI2CState *s)
++{
++    qemu_set_irq(s->irq,
++                 imx_i2c_is_enabled(s) &&
++                 imx_i2c_interrupt_is_enabled(s) &&
++                 (s->i2sr & I2SR_IIF));
++}
++
+ static void imx_i2c_reset(DeviceState *dev)
+ {
+     IMXI2CState *s = IMX_I2C(dev);
+@@ -75,17 +83,16 @@ static void imx_i2c_reset(DeviceState *dev)
+     s->i2sr       = I2SR_RESET;
+     s->i2dr_read  = I2DR_RESET;
+     s->i2dr_write = I2DR_RESET;
++    imx_i2c_update_irq(s);
+ }
+ 
+ static inline void imx_i2c_raise_interrupt(IMXI2CState *s)
+ {
+     if (imx_i2c_is_enabled(s)) {
+         s->i2sr |= I2SR_IIF;
+-
+-        if (imx_i2c_interrupt_is_enabled(s)) {
+-            qemu_irq_raise(s->irq);
+-        }
+     }
++
++    imx_i2c_update_irq(s);
+ }
+ 
+ static uint64_t imx_i2c_read(void *opaque, hwaddr offset,
+@@ -198,6 +205,9 @@ static void imx_i2c_write(void *opaque, hwaddr offset,
+                     s->i2cr &= ~I2CR_RSTA;
+                 }
+             }
++
++            /* IIF may predate IIEN, so re-evaluate the level on control writes. */
++            imx_i2c_update_irq(s);
+         }
+         break;
+     case I2SR_ADDR:
+@@ -207,7 +217,6 @@ static void imx_i2c_write(void *opaque, hwaddr offset,
+          */
+         if ((s->i2sr & I2SR_IIF) && !(value & I2SR_IIF)) {
+             s->i2sr &= ~I2SR_IIF;
+-            qemu_irq_lower(s->irq);
+         }
+ 
+         /*
+@@ -217,6 +226,8 @@ static void imx_i2c_write(void *opaque, hwaddr offset,
+             s->i2sr &= ~I2SR_IAL;
+         }
+ 
++        imx_i2c_update_irq(s);
++
+         break;
+     case I2DR_ADDR:
+         /* if the device is not enabled, nothing to do */
+diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
+--- a/hw/misc/imx7_snvs.c
++++ b/hw/misc/imx7_snvs.c
+@@ -28,11 +28,13 @@
+ 
+ static const VMStateDescription vmstate_imx7_snvs = {
+     .name = TYPE_IMX7_SNVS,
+-    .version_id = 1,
++    .version_id = 2,
+     .minimum_version_id = 1,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT64(tick_offset, IMX7SNVSState),
+         VMSTATE_UINT64(lpcr, IMX7SNVSState),
++        VMSTATE_UINT32_V(hpcomr, IMX7SNVSState, 2),
++        VMSTATE_UINT32_V(hpcr, IMX7SNVSState, 2),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -50,6 +52,16 @@ static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
+     uint64_t ret = 0;
+ 
+     switch (offset) {
++    case SNVS_HPCOMR:
++        ret = s->hpcomr;
++        break;
++    case SNVS_HPCR:
++        ret = s->hpcr;
++        break;
++    case SNVS_HPSR:
++        /* No power-button or security event is asserted by default. */
++        ret = 0;
++        break;
+     case SNVS_LPSRTCMR:
+         ret = extract64(imx7_snvs_get_count(s), 32, 15);
+         break;
+@@ -71,6 +83,8 @@ static void imx7_snvs_reset(DeviceState *dev)
+     IMX7SNVSState *s = IMX7_SNVS(dev);
+ 
+     s->lpcr = 0;
++    s->hpcomr = 0;
++    s->hpcr = 0;
+ }
+ 
+ static void imx7_snvs_write(void *opaque, hwaddr offset,
+@@ -87,6 +101,12 @@ static void imx7_snvs_write(void *opaque, hwaddr offset,
+     }
+ 
+     switch (offset) {
++    case SNVS_HPCOMR:
++        s->hpcomr = v;
++        break;
++    case SNVS_HPCR:
++        s->hpcr = v;
++        break;
+     case SNVS_LPSRTCMR:
+         new_value = deposit64(snvs_count, 32, 32, v);
+         break;
+diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
+--- a/include/hw/misc/imx7_snvs.h
++++ b/include/hw/misc/imx7_snvs.h
+@@ -18,6 +18,9 @@
+ 
+ 
+ enum IMX7SNVSRegisters {
++    SNVS_HPCOMR = 0x04,
++    SNVS_HPCR = 0x08,
++    SNVS_HPSR = 0x14,
+     SNVS_LPCR = 0x38,
+     SNVS_LPCR_TOP   = BIT(6),
+     SNVS_LPCR_DP_EN = BIT(5),
+@@ -36,6 +39,8 @@ struct IMX7SNVSState {
+ 
+     uint64_t tick_offset;
+     uint64_t lpcr;
++    uint32_t hpcomr;
++    uint32_t hpcr;
+ };
+ 
+ #endif /* IMX7_SNVS_H */

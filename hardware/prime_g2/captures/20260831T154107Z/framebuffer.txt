@@ -1,0 +1,26 @@
+# 
+mode "320x240-139"
+    # D: 18.000 MHz, H: 36.586 kHz, V: 138.582 Hz
+    geometry 320 240 320 240 32
+    timings 55555 71 100 17 6 1 1
+    rgba 8/16,8/8,8/0,0/0
+endmode
+
+Frame buffer device information:
+    Name        : mxs-lcdif
+    Address     : 0x88000000
+    Size        : 33554432
+    Type        : PACKED PIXELS
+    Visual      : TRUECOLOR
+    XPanStep    : 0
+    YPanStep    : 1
+    YWrapStep   : 1
+    LineLength  : 1280
+    Accelerator : No
+
+[/sys/class/graphics/fb0]
+
+[/sys/class/graphics/fbcon]
+
+[/sys/class/backlight/backlight]
+# # 

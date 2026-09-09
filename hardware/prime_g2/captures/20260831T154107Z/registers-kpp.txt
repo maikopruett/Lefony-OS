@@ -1,0 +1,1 @@
+capture failed: timed out after 60.0s: printf 'KPP_KPCR|0x020b8000|16|' && devmem 0x020b8000 16; printf 'KPP_KPSR|0x020b8002|16|' && devmem 0x020b8002 16; printf 'KPP_KDDR|0x020b8004|16|' && devmem 0x020b8004 16; printf 'KPP_KPDR|0x020b8006|16|' && devmem 0x020b8006 16

@@ -1,0 +1,57 @@
+diff --git a/liba/src/external/sqlite/mem5.c b/liba/src/external/sqlite/mem5.c
+--- a/liba/src/external/sqlite/mem5.c
++++ b/liba/src/external/sqlite/mem5.c
+@@ -552,6 +552,53 @@ void sqlite3Memsys5Dump(const char *zFilename){
+ }
+ #endif
+ 
++#if PRIME_G2_MEMORY_TELEMETRY
++unsigned prime_g2_heap_capacity(void){
++  return sqlite3GlobalConfig.nHeap;
++}
++
++unsigned prime_g2_heap_current(void){
++  return mem5.currentOut;
++}
++
++unsigned prime_g2_heap_high_water(void){
++  return mem5.maxOut;
++}
++
++unsigned prime_g2_heap_allocation_count(void){
++  return mem5.currentCount;
++}
++
++int prime_g2_heap_fragmentation_self_test(void){
++  void *large[64] = {0};
++  void *small[64] = {0};
++  unsigned baseline = mem5.currentOut;
++  int count = 0;
++  int ok = 1;
++  /* Exhaust through the nullable primitive so the expected OOM condition
++  ** does not trip Upsilon's public malloc assertion. */
++  while(count < 64 && (large[count] = memsys5MallocUnsafe(1 << 20)) != 0){
++    count++;
++  }
++  if(count < 2 || count == 64) ok = 0;
++  for(int i = 0; i < count; i += 2){
++    memsys5FreeUnsafe(large[i]);
++    large[i] = 0;
++  }
++  /* Refill deliberately fragmented holes with half-size blocks. */
++  for(int i = 0; i < count; i += 2){
++    small[i] = memsys5MallocUnsafe(1 << 19);
++    if(small[i] == 0) ok = 0;
++  }
++  for(int i = 0; i < count; i++){
++    if(large[i] != 0) memsys5FreeUnsafe(large[i]);
++    if(small[i] != 0) memsys5FreeUnsafe(small[i]);
++  }
++  if(mem5.currentOut != baseline) ok = 0;
++  return ok;
++}
++#endif
++
+ /*
+ ** This routine is the only routine in this file with external 
+ ** linkage. It returns a pointer to a static sqlite3_mem_methods

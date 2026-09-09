@@ -1,0 +1,18 @@
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -152,8 +152,13 @@ static inline bool imx6ul_lcdif_frame_done_pending(IMX6ULLCDIFState *s)
+ }
+ 
++static uint64_t prime_panel_frame_period_ns(IMX6ULLCDIFState *s);
++
+ static void imx6ul_lcdif_schedule_frame(IMX6ULLCDIFState *s)
+ {
+     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+ 
+-    timer_mod(s->frame_timer, now + FRAME_PERIOD_NS);
++    /* Prime frame completion follows the programmed pixel clock and totals,
++     * not a fixed 16 ms UI cadence. Other machines retain the upstream rate. */
++    uint64_t period = s->prime_g2_panel ? prime_panel_frame_period_ns(s) : FRAME_PERIOD_NS;
++    timer_mod(s->frame_timer, now + period);
+ }

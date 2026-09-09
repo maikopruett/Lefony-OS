@@ -1,0 +1,32 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -554,9 +554,23 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+             FSL_IMX6UL_USB2_IRQ,
+         };
+ 
+-        sysbus_realize(SYS_BUS_DEVICE(&s->usb[i]), &error_abort);
+-        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0,
+-                        FSL_IMX6UL_USB02_USBn_ADDR[i]);
+-        sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
++        SysBusDevice *usbdev;
++        if (i == 0) {
++            /* The Prime exposes USBOTG1 as a peripheral. Upstream ChipIdea
++             * emulation is EHCI-host-only, so use the board's device-mode
++             * queue-head/dTD model for this instance. */
++            sysbus_realize(SYS_BUS_DEVICE(&s->usb[i]), &error_abort);
++            usbdev = SYS_BUS_DEVICE(qdev_new(TYPE_PRIME_G2_USBOTG));
++            sysbus_realize_and_unref(usbdev, &error_abort);
++            qdev_connect_gpio_out_named(DEVICE(usbdev), "cable", 0,
++                qdev_get_gpio_in(DEVICE(&s->gpio[0]), 0));
++            qdev_connect_gpio_out_named(DEVICE(usbdev), "cable", 1,
++                qdev_get_gpio_in(DEVICE(&s->gpio[0]), 3));
++        } else {
++            usbdev = SYS_BUS_DEVICE(&s->usb[i]);
++            sysbus_realize(usbdev, &error_abort);
++        }
++        sysbus_mmio_map(usbdev, 0, FSL_IMX6UL_USB02_USBn_ADDR[i]);
++        sysbus_connect_irq(usbdev, 0,
+                            qdev_get_gpio_in(gic, FSL_IMX6UL_USBn_IRQ[i]));
+     }
+ 

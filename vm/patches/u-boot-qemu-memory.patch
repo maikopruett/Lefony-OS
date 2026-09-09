@@ -1,0 +1,182 @@
+diff --git a/board/nxp/mx6ullevk/mx6ullevk.c b/board/nxp/mx6ullevk/mx6ullevk.c
+index 4f620826e9..a72889101d 100644
+--- a/board/nxp/mx6ullevk/mx6ullevk.c
++++ b/board/nxp/mx6ullevk/mx6ullevk.c
+@@ -26,7 +26,10 @@ DECLARE_GLOBAL_DATA_PTR;
+ 
+ int dram_init(void)
+ {
+-	gd->ram_size = imx_ddr_size();
++	/* QEMU exposes RAM directly but does not model the MMDC geometry
++	 * registers queried by imx_ddr_size(). Keep this emulator-only U-Boot
++	 * build aligned with run-native-vm.sh's 256 MiB machine size. */
++	gd->ram_size = SZ_256M;
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm/mach-imx/mx6/soc.c b/arch/arm/mach-imx/mx6/soc.c
+--- a/arch/arm/mach-imx/mx6/soc.c
++++ b/arch/arm/mach-imx/mx6/soc.c
+@@ -62,10 +62,9 @@ struct imx_fuse const imx_field_return_fuse = {
+ };
+ #endif
+ 
+ u32 get_nr_cpus(void)
+ {
+-	struct scu_regs *scu = (struct scu_regs *)SCU_BASE_ADDR;
+-	return readl(&scu->config) & 3;
++	return 0;
+ }
+ 
+ u32 get_cpu_rev(void)
+@@ -78,8 +77,6 @@ u32 get_cpu_rev(void)
+ 	if (type != MXC_CPU_MX6SL) {
+ 		reg = readl(&anatop->digprog);
+-		struct scu_regs *scu = (struct scu_regs *)SCU_BASE_ADDR;
+-		cfg = readl(&scu->config) & 3;
+ 		type = ((reg >> 16) & 0xff);
+ 		if (type == MXC_CPU_MX6DL) {
+ 			if (!cfg)
+ 				type = MXC_CPU_MX6SOLO;
+@@ -413,5 +410,9 @@
+ int arch_cpu_init(void)
+ {
++	/* QEMU presents a boot-ready SoC and does not map the AIPS setup
++	 * registers touched by the physical EVK initialization path. */
++	return 0;
++
+ 	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
+ 
+ 	init_aips();
+diff --git a/arch/arm/mach-imx/syscounter.c b/arch/arm/mach-imx/syscounter.c
+--- a/arch/arm/mach-imx/syscounter.c
++++ b/arch/arm/mach-imx/syscounter.c
+@@ -68,6 +68,13 @@ int timer_init(void)
+ 	freq = CFG_SC_TIMER_CLK;
+ 	asm volatile("mcr p15, 0, %0, c14, c0, 0" : : "r" (freq));
+ 
++	/* QEMU implements the architectural counter but not the i.MX system
++	 * counter control page. The CP15 frequency write above is sufficient. */
++	gd->arch.tbl = 0;
++	gd->arch.tbu = 0;
++	gd->arch.timer_rate_hz = freq;
++	return 0;
++
+ 	writel(freq, &sctr->cntfid0);
+ 
+ 	/* Enable system counter */
+diff --git a/arch/arm/dts/imx6ull-14x14-evk-u-boot.dtsi b/arch/arm/dts/imx6ull-14x14-evk-u-boot.dtsi
+--- a/arch/arm/dts/imx6ull-14x14-evk-u-boot.dtsi
++++ b/arch/arm/dts/imx6ull-14x14-evk-u-boot.dtsi
+@@ -10,3 +10,8 @@
+ &rngb {
+ 	bootph-all;
+ };
++
++&usdhc1 {
++	/delete-property/ cd-gpios;
++	non-removable;
++};
+diff --git a/drivers/mmc/fsl_esdhc_imx.c b/drivers/mmc/fsl_esdhc_imx.c
+--- a/drivers/mmc/fsl_esdhc_imx.c
++++ b/drivers/mmc/fsl_esdhc_imx.c
+@@ -1016,6 +1016,14 @@ static int esdhc_init_common(struct fsl_esdhc_priv *priv, struct mmc *mmc)
+ 	/* Set the initial clock speed */
+ 	set_sysctl(priv, mmc, 400000);
+ 
++	if (IS_ENABLED(CONFIG_FSL_USDHC))
++		/* QEMU's i.MX uSDHC adapter exposes the vendor clock controls,
++		 * but its command engine still gates commands on the standard
++		 * SDHCI clock bits. Mirror the enabled clocks for this
++		 * emulator-only U-Boot build. */
++		esdhc_setbits32(&regs->sysctl,
++				  SYSCTL_IPGEN | SYSCTL_HCKEN | SYSCTL_PEREN);
++
+ 	/* Disable the BRR and BWR bits in IRQSTAT */
+ 	esdhc_clrbits32(&regs->irqstaten, IRQSTATEN_BRR | IRQSTATEN_BWR);
+ 
+@@ -1238,7 +1246,10 @@ static int fsl_esdhc_init(struct fsl_esdhc_priv *priv,
+ 	cfg->f_min = 400000;
+ 	cfg->f_max = min(priv->sdhc_clk, (u32)200000000);
+ 
+-	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
++	/* QEMU's i.MX uSDHC model stalls when a guest submits the complete
++	 * multi-megabyte payload as one SDMA transaction. Small bounded requests
++	 * exercise the same media path and remain deterministic. */
++	cfg->b_max = 8;
+ 
+ 	esdhc_write32(&regs->dllctrl, 0);
+ 	if (priv->flags & ESDHC_FLAG_USDHC) {
+diff --git a/lib/elf.c b/lib/elf.c
+--- a/lib/elf.c
++++ b/lib/elf.c
+@@ -280,6 +280,17 @@ unsigned long load_elf_image_shdr(unsigned long addr)
+ 	return ehdr->e_entry;
+ }
+ 
++static int valid_native_load_range(ulong start, ulong end)
++{
++	if (end < start)
++		return 0;
++
++	return (start >= 0x82000000 && end <= 0x85000000) ||
++	       /* The linker reserves one MiB for the 320x240 framebuffer,
++		* including small before/after guards used by emulator diagnostics. */
++	       (start >= 0x8f000000 && end <= 0x8f100000);
++}
++
+ /*
+  * Determine if a valid ELF image exists at the given memory location.
+  * First look at the ELF header magic field, then make sure that it is
+@@ -288,6 +299,9 @@ unsigned long load_elf_image_shdr(unsigned long addr)
+ int valid_elf_image(unsigned long addr)
+ {
+ 	Elf32_Ehdr *ehdr; /* Elf header structure pointer */
++	Elf32_Phdr *phdr;
++	ulong payload_size;
++	int i;
+ 
+ 	ehdr = (Elf32_Ehdr *)addr;
+ 
+@@ -301,5 +315,41 @@ int valid_elf_image(unsigned long addr)
+ 		return 0;
+ 	}
+ 
++	payload_size = env_get_hex("filesize", 0);
++	if (ehdr->e_ident[EI_CLASS] != ELFCLASS32 ||
++	    ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
++	    ehdr->e_machine != EM_ARM ||
++	    ehdr->e_phentsize != sizeof(*phdr) || !payload_size ||
++	    ehdr->e_phoff > payload_size ||
++	    (ulong)ehdr->e_phnum >
++		(payload_size - ehdr->e_phoff) / sizeof(*phdr)) {
++		printf("## Invalid native ELF header or program-header table\n");
++		return 0;
++	}
++
++	phdr = (Elf32_Phdr *)(addr + ehdr->e_phoff);
++	for (i = 0; i < ehdr->e_phnum; ++i, ++phdr) {
++		ulong segment_end;
++
++		if (phdr->p_type != PT_LOAD)
++			continue;
++		if (phdr->p_filesz > phdr->p_memsz ||
++		    phdr->p_offset > payload_size ||
++		    phdr->p_filesz > payload_size - phdr->p_offset) {
++			printf("## Native ELF segment exceeds payload bounds\n");
++			return 0;
++		}
++		segment_end = phdr->p_paddr + phdr->p_memsz;
++		if (!valid_native_load_range(phdr->p_paddr, segment_end)) {
++			printf("## ELF load segment outside native memory map\n");
++			return 0;
++		}
++	}
++
++	if (ehdr->e_entry < 0x82000000 || ehdr->e_entry >= 0x85000000) {
++		printf("## Native ELF entry point outside executable memory\n");
++		return 0;
++	}
++
+ 	return 1;
+ }

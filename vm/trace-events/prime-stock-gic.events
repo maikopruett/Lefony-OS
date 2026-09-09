@@ -1,0 +1,7 @@
+gic_dist_write
+gic_cpu_write
+gic_enable_irq
+gic_disable_irq
+gic_acknowledge_irq
+gic_set_irq
+imx7_snvs_write

@@ -1,0 +1,19 @@
+diff --git a/ion/src/shared/events_keyboard.cpp b/ion/src/shared/events_keyboard.cpp
+--- a/ion/src/shared/events_keyboard.cpp
++++ b/ion/src/shared/events_keyboard.cpp
+@@ -30,6 +30,16 @@ constexpr int delayBetweenRepeat = 50;
+ 
+ static bool canRepeatEvent(Event e) {
++#if defined(PLATFORM_PRIME_G2)
++  /* A held Prime D-pad direction represents one navigation action. A new
++   * action requires release followed by another press; retain repeat for
++   * editing keys such as Backspace. Shifted directions are still D-pad
++   * directions and follow the same single-step policy. */
++  if (e == Events::Left || e == Events::Up || e == Events::Down ||
++      e == Events::Right || e == Events::ShiftLeft ||
++      e == Events::ShiftRight || e == Events::ShiftUp ||
++      e == Events::ShiftDown) return false;
++#endif
+   return e == Events::Left
+     || e == Events::Up
+     || e == Events::Down

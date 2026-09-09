@@ -1,0 +1,59 @@
+{
+  "provenance": {
+    "method": "scripts/capture_prime_g2_rom_usb.py --src --clocks --nand-status",
+    "transport": "macOS IOHID and USB descriptor reads",
+    "state": "physical calculator already in ROM recovery; no reset induced",
+    "nand_guard": "CCGR4 & 0xff003000 == 0xff003000; CCGR6 & 0x3c0 == 0x3c0",
+    "writes_downloads_resets": false,
+    "caution": "BCH_STATUS0 describes a prior controller operation; this capture cannot identify its NAND page or establish the cause of every historical boot failure."
+  },
+  "device": "1201000200000040a2158000010001020001",
+  "configuration": "09022200010104c005090400000103000005092110010001224c0007058103400001",
+  "hid_report": "0600ff0901a101850119012901150026ff00750895109102850219012901150026ff00758095409102850319012901150026ff00750895048102850419012901150026ff00750895408102c0",
+  "strings": {
+    "0": "04030904",
+    "1": "3a0346007200650065007300630061006c0065002000530065006d00690043006f006e0064007500630074006f007200200049006e0063002000",
+    "2": "1e0353004500200042006c0061006e006b002000360055004c004c000000",
+    "4": "200346007200650065007300630061006c006500200046006c00610073006800",
+    "5": "200346007200650065007300630061006c006500200046006c00610073006800"
+  },
+  "src_registers": {
+    "SRC_SBMR1": {"address": "0x020d8004", "value": "0x00000893"},
+    "SRC_SRSR": {"address": "0x020d8008", "value": "0x00000001"},
+    "SRC_SBMR2": {"address": "0x020d801c", "value": "0x02000001"},
+    "SRC_GPR9": {"address": "0x020d8040", "value": "0x00000000"},
+    "SRC_GPR10": {"address": "0x020d8044", "value": "0x00000000"}
+  },
+  "clock_registers": {
+    "CCM_CCSR": {"address": "0x020c400c", "value": "0x00000100"},
+    "CCM_CACRR": {"address": "0x020c4010", "value": "0x00000001"},
+    "CCM_CBCDR": {"address": "0x020c4014", "value": "0x00018900"},
+    "CCM_CBCMR": {"address": "0x020c4018", "value": "0x24a69324"},
+    "CCM_CSCMR1": {"address": "0x020c401c", "value": "0x04900000"},
+    "CCM_CSCDR1": {"address": "0x020c4024", "value": "0x06490b00"},
+    "CCM_CCGR0": {"address": "0x020c4068", "value": "0xffc00f3f"},
+    "CCM_CCGR4": {"address": "0x020c4078", "value": "0xff00f3ff"},
+    "CCM_CCGR6": {"address": "0x020c4080", "value": "0x00fc33c3"},
+    "ANATOP_PLL_ARM": {"address": "0x020c8000", "value": "0x80002042"},
+    "ANATOP_PLL_USB1": {"address": "0x020c8010", "value": "0x80003040"},
+    "ANATOP_PLL_SYS": {"address": "0x020c8030", "value": "0x80002001"},
+    "ANATOP_PFD_528": {"address": "0x020c8100", "value": "0x5058505b"}
+  },
+  "nand_registers": {
+    "CCM_CCGR4": {"address": "0x020c4078", "value": "0xff00f3ff"},
+    "CCM_CCGR6": {"address": "0x020c4080", "value": "0x00fc33c3"},
+    "BCH_CTRL": {"address": "0x01808000", "value": "0x00000000"},
+    "BCH_STATUS0": {"address": "0x01808010", "value": "0x00000004"},
+    "BCH_MODE": {"address": "0x01808020", "value": "0x00000000"},
+    "BCH_FLASH0LAYOUT0": {"address": "0x01808080", "value": "0x030a0880"},
+    "BCH_FLASH0LAYOUT1": {"address": "0x01808090", "value": "0x08170880"},
+    "BCH_VERSION": {"address": "0x01808160", "value": "0x01000000"},
+    "BCH_DEBUG1": {"address": "0x01808170", "value": "0x00000000"},
+    "GPMI_CTRL0": {"address": "0x01806000", "value": "0x03800000"},
+    "GPMI_CTRL1": {"address": "0x01806060", "value": "0x00c4000c"},
+    "GPMI_TIMING0": {"address": "0x01806070", "value": "0x00010202"},
+    "GPMI_TIMING1": {"address": "0x01806080", "value": "0x003b0000"},
+    "GPMI_TIMING2": {"address": "0x01806090", "value": "0x23023336"},
+    "GPMI_STAT": {"address": "0x018060b0", "value": "0xff000005"}
+  }
+}

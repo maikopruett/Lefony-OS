@@ -1,0 +1,17 @@
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -1072,5 +1072,8 @@
+-        if (s->prime_pwm_regs[0] & ((1u << 20) | (1u << 21))) {
+-            qemu_log_mask(LOG_UNIMP, "PWM7 sample byte/halfword swap is not modeled\n");
+-            return;
++        /* HCTR selects the other bus halfword; BCTR swaps its two bytes.
++         * Store the transformed sample, independent of later CR changes. */
++        uint16_t sample = value >> ((s->prime_pwm_regs[0] & (1u << 20)) ? 16 : 0);
++        if (s->prime_pwm_regs[0] & (1u << 21)) {
++            sample = (sample >> 8) | (sample << 8);
+         }
+         if (s->prime_pwm_fifo_count == 4) {
+@@ -1080,1 +1083,1 @@
+-            s->prime_pwm_fifo[tail] = value & 0xffff;
++            s->prime_pwm_fifo[tail] = sample;

@@ -1,0 +1,33 @@
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -51,10 +51,13 @@
+ 
++static int imx_gpt_post_load(void *opaque, int version_id);
++
+ static const VMStateDescription vmstate_imx_timer_gpt = {
+     .name = TYPE_IMX_GPT,
+     .version_id = 3,
+     .minimum_version_id = 3,
++    .post_load = imx_gpt_post_load,
+     .fields = (const VMStateField[]) {
+@@ -173,6 +176,15 @@
+ }
+ 
++static int imx_gpt_post_load(void *opaque, int version_id)
++{
++    IMXGPTState *s = opaque;
++
++    /* The IRQ wire is derived from registers, not serialized separately. */
++    imx_gpt_update_int(s);
++    return 0;
++}
++
+ static uint32_t imx_gpt_update_count(IMXGPTState *s)
+@@ -367,6 +379,8 @@
+     ptimer_transaction_commit(s->timer);
++    /* Clearing SR/IR must also deassert a previously pending interrupt. */
++    imx_gpt_update_int(s);
+ }
+ 
+ static void imx_gpt_soft_reset(DeviceState *dev)

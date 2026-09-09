@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "captured_at_utc": "2026-09-08T05:38:48Z",
+  "source": "Connected physical HP Prime G2, user-confirmed ROM recovery; native macOS IOHID SDP READ_REGISTER",
+  "physical_access": true,
+  "register_writes": false,
+  "reset_performed": false,
+  "firmware_downloaded": false,
+  "administrator_required": false,
+  "repeat_reads_identical": true,
+  "battery_present": false,
+  "recovery_entry_method": "User reports it was already in recovery and they performed no new action; preceding transition is unknown",
+  "src_registers": {
+    "SRC_SCR": {"address": "0x020d8000", "value": "0xa0480539"},
+    "SRC_SBMR1": {"address": "0x020d8004", "value": "0x00000893"},
+    "SRC_SRSR": {"address": "0x020d8008", "value": "0x00000001"},
+    "SRC_SBMR2": {"address": "0x020d801c", "value": "0x02000001"},
+    "SRC_GPR9": {"address": "0x020d8040", "value": "0x00000000"},
+    "SRC_GPR10": {"address": "0x020d8044", "value": "0x00000000"}
+  },
+  "clock_registers": {
+    "CCM_CCDR": {"address": "0x020c4004", "value": "0x00020000"},
+    "CCM_CCSR": {"address": "0x020c400c", "value": "0x00000100"},
+    "CCM_CACRR": {"address": "0x020c4010", "value": "0x00000001"},
+    "CCM_CBCDR": {"address": "0x020c4014", "value": "0x00018900"},
+    "CCM_CBCMR": {"address": "0x020c4018", "value": "0x24a69324"},
+    "CCM_CSCMR1": {"address": "0x020c401c", "value": "0x04900000"},
+    "CCM_CSCDR1": {"address": "0x020c4024", "value": "0x06490b00"},
+    "CCM_CCGR0": {"address": "0x020c4068", "value": "0xffc00f3f"},
+    "CCM_CCGR4": {"address": "0x020c4078", "value": "0xff00f3ff"},
+    "CCM_CCGR6": {"address": "0x020c4080", "value": "0x00fc33c3"},
+    "ANATOP_PLL_ARM": {"address": "0x020c8000", "value": "0x80002042"},
+    "ANATOP_PLL_USB1": {"address": "0x020c8010", "value": "0x80003040"},
+    "ANATOP_PLL_SYS": {"address": "0x020c8030", "value": "0x80002001"},
+    "ANATOP_PFD_528": {"address": "0x020c8100", "value": "0x5058505b"}
+  },
+  "interpretation": "CCDR differs from r69 emulator zero baseline. GPR9/GPR10 show no retained software recovery override. SRSR records POR. This post-ROM snapshot does not establish the cause of recovery, true silicon reset defaults, DDR retention, or writable/reserved SRC bits."
+}

@@ -1,0 +1,25 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      bc \
+      binutils-arm-none-eabi \
+      bison \
+      build-essential \
+      ca-certificates \
+      device-tree-compiler \
+      dosfstools \
+      fdisk \
+      flex \
+      gcc-arm-none-eabi \
+      libssl-dev \
+      mtools \
+      python3 \
+      python3-setuptools \
+      swig \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      libgnutls28-dev \
+ && rm -rf /var/lib/apt/lists/*

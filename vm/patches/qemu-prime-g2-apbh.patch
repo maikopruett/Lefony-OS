@@ -1,0 +1,30 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -432,10 +432,13 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+         sysbus_realize_and_unref(nsbd, &error_abort);
+         sysbus_mmio_map(nsbd, 0, FSL_IMX6UL_GPMI_ADDR);
+         sysbus_mmio_map(nsbd, 1, FSL_IMX6UL_BCH_ADDR);
++        sysbus_mmio_map(nsbd, 2, FSL_IMX6UL_APBH_DMA_ADDR);
+         sysbus_connect_irq(nsbd, 0,
+                            qdev_get_gpio_in(gic, FSL_IMX6UL_RAWNAND1_IRQ));
+         sysbus_connect_irq(nsbd, 1,
+                            qdev_get_gpio_in(gic, FSL_IMX6UL_RAWNAND2_IRQ));
++        sysbus_connect_irq(nsbd, 2,
++                           qdev_get_gpio_in(gic, FSL_IMX6UL_APBH_DMA_IRQ));
+     }
+ 
+     /*
+@@ -692,12 +695,6 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+         create_unimplemented_device(name, FSL_IMX6UL_CANn_ADDR[i],
+                                     FSL_IMX6UL_CANn_SIZE);
+     }
+-
+-    /*
+-     * APHB_DMA
+-     */
+-    create_unimplemented_device("aphb_dma", FSL_IMX6UL_APBH_DMA_ADDR,
+-                                FSL_IMX6UL_APBH_DMA_SIZE);
+ 
+     /*
+      * ADCs

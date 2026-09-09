@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "geometry": {
+    "total_bytes": 536870912,
+    "page_bytes": 2048,
+    "oob_bytes": 64,
+    "erase_block_bytes": 131072,
+    "ecc_strength_bits_per_512": 8
+  },
+  "captured_physical_layout": [
+    {"name": "boot", "offset": 0, "size": 4194304, "policy": "preserve"},
+    {"name": "kernel", "offset": 4194304, "size": 8388608, "policy": "host-backup-required"},
+    {"name": "dtb", "offset": 12582912, "size": 1048576, "policy": "preserve"},
+    {"name": "misc", "offset": 13631488, "size": 1048576, "policy": "preserve"},
+    {"name": "rootfs", "offset": 14680064, "size": 522190848, "policy": "preserve"}
+  ],
+  "emulator_ab_layout": [
+    {"name": "boot", "offset": 0, "size": 4194304},
+    {"name": "slot_a", "offset": 4194304, "size": 8388608},
+    {"name": "dtb", "offset": 12582912, "size": 1048576},
+    {"name": "metadata_primary", "offset": 13631488, "size": 131072},
+    {"name": "metadata_redundant", "offset": 13762560, "size": 131072},
+    {"name": "rootfs", "offset": 14680064, "size": 505413632},
+    {"name": "slot_b", "offset": 520093696, "size": 8388608},
+    {"name": "rescue", "offset": 528482304, "size": 8388608}
+  ],
+  "physical_ab_layout": [
+    {"name": "boot", "offset": 0, "size": 4194304, "policy": "redundant-rom-bootstreams"},
+    {"name": "slot_a", "offset": 4194304, "size": 8388608, "policy": "active-or-inactive"},
+    {"name": "dtb", "offset": 12582912, "size": 1048576, "policy": "preserve"},
+    {"name": "metadata_primary", "offset": 13631488, "size": 131072, "policy": "redundant-crc32"},
+    {"name": "metadata_redundant", "offset": 13762560, "size": 131072, "policy": "redundant-crc32"},
+    {"name": "retired_rootfs", "offset": 14680064, "size": 505413632, "policy": "preserve-outside-reserved-tail"},
+    {"name": "slot_b", "offset": 520093696, "size": 8388608, "policy": "active-or-inactive"},
+    {"name": "rescue", "offset": 528482304, "size": 8126464, "policy": "reserved-read-only"},
+    {"name": "nand_bbt", "offset": 536608768, "size": 262144, "policy": "preserve-linux-flash-bbt"}
+  ],
+  "implementation_status": "ready-for-physical-qualification",
+  "physical_ab_migration_allowed": false,
+  "physical_ab_blocker": "One-time migration retires the final 16 MiB of the captured stock UBI rootfs. No physical calculator was connected to qualify that migration, USB enumeration, bad-block handling, cold boot, or injected-power-loss rollback; unprovisioned NAND therefore remains fail-closed."
+}

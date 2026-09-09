@@ -1,0 +1,16 @@
+diff --git a/ion/src/shared/internal_storage.cpp b/ion/src/shared/internal_storage.cpp
+--- a/ion/src/shared/internal_storage.cpp
++++ b/ion/src/shared/internal_storage.cpp
+@@ -374,8 +374,10 @@ InternalStorage::Record::ErrorStatus InternalStorage::setFullNameOfRecord(const
+     }
+     overrideSizeAtPosition(p, newRecordSize);
+     overrideFullNameAtPosition(p+sizeof(record_size_t), fullName);
+-    notifyChangeToDelegate(record);
+-    m_lastRecordRetrieved = record;
++    // The name is the record identity; do not leave the old CRC cached.
++    Record renamedRecord = Record(fullNameOfRecordStarting(p));
++    notifyChangeToDelegate(renamedRecord);
++    m_lastRecordRetrieved = renamedRecord;
+     m_lastRecordRetrievedPointer = p;
+     return Record::ErrorStatus::None;
+   }

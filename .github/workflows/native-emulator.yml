@@ -1,0 +1,65 @@
+name: Lefony source and native firmware
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      emulator:
+        description: Build custom QEMU and exercise native touch
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lefony-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - run: make test check-public
+
+  firmware:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install cross compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+      - name: Compile physical and emulator targets sequentially
+        run: make firmware firmware-vm
+
+  emulator:
+    if: github.event_name == 'workflow_dispatch' && inputs.emulator
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ninja-build pkg-config libglib2.0-dev libpixman-1-dev libsdl2-dev gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+          python -m pip install -r requirements-dev.txt
+      - run: make emulator firmware-vm
+      - name: Exercise native touch without private firmware
+        run: |
+          python vm/test-prime-coordinate-touch.py --elf dist/lefony-os-prime-g2-vm-native.elf --functions
+          python vm/test-prime-coordinate-touch.py --elf dist/lefony-os-prime-g2-vm-native.elf --calculation-history

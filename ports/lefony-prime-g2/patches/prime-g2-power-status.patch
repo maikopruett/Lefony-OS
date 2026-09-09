@@ -1,0 +1,79 @@
+diff --git a/apps/apps_window.cpp b/apps/apps_window.cpp
+--- a/apps/apps_window.cpp
++++ b/apps/apps_window.cpp
+@@ -6,6 +6,13 @@ extern "C" {
+ }
+ #include <ion/rtc.h>
+ 
++extern "C" bool prime_g2_external_power_present() __attribute__((weak));
++
++static bool externalPowerPresent() {
++  return prime_g2_external_power_present ? prime_g2_external_power_present() :
++    Ion::USB::isPlugged();
++}
++
+ AppsWindow::AppsWindow() :
+   Window(),
+   m_titleBarView(),
+@@ -32,7 +39,7 @@ bool AppsWindow::updateIsChargingState() {
+ }
+ 
+ bool AppsWindow::updatePluggedState() {
+-  return m_titleBarView.setIsPlugged(Ion::USB::isPlugged());
++  return m_titleBarView.setIsPlugged(externalPowerPresent());
+ }
+ 
+ void AppsWindow::refreshPreferences() {
+diff --git a/apps/battery_timer.cpp b/apps/battery_timer.cpp
+--- a/apps/battery_timer.cpp
++++ b/apps/battery_timer.cpp
+@@ -2,6 +2,13 @@
+ #include "apps_container.h"
+ #include "prime_g2_boot_progress.h"
+ 
++extern "C" bool prime_g2_external_power_present() __attribute__((weak));
++
++static bool externalPowerPresent() {
++  return prime_g2_external_power_present ? prime_g2_external_power_present() :
++    Ion::USB::isPlugged();
++}
++
+ BatteryTimer::BatteryTimer() :
+   Timer(1)
+ {
+@@ -11,7 +18,8 @@ BatteryTimer::BatteryTimer() :
+ bool BatteryTimer::fire() {
+   AppsContainer * container = AppsContainer::sharedAppsContainer();
+   bool needRedrawing = container->updateBatteryState();
+-  if (Ion::Battery::level() == Ion::Battery::Charge::EMPTY && !Ion::USB::isPlugged()) {
++  if (Ion::Battery::level() == Ion::Battery::Charge::EMPTY &&
++      !externalPowerPresent()) {
+     container->shutdownDueToLowBattery();
+   }
+   return needRedrawing;
+diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
+--- a/apps/apps_container.cpp
++++ b/apps/apps_container.cpp
+@@ -16,6 +16,13 @@ extern "C" {
+ using namespace Poincare;
+ using namespace Shared;
+ 
++extern "C" bool prime_g2_external_power_present() __attribute__((weak));
++
++static bool externalPowerPresent() {
++  return prime_g2_external_power_present ? prime_g2_external_power_present() :
++    Ion::USB::isPlugged();
++}
++
+ // We initialize g_appsContainerStorage by hand to be able to retrieve its
+ // address inside UserlandHeader
+ alignas(AppsContainerStorage) uint8_t g_appsContainerStorageRaw[sizeof(AppsContainerStorage)];
+@@ -467,7 +474,8 @@ void AppsContainer::shutdownDueToLowBattery() {
+     return;
+   }
+-  while (Ion::Battery::level() == Ion::Battery::Charge::EMPTY && !Ion::USB::isPlugged()) {
++  while (Ion::Battery::level() == Ion::Battery::Charge::EMPTY &&
++         !externalPowerPresent()) {
+     Ion::Backlight::setBrightness(0);
+     if (!GlobalPreferences::sharedGlobalPreferences()->isInExamMode()) {
+       /* Unless the LED is lit up for the exam mode, switch off the LED. IF the

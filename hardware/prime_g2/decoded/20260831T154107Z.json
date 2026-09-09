@@ -1,0 +1,670 @@
+{
+  "capture": "20260831T154107Z",
+  "derived": {
+    "backlight_duty_percent": 50.195,
+    "physical_height": 240,
+    "physical_width": 320,
+    "pixel_clock_hz": 18000000.0,
+    "pixel_clock_source": "observed fbset mode",
+    "refresh_hz": 60.23128814648249,
+    "serial_rgb_cycles_per_pixel": 3
+  },
+  "records": [
+    {
+      "address": "0x020c4000",
+      "decoded": {},
+      "name": "CCM_CCR",
+      "source": "registers-ccm.txt",
+      "value": "0x0401107f",
+      "width": 32
+    },
+    {
+      "address": "0x020c4014",
+      "decoded": {},
+      "name": "CCM_CBCDR",
+      "source": "registers-ccm.txt",
+      "value": "0x00018d00",
+      "width": 32
+    },
+    {
+      "address": "0x020c4018",
+      "decoded": {
+        "lcdif_pre_clk_sel": 4,
+        "periph2_clk2_sel": 2
+      },
+      "name": "CCM_CBCMR",
+      "source": "registers-ccm.txt",
+      "value": "0x26228324",
+      "width": 32
+    },
+    {
+      "address": "0x020c401c",
+      "decoded": {},
+      "name": "CCM_CSCMR1",
+      "source": "registers-ccm.txt",
+      "value": "0x04900040",
+      "width": 32
+    },
+    {
+      "address": "0x020c4038",
+      "decoded": {
+        "lcdif_podf": 1,
+        "lcdif_pre_clk_sel": 5,
+        "lcdif_pred": 6
+      },
+      "name": "CCM_CSCDR2",
+      "source": "registers-ccm.txt",
+      "value": "0x0002d150",
+      "width": 32
+    },
+    {
+      "address": "0x020c4068",
+      "decoded": {
+        "gate_0": 3,
+        "gate_1": 3,
+        "gate_10": 0,
+        "gate_11": 3,
+        "gate_12": 0,
+        "gate_13": 0,
+        "gate_14": 0,
+        "gate_15": 3,
+        "gate_2": 0,
+        "gate_3": 0,
+        "gate_4": 3,
+        "gate_5": 3,
+        "gate_6": 0,
+        "gate_7": 0,
+        "gate_8": 0,
+        "gate_9": 0
+      },
+      "name": "CCM_CCGR0",
+      "source": "registers-ccm.txt",
+      "value": "0xc0c00f0f",
+      "width": 32
+    },
+    {
+      "address": "0x020c406c",
+      "decoded": {
+        "gate_0": 0,
+        "gate_1": 0,
+        "gate_10": 3,
+        "gate_11": 0,
+        "gate_12": 0,
+        "gate_13": 3,
+        "gate_14": 3,
+        "gate_15": 3,
+        "gate_2": 0,
+        "gate_3": 0,
+        "gate_4": 0,
+        "gate_5": 0,
+        "gate_6": 0,
+        "gate_7": 0,
+        "gate_8": 0,
+        "gate_9": 3
+      },
+      "name": "CCM_CCGR1",
+      "source": "registers-ccm.txt",
+      "value": "0xfc3c0000",
+      "width": 32
+    },
+    {
+      "address": "0x020c4070",
+      "decoded": {
+        "gate_0": 0,
+        "gate_1": 0,
+        "gate_10": 3,
+        "gate_11": 3,
+        "gate_12": 3,
+        "gate_13": 3,
+        "gate_14": 3,
+        "gate_15": 0,
+        "gate_2": 3,
+        "gate_3": 0,
+        "gate_4": 3,
+        "gate_5": 0,
+        "gate_6": 0,
+        "gate_7": 0,
+        "gate_8": 3,
+        "gate_9": 3
+      },
+      "name": "CCM_CCGR2",
+      "source": "registers-ccm.txt",
+      "value": "0x3fff0330",
+      "width": 32
+    },
+    {
+      "address": "0x020c4074",
+      "decoded": {
+        "gate_0": 3,
+        "gate_1": 0,
+        "gate_10": 3,
+        "gate_11": 3,
+        "gate_12": 3,
+        "gate_13": 3,
+        "gate_14": 3,
+        "gate_15": 3,
+        "gate_2": 0,
+        "gate_3": 0,
+        "gate_4": 3,
+        "gate_5": 3,
+        "gate_6": 3,
+        "gate_7": 0,
+        "gate_8": 3,
+        "gate_9": 3
+      },
+      "name": "CCM_CCGR3",
+      "source": "registers-ccm.txt",
+      "value": "0xffff3f03",
+      "width": 32
+    },
+    {
+      "address": "0x020c4078",
+      "decoded": {
+        "gate_0": 3,
+        "gate_1": 3,
+        "gate_10": 0,
+        "gate_11": 0,
+        "gate_12": 0,
+        "gate_13": 0,
+        "gate_14": 0,
+        "gate_15": 0,
+        "gate_2": 3,
+        "gate_3": 3,
+        "gate_4": 3,
+        "gate_5": 3,
+        "gate_6": 0,
+        "gate_7": 3,
+        "gate_8": 0,
+        "gate_9": 0
+      },
+      "name": "CCM_CCGR4",
+      "source": "registers-ccm.txt",
+      "value": "0x0000cfff",
+      "width": 32
+    },
+    {
+      "address": "0x020c407c",
+      "decoded": {
+        "gate_0": 3,
+        "gate_1": 3,
+        "gate_10": 3,
+        "gate_11": 0,
+        "gate_12": 3,
+        "gate_13": 0,
+        "gate_14": 0,
+        "gate_15": 0,
+        "gate_2": 3,
+        "gate_3": 0,
+        "gate_4": 0,
+        "gate_5": 0,
+        "gate_6": 0,
+        "gate_7": 0,
+        "gate_8": 3,
+        "gate_9": 3
+      },
+      "name": "CCM_CCGR5",
+      "source": "registers-ccm.txt",
+      "value": "0x033f003f",
+      "width": 32
+    },
+    {
+      "address": "0x020c4080",
+      "decoded": {
+        "gate_0": 3,
+        "gate_1": 0,
+        "gate_10": 0,
+        "gate_11": 3,
+        "gate_12": 0,
+        "gate_13": 0,
+        "gate_14": 0,
+        "gate_15": 3,
+        "gate_2": 0,
+        "gate_3": 3,
+        "gate_4": 3,
+        "gate_5": 0,
+        "gate_6": 3,
+        "gate_7": 0,
+        "gate_8": 0,
+        "gate_9": 3
+      },
+      "name": "CCM_CCGR6",
+      "source": "registers-ccm.txt",
+      "value": "0xc0cc33c3",
+      "width": 32
+    },
+    {
+      "address": "0x0209c000",
+      "decoded": {
+        "high_output_latches": [
+          0,
+          1,
+          2,
+          7,
+          8,
+          9,
+          19,
+          20,
+          24,
+          28,
+          29,
+          30
+        ]
+      },
+      "name": "GPIO1_DR",
+      "source": "registers-gpio.txt",
+      "value": "0x71180387",
+      "width": 32
+    },
+    {
+      "address": "0x0209c004",
+      "decoded": {
+        "output_bits": [
+          2
+        ]
+      },
+      "name": "GPIO1_GDIR",
+      "source": "registers-gpio.txt",
+      "value": "0x00000004",
+      "width": 32
+    },
+    {
+      "address": "0x0209c008",
+      "decoded": {
+        "high_input_bits": [
+          0,
+          1,
+          7,
+          8,
+          9,
+          19,
+          20,
+          24,
+          28,
+          29,
+          30
+        ]
+      },
+      "name": "GPIO1_PSR",
+      "source": "registers-gpio.txt",
+      "value": "0x71180383",
+      "width": 32
+    },
+    {
+      "address": "0x020a0000",
+      "decoded": {
+        "high_output_latches": [
+          21
+        ]
+      },
+      "name": "GPIO2_DR",
+      "source": "registers-gpio.txt",
+      "value": "0x00200000",
+      "width": 32
+    },
+    {
+      "address": "0x020a0004",
+      "decoded": {
+        "output_bits": [
+          21
+        ]
+      },
+      "name": "GPIO2_GDIR",
+      "source": "registers-gpio.txt",
+      "value": "0x00200000",
+      "width": 32
+    },
+    {
+      "address": "0x020a0008",
+      "decoded": {
+        "high_input_bits": []
+      },
+      "name": "GPIO2_PSR",
+      "source": "registers-gpio.txt",
+      "value": "0x00000000",
+      "width": 32
+    },
+    {
+      "address": "0x020a4000",
+      "decoded": {
+        "high_output_latches": [
+          4,
+          16
+        ]
+      },
+      "name": "GPIO3_DR",
+      "source": "registers-gpio.txt",
+      "value": "0x00010010",
+      "width": 32
+    },
+    {
+      "address": "0x020a4004",
+      "decoded": {
+        "output_bits": [
+          4
+        ]
+      },
+      "name": "GPIO3_GDIR",
+      "source": "registers-gpio.txt",
+      "value": "0x00000010",
+      "width": 32
+    },
+    {
+      "address": "0x020a4008",
+      "decoded": {
+        "high_input_bits": [
+          16
+        ]
+      },
+      "name": "GPIO3_PSR",
+      "source": "registers-gpio.txt",
+      "value": "0x00010000",
+      "width": 32
+    },
+    {
+      "address": "0x020a8000",
+      "decoded": {
+        "high_output_latches": [
+          0,
+          21,
+          22,
+          23,
+          24,
+          26
+        ]
+      },
+      "name": "GPIO4_DR",
+      "source": "registers-gpio.txt",
+      "value": "0x05e00001",
+      "width": 32
+    },
+    {
+      "address": "0x020a8004",
+      "decoded": {
+        "output_bits": [
+          21,
+          22,
+          23
+        ]
+      },
+      "name": "GPIO4_GDIR",
+      "source": "registers-gpio.txt",
+      "value": "0x00e00000",
+      "width": 32
+    },
+    {
+      "address": "0x020a8008",
+      "decoded": {
+        "high_input_bits": [
+          0,
+          24,
+          26
+        ]
+      },
+      "name": "GPIO4_PSR",
+      "source": "registers-gpio.txt",
+      "value": "0x05000001",
+      "width": 32
+    },
+    {
+      "address": "0x021c8000",
+      "decoded": {
+        "bypass_count": true,
+        "clkgate": false,
+        "data_format_24_bit": false,
+        "dotclk_mode": true,
+        "lcd_databus_width": 1,
+        "run": true,
+        "soft_reset": false,
+        "word_length": 1
+      },
+      "name": "LCDIF_CTRL",
+      "source": "registers-lcdif.txt",
+      "value": "0x000a4521",
+      "width": 32
+    },
+    {
+      "address": "0x021c8010",
+      "decoded": {
+        "byte_packing": 7,
+        "fifo_clear": false,
+        "frame_done_irq": true,
+        "frame_done_irq_enable": false,
+        "recover_on_underflow": true,
+        "reset": false,
+        "underflow_irq": false,
+        "underflow_irq_enable": false
+      },
+      "name": "LCDIF_CTRL1",
+      "source": "registers-lcdif.txt",
+      "value": "0x03070300",
+      "width": 32
+    },
+    {
+      "address": "0x021c8020",
+      "decoded": {
+        "burst_len_8": false,
+        "even_line_pattern": 0,
+        "odd_line_pattern": 0,
+        "outstanding_requests": 5
+      },
+      "name": "LCDIF_CTRL2",
+      "source": "registers-lcdif.txt",
+      "value": "0x00a00000",
+      "width": 32
+    },
+    {
+      "address": "0x021c8030",
+      "decoded": {
+        "horizontal_transfer_count": 960,
+        "vertical_transfer_count": 240
+      },
+      "name": "LCDIF_TRANSFER_COUNT",
+      "source": "registers-lcdif.txt",
+      "value": "0x00f003c0",
+      "width": 32
+    },
+    {
+      "address": "0x021c8040",
+      "decoded": {},
+      "name": "LCDIF_CUR_BUF",
+      "source": "registers-lcdif.txt",
+      "value": "0x88000000",
+      "width": 32
+    },
+    {
+      "address": "0x021c8050",
+      "decoded": {},
+      "name": "LCDIF_NEXT_BUF",
+      "source": "registers-lcdif.txt",
+      "value": "0x88000000",
+      "width": 32
+    },
+    {
+      "address": "0x021c8070",
+      "decoded": {
+        "dotclk_active_falling": false,
+        "enable_active_high": true,
+        "enable_present": true,
+        "hsync_active_high": false,
+        "vsync_active_high": false,
+        "vsync_period_unit": true,
+        "vsync_pulse_width": 1,
+        "vsync_pulse_width_unit": true
+      },
+      "name": "LCDIF_VDCTRL0",
+      "source": "registers-lcdif.txt",
+      "value": "0x11300001",
+      "width": 32
+    },
+    {
+      "address": "0x021c8080",
+      "decoded": {
+        "vertical_period": 264
+      },
+      "name": "LCDIF_VDCTRL1",
+      "source": "registers-lcdif.txt",
+      "value": "0x00000108",
+      "width": 32
+    },
+    {
+      "address": "0x021c8090",
+      "decoded": {
+        "horizontal_period": 1132,
+        "hsync_pulse_width": 1
+      },
+      "name": "LCDIF_VDCTRL2",
+      "source": "registers-lcdif.txt",
+      "value": "0x0004046c",
+      "width": 32
+    },
+    {
+      "address": "0x021c80a0",
+      "decoded": {
+        "horizontal_wait_count": 72,
+        "vertical_wait_count": 18
+      },
+      "name": "LCDIF_VDCTRL3",
+      "source": "registers-lcdif.txt",
+      "value": "0x00480012",
+      "width": 32
+    },
+    {
+      "address": "0x021c80b0",
+      "decoded": {
+        "dotclk_delay": 0,
+        "dotclk_horizontal_valid_data_count": 960,
+        "sync_signals_on": true
+      },
+      "name": "LCDIF_VDCTRL4",
+      "source": "registers-lcdif.txt",
+      "value": "0x000403c0",
+      "width": 32
+    },
+    {
+      "address": "0x021c81d0",
+      "decoded": {},
+      "name": "LCDIF_DEBUG0",
+      "source": "registers-lcdif.txt",
+      "value": "0x2f04000f",
+      "width": 32
+    },
+    {
+      "address": "0x020f8000",
+      "decoded": {
+        "clock_source": 2,
+        "enable": true,
+        "output_polarity_inverted": false,
+        "prescaler": 1,
+        "repeat": 0,
+        "software_reset": false
+      },
+      "name": "PWM7_CR",
+      "source": "registers-pwm7.txt",
+      "value": "0x01c20011",
+      "width": 32
+    },
+    {
+      "address": "0x020f8004",
+      "decoded": {
+        "compare": true,
+        "fifo_available": 0,
+        "fifo_empty": true,
+        "rollover": true
+      },
+      "name": "PWM7_SR",
+      "source": "registers-pwm7.txt",
+      "value": "0x00000038",
+      "width": 32
+    },
+    {
+      "address": "0x020f8008",
+      "decoded": {},
+      "name": "PWM7_IR",
+      "source": "registers-pwm7.txt",
+      "value": "0x00000000",
+      "width": 32
+    },
+    {
+      "address": "0x020f800c",
+      "decoded": {},
+      "name": "PWM7_SAR",
+      "source": "registers-pwm7.txt",
+      "value": "0x000075a5",
+      "width": 32
+    },
+    {
+      "address": "0x020f8010",
+      "decoded": {},
+      "name": "PWM7_PR",
+      "source": "registers-pwm7.txt",
+      "value": "0x0000ea5e",
+      "width": 32
+    },
+    {
+      "address": "0x020f8014",
+      "decoded": {},
+      "name": "PWM7_CNR",
+      "source": "registers-pwm7.txt",
+      "value": "0x0000daf8",
+      "width": 32
+    },
+    {
+      "address": "0x020d8000",
+      "decoded": {},
+      "name": "SRC_SCR",
+      "source": "registers-src.txt",
+      "value": "0xa0480538",
+      "width": 32
+    },
+    {
+      "address": "0x020d8004",
+      "decoded": {},
+      "name": "SRC_SBMR1",
+      "source": "registers-src.txt",
+      "value": "0x00000893",
+      "width": 32
+    },
+    {
+      "address": "0x020d8008",
+      "decoded": {
+        "csu": false,
+        "ipg": false,
+        "ipp_user": false,
+        "jtag": false,
+        "jtag_sw": false,
+        "tempsense": false,
+        "wdog1": false,
+        "wdog3": false
+      },
+      "name": "SRC_SRSR",
+      "source": "registers-src.txt",
+      "value": "0x00000000",
+      "width": 32
+    },
+    {
+      "address": "0x020d801c",
+      "decoded": {},
+      "name": "SRC_SBMR2",
+      "source": "registers-src.txt",
+      "value": "0x02000001",
+      "width": 32
+    },
+    {
+      "address": "0x020d8040",
+      "decoded": {},
+      "name": "SRC_GPR9",
+      "source": "registers-src.txt",
+      "value": "0x00000000",
+      "width": 32
+    },
+    {
+      "address": "0x020d8044",
+      "decoded": {},
+      "name": "SRC_GPR10",
+      "source": "registers-src.txt",
+      "value": "0x00000000",
+      "width": 32
+    }
+  ],
+  "schema": "mahalo.prime-g2.registers.v1"
+}

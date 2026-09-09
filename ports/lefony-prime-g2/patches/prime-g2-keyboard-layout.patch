@@ -1,0 +1,343 @@
+--- a/ion/include/ion/keyboard/layout_B2/layout_keyboard.h
++++ b/ion/include/ion/keyboard/layout_B2/layout_keyboard.h
+@@ -14,6 +14,11 @@
+   Four=36, Five=37,  Six=38,    Multiplication=39, Division=40,        PrimeAlphaSpace=41,
+   One=42,  Two=43,   Three=44,  Plus=45,           Minus=46,           // H6=47,
+   Zero=48, Dot=49,   EE=50,     Ans=51,            EXE=52,             // I6=53,
++  // The Prime has six additional application keys. Reuse B2 positions that
++  // have no physical Prime key; their original functions remain available
++  // through the Prime's printed Shift legends.
++  PrimeSymb=Exp, PrimePlot=Imaginary, PrimeNum=Pi,
++  PrimeHelp=Sqrt, PrimeView=RightParenthesis, PrimeMenu=Ans,
+   None = 54
+ };
+ 
+--- a/ion/include/ion/events.h
++++ b/ion/include/ion/events.h
+@@ -103,15 +103,28 @@
+-constexpr Event Exp = Event::PlainKey(Keyboard::Key::Exp);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Exp = Event::ShiftKey(Keyboard::Key::Ln);
++#else
++constexpr Event Exp = Event::PlainKey(Keyboard::Key::Exp);
++#endif
+ constexpr Event Ln = Event::PlainKey(Keyboard::Key::Ln);
+ constexpr Event Log = Event::PlainKey(Keyboard::Key::Log);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Imaginary = Event::ShiftKey(Keyboard::Key::Two);
++#else
+ constexpr Event Imaginary = Event::PlainKey(Keyboard::Key::Imaginary);
++#endif
+ constexpr Event Comma = Event::PlainKey(Keyboard::Key::Comma);
+ constexpr Event Power = Event::PlainKey(Keyboard::Key::Power);
+ 
+ constexpr Event Sine = Event::PlainKey(Keyboard::Key::Sine);
+ constexpr Event Cosine = Event::PlainKey(Keyboard::Key::Cosine);
+ constexpr Event Tangent = Event::PlainKey(Keyboard::Key::Tangent);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Pi = Event::ShiftKey(Keyboard::Key::Three);
++constexpr Event Sqrt = Event::ShiftKey(Keyboard::Key::Square);
++#else
+ constexpr Event Pi = Event::PlainKey(Keyboard::Key::Pi);
+ constexpr Event Sqrt = Event::PlainKey(Keyboard::Key::Sqrt);
++#endif
+ constexpr Event Square = Event::PlainKey(Keyboard::Key::Square);
+ 
+ constexpr Event Seven = Event::PlainKey(Keyboard::Key::Seven);
+@@ -135,7 +144,11 @@
+ constexpr Event Zero = Event::PlainKey(Keyboard::Key::Zero);
+ constexpr Event Dot = Event::PlainKey(Keyboard::Key::Dot);
+ constexpr Event EE = Event::PlainKey(Keyboard::Key::EE);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Ans = Event::ShiftKey(Keyboard::Key::Plus);
++#else
+ constexpr Event Ans = Event::PlainKey(Keyboard::Key::Ans);
++#endif
+ constexpr Event EXE = Event::PlainKey(Keyboard::Key::EXE);
+ 
+ // Shift
+@@ -150,22 +163,57 @@
+ constexpr Event ShiftBack  = Event::ShiftKey(Keyboard::Key::Back);
+ 
+ constexpr Event AlphaLock = Event::ShiftKey(Keyboard::Key::Alpha);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Cut = Event::ShiftKey(Keyboard::Key::EXE); // No Prime Cut legend
++constexpr Event Copy = Event::ShiftKey(Keyboard::Key::PrimeView);
++constexpr Event Paste = Event::ShiftKey(Keyboard::Key::PrimeMenu);
++constexpr Event Clear = Event::ShiftKey(Keyboard::Key::Back);
++constexpr Event PrimeDelete = Event::ShiftKey(Keyboard::Key::Backspace);
++constexpr Event PrimeChars = Event::ShiftKey(Keyboard::Key::Var);
++constexpr Event PrimeMemory = Event::ShiftKey(Keyboard::Key::Toolbox);
++constexpr Event PrimeEval = Event::ShiftKey(Keyboard::Key::Comma);
++constexpr Event PrimeList = Event::ShiftKey(Keyboard::Key::Seven);
++constexpr Event PrimeMatrix = Event::ShiftKey(Keyboard::Key::Four);
++constexpr Event PrimeProgram = Event::ShiftKey(Keyboard::Key::One);
++constexpr Event PrimeBase = Event::ShiftKey(Keyboard::Key::Minus);
++constexpr Event PrimeNotes = Event::ShiftKey(Keyboard::Key::Zero);
++constexpr Event PrimeSymb = Event::PlainKey(Keyboard::Key::PrimeSymb);
++constexpr Event PrimePlot = Event::PlainKey(Keyboard::Key::PrimePlot);
++constexpr Event PrimeNum = Event::PlainKey(Keyboard::Key::PrimeNum);
++constexpr Event PrimeHelp = Event::PlainKey(Keyboard::Key::PrimeHelp);
++constexpr Event PrimeView = Event::PlainKey(Keyboard::Key::PrimeView);
++constexpr Event PrimeMenu = Event::PlainKey(Keyboard::Key::PrimeMenu);
++constexpr Event PrimeSymbSetup = Event::ShiftKey(Keyboard::Key::PrimeSymb);
++constexpr Event PrimePlotSetup = Event::ShiftKey(Keyboard::Key::PrimePlot);
++constexpr Event PrimeNumSetup = Event::ShiftKey(Keyboard::Key::PrimeNum);
++constexpr Event PrimeInfo = Event::ShiftKey(Keyboard::Key::Apps);
++constexpr Event PrimeCASSetup = Event::ShiftKey(Keyboard::Key::CAS);
++#else
+ constexpr Event Cut = Event::ShiftKey(Keyboard::Key::XNT);
+ constexpr Event Copy = Event::ShiftKey(Keyboard::Key::Var);
+ constexpr Event Paste = Event::ShiftKey(Keyboard::Key::Toolbox);
+ constexpr Event Clear = Event::ShiftKey(Keyboard::Key::Backspace);
++#endif
+ 
+ constexpr Event LeftBracket = Event::ShiftKey(Keyboard::Key::Exp);
+ constexpr Event RightBracket = Event::ShiftKey(Keyboard::Key::Ln);
+ constexpr Event LeftBrace = Event::ShiftKey(Keyboard::Key::Log);
+ constexpr Event RightBrace = Event::ShiftKey(Keyboard::Key::Imaginary);
+ constexpr Event Underscore = Event::ShiftKey(Keyboard::Key::Comma);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Sto = Event::ShiftKey(Keyboard::Key::EE);
++#else
+ constexpr Event Sto = Event::ShiftKey(Keyboard::Key::Power);
++#endif
+ 
+ constexpr Event Arcsine = Event::ShiftKey(Keyboard::Key::Sine);
+ constexpr Event Arccosine = Event::ShiftKey(Keyboard::Key::Cosine);
+ constexpr Event Arctangent = Event::ShiftKey(Keyboard::Key::Tangent);
++#if defined(PLATFORM_PRIME_G2)
++constexpr Event Equal = Event::ShiftKey(Keyboard::Key::Dot);
++#else
+ constexpr Event Equal = Event::ShiftKey(Keyboard::Key::Pi);
++#endif
+ constexpr Event Lower = Event::ShiftKey(Keyboard::Key::Sqrt);
+ constexpr Event Greater = Event::ShiftKey(Keyboard::Key::Square);
+ 
+--- a/ion/src/shared/keyboard/layout_B2/layout_events.cpp
++++ b/ion/src/shared/keyboard/layout_B2/layout_events.cpp
+@@ -7,24 +7,24 @@
+ const EventData s_dataForEvent[4 * Event::PageSize] = {
+ // Plain
+   TL(), TL(), TL(), TL(), TL(), TL(),
+-  TL(), TL(), TL(), TL(), U(), U(),
++  TL(), TL(), TL(), TL(), T("(\x11)/(\x11)"), T("(\x11)/(\x11)"),
+   TL(), TL(), TL(), TL(), TL(), TL(),
+-  T("ℯ^(\x11)"), T("ln(\x11)"),  T("log(\x11)"), T("𝐢"), T(","), T("^"),
+-  T("sin(\x11)"), T("cos(\x11)"), T("tan(\x11)"), T("π"), T("√(\x11)"), T("^2"),
+-  T("7"), T("8"), T("9"), T("("), T(")"), U(),
+-  T("4"), T("5"), T("6"), T("*"), T("/"), U(),
++  TL(), T("ln(\x11)"), T("log(\x11)"), TL(), T(","), T("^"),
++  T("sin(\x11)"), T("cos(\x11)"), T("tan(\x11)"), TL(), TL(), T("^2"),
++  T("7"), T("8"), T("9"), T("(\x11)"), TL(), T("-"),
++  T("4"), T("5"), T("6"), T("*"), T("/"), T(" "),
+   T("1"), T("2"), T("3"), T("+"), T("-"), U(),
+   T("0"), T("."), T("ᴇ"), TL(), TL(), U(),
+ // Shift
+   TL(), TL(), TL(), TL(), TL(), TL(),
+-  TL(), U(), U(), U(), U(), U(),
+-  U(), U(), TL(), TL(), TL(), TL(),
+-  T("["), T("]"), T("{"), T("}"), T("_"), T("→"),
+-  T("asin(\x11)"), T("acos(\x11)"), T("atan(\x11)"), T("="), T("<"), T(">"),
+-  T("μ"), TL(), T("Ω"), T("(\x11)"), U(), U(),
+-  TL(), TL(), TL(), TL(), TL(), U(),
+-  TL(), TL(), TL(), TL(), TL(), U(),
+-  TL(), TL(), TL(), TL(), TL(), U(),
++  TL(), U(), TL(), TL(), T("_"), T("(\x11)/(\x11)"),
++  U(), TL(), T("→"), TL(), TL(), TL(),
++  TL(), T("ℯ^(\x11)"), T("10^(\x11)"), TL(), TL(), T("root(\x11,\x11)"),
++  T("asin(\x11)"), T("acos(\x11)"), T("atan(\x11)"), TL(), TL(), T("√(\x11)"),
++  TL(), T("{\x11}"), T("[\x11,\x11]"), T("!"), TL(), T("abs(\x11)"),
++  TL(), T("[\x11]"), T("sum(\x11,\x11,\x11,\x11)"), T("arg(\x11)"), T("^(-1)"), T("-"),
++  TL(), T("𝐢"), T("π"), T("ans"), TL(), U(),
++  TL(), T("="), T("→"), TL(), U(), U(),
+ // Alpha
+   TL(), TL(), TL(), TL(), U(), U(),
+   U(), U(), U(), U(), T("c"), T("e"),
+--- a/escher/src/text_field.cpp
++++ b/escher/src/text_field.cpp
+@@ -338,8 +338,18 @@
+       return removePreviousGlyph();
+     }
+     deleteSelection();
++    return true;
++  }
++#if defined(PLATFORM_PRIME_G2)
++  if (event == Ion::Events::PrimeDelete && isEditing()) {
++    if (!m_contentView.selectionIsEmpty()) {
++      deleteSelection();
++    } else if (TextInput::moveCursorRight()) {
++      removePreviousGlyph();
++    }
+     return true;
+   }
++#endif
+   if (event == Ion::Events::Back && isEditing()) {
+     reinitDraftTextBuffer();
+     resetSelection();
+--- a/escher/src/text_area.cpp
++++ b/escher/src/text_area.cpp
+@@ -237,6 +237,17 @@
+   }
+ 
+   // The following events need a scrollToCursor and return true
++#if defined(PLATFORM_PRIME_G2)
++  if (event == Ion::Events::PrimeDelete) {
++    if (!contentView()->selectionIsEmpty()) {
++      deleteSelection();
++    } else if (TextInput::moveCursorRight()) {
++      removePreviousGlyph();
++    }
++    scrollToCursor();
++    return true;
++  }
++#endif
+   if (event == Ion::Events::Backspace) {
+     if (contentView()->selectionIsEmpty()) {
+       if (!removePreviousGlyph()) {
+--- a/escher/src/layout_field.cpp
++++ b/escher/src/layout_field.cpp
+@@ -553,8 +553,24 @@
+     resetSelection();
+     setEditing(false);
+     m_delegate->layoutFieldDidAbortEditing(this);
++    return true;
++  }
++#if defined(PLATFORM_PRIME_G2)
++  if (event == Ion::Events::PrimeDelete && isEditing()) {
++    if (!m_contentView.selectionIsEmpty()) {
++      deleteSelection();
++    } else {
++      bool shouldRecomputeLayout = false;
++      LayoutCursor next = m_contentView.cursor()->cursorAtDirection(
++        LayoutCursor::Direction::Right, &shouldRecomputeLayout);
++      if (next.isDefined()) {
++        m_contentView.setCursor(next);
++        m_contentView.cursor()->performBackspace();
++      }
++    }
+     return true;
+   }
++#endif
+   if (event.hasText() || event == Ion::Events::Paste || event == Ion::Events::Backspace) {
+     if (!isEditing()) {
+       setEditing(true);
+--- a/apps/apps_container.cpp
++++ b/apps/apps_container.cpp
+@@ -160,6 +160,21 @@
+ }
+ 
+ bool AppsContainer::dispatchEvent(Ion::Events::Event event) {
++#if defined(PLATFORM_PRIME_G2)
++  // Translate Prime-specific semantic keys before the active responder sees
++  // them. This preserves the behavior printed on the case without making
++  // every Escher editor know about Prime matrix positions.
++  if (event == Ion::Events::PrimeEval && s_activeApp != nullptr &&
++      appIndexFromSnapshot(s_activeApp->snapshot()) != 0) {
++    event = Ion::Events::OK;
++  } else if (event == Ion::Events::PrimeMenu || event == Ion::Events::PrimeChars ||
++             event == Ion::Events::PrimeList || event == Ion::Events::PrimeMatrix ||
++             event == Ion::Events::PrimeBase) {
++    event = Ion::Events::Toolbox;
++  } else if (event == Ion::Events::PrimeMemory) {
++    event = Ion::Events::Var;
++  }
++#endif
+   bool alphaLockWantsRedraw = updateAlphaLock();
+   bool didProcessEvent = false;
+ 
+@@ -261,12 +276,14 @@
+ }
+ 
+ // List of keys that are used to switch between apps, in order of app to go (eg. 0 : First App, 1 : Second App, 2 : Third App, ...)
++#if !defined(PLATFORM_PRIME_G2)
+ static constexpr Ion::Events::Event switch_events[] = {
+     Ion::Events::ShiftSeven, Ion::Events::ShiftEight, Ion::Events::ShiftNine,
+     Ion::Events::ShiftFour, Ion::Events::ShiftFive, Ion::Events::ShiftSix,
+     Ion::Events::ShiftOne, Ion::Events::ShiftTwo, Ion::Events::ShiftThree,
+     Ion::Events::ShiftZero, Ion::Events::ShiftDot, Ion::Events::ShiftEE
+ };
++#endif
+ 
+ bool AppsContainer::processEvent(Ion::Events::Event event) {
+   // Warning: if the window is dirtied, you need to call window()->redraw()
+@@ -299,9 +316,38 @@
+   // On NumWorks, Home and Back both open the application launcher.
+   if (event == Ion::Events::Home || event == Ion::Events::Back) {
+ #endif
++    switchTo(appSnapshotAtIndex(0));
++    return true;
++  }
++#if defined(PLATFORM_PRIME_G2)
++  // Prime application/view keys. Lefony has one Graph app rather than HP's
++  // three-view app model, so SYMB/PLOT/NUM converge on Graph. Their Setup
++  // variants, Home Setup, CAS Setup, and Apps Info open Lefony Settings.
++  if (event == Ion::Events::PrimeSymb || event == Ion::Events::PrimePlot ||
++      event == Ion::Events::PrimeNum) {
++    switchTo(appSnapshotAtIndex(2));
++    return true;
++  }
++  if (event == Ion::Events::ShiftHome || event == Ion::Events::PrimeCASSetup ||
++      event == Ion::Events::PrimeSymbSetup || event == Ion::Events::PrimePlotSetup ||
++      event == Ion::Events::PrimeNumSetup || event == Ion::Events::PrimeInfo ||
++      event == Ion::Events::PrimeHelp) {
++    switchTo(appSnapshotAtIndex(numberOfApps() - 1));
++    return true;
++  }
++  // VIEW is context-specific in HP firmware. In Lefony it returns to the app
++  // launcher; Shift+VIEW and Shift+MENU remain Copy and Paste events.
++  if (event == Ion::Events::PrimeView) {
+     switchTo(appSnapshotAtIndex(0));
+     return true;
+   }
++  // Lefony has one source editor and no separate Notes app, so both printed
++  // Prime shortcuts open Code. List/Matrix/Base open the math toolbox above.
++  if (event == Ion::Events::PrimeProgram || event == Ion::Events::PrimeNotes) {
++    switchTo(appSnapshotAtIndex(4));
++    return true;
++  }
++#else
+   // If shift + Home are pressed, we switch to the first app.
+   if (event == Ion::Events::ShiftHome) {
+     switchTo(appSnapshotAtIndex(1));
+@@ -328,6 +374,7 @@
+     switchTo(appSnapshotAtIndex(m_lastAppIndex));
+     return true;
+   }
++#endif
+ 
+   // If the event is the OnOff key, we suspend the calculator.
+   if (event == Ion::Events::OnOff) {
+@@ -335,12 +381,14 @@
+     return true;
+   }
+   // If the event is a brightness event, we update the brightness according to the event.
++#if !defined(PLATFORM_PRIME_G2)
+   if (event == Ion::Events::BrightnessPlus || event == Ion::Events::BrightnessMinus) {
+       int delta = Ion::Backlight::MaxBrightness/GlobalPreferences::NumberOfBrightnessStates;
+       int NumberOfStepsPerShortcut = GlobalPreferences::sharedGlobalPreferences()->brightnessShortcut();
+       int direction = (event == Ion::Events::BrightnessPlus) ? NumberOfStepsPerShortcut*delta : -delta*NumberOfStepsPerShortcut;
+       GlobalPreferences::sharedGlobalPreferences()->setBrightnessLevel(GlobalPreferences::sharedGlobalPreferences()->brightnessLevel()+direction);
+   }
++#endif
+   // Else, the event was not processed.
+   return false;
+ }
+--- a/apps/settings/sub_menu/brightness_controller.cpp
++++ b/apps/settings/sub_menu/brightness_controller.cpp
+@@ -89,6 +89,7 @@
+       m_selectableTableView.reloadCellAtLocation(m_selectableTableView.selectedColumn(), m_selectableTableView.selectedRow());
+       return true;
+     }
++#if !defined(PLATFORM_PRIME_G2)
+     if (event == Ion::Events::BrightnessPlus || event == Ion::Events::BrightnessMinus){
+       int delta = Ion::Backlight::MaxBrightness/GlobalPreferences::NumberOfBrightnessStates;
+       int NumberOfStepsPerShortcut = GlobalPreferences::sharedGlobalPreferences()->brightnessShortcut();
+@@ -97,6 +98,7 @@
+       m_selectableTableView.reloadCellAtLocation(m_selectableTableView.selectedColumn(), 0);
+       return true;
+     }
++#endif
+     return false;
+ }
+ 

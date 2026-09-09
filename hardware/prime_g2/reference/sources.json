@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "board_artifacts": {
+    "dtb": {
+      "file": "imx6ull-14x14-prime.dtb",
+      "sha256": "ba6febaffca915a1fe43fe986980cc78d83d93ede559ae9bb7056aa677440bee",
+      "live_source": "/dev/mtd2 first 30960 bytes",
+      "distribution": "Private reference, not distributed. Optional tests use LEFONY_PRIVATE_HARDWARE_DIR."
+    },
+    "dts": {
+      "file": "imx6ull-14x14-prime.dts",
+      "sha256": "625d3954774cdc7645ebab8465395255aea0566efd87d83e8d6a7032284a314d",
+      "derived_from": "imx6ull-14x14-prime.dtb via dtc",
+      "distribution": "Private reference, not distributed. Optional tests use LEFONY_PRIVATE_HARDWARE_DIR."
+    },
+    "keypad_matrix": {
+      "file": "keypad-matrix.csv",
+      "sha256": "2d1786e3bd9ca1f4908b47b9950b9f3c16566f21470ca2a878da001db1d8ab4e",
+      "derived_from": "DT linux,keymap plus exact Linux input-event codes"
+    }
+  },
+  "external_primary_sources": [
+    {
+      "name": "NXP i.MX 6ULL Applications Processors Data Sheet",
+      "revision": "IMX6ULLIEC Rev. 1.2, 11/2017",
+      "url": "https://www.nxp.com/docs/en/data-sheet/IMX6ULLIEC.pdf",
+      "use": "SoC capabilities, electrical limits, NAND/LCD/KPP/USB interface constraints"
+    },
+    {
+      "name": "NXP i.MX Linux Reference Manual",
+      "url": "https://www.nxp.com/docs/en/reference-manual/IMX_REFERENCE_MANUAL.pdf",
+      "use": "Linux BSP behavior and peripheral-driver context"
+    },
+    {
+      "name": "NXP PF1550 Data Sheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/PF1550.pdf",
+      "use": "PMIC, regulators, charger, on-key, IRQ, RTC supply and I2C behavior"
+    },
+    {
+      "name": "Prinux Linux source",
+      "revision": "8739abed6866a57067c553a086e80f5f68659f1c",
+      "url": "https://github.com/RaymiiOrg/prinux-linux/tree/8739abed6866a57067c553a086e80f5f68659f1c",
+      "use": "Exact kernel driver behavior corresponding to the live 4.14.98 system"
+    },
+    {
+      "name": "Prinux mxsfb driver",
+      "revision": "8739abed6866a57067c553a086e80f5f68659f1c",
+      "url": "https://github.com/RaymiiOrg/prinux-linux/blob/8739abed6866a57067c553a086e80f5f68659f1c/drivers/video/fbdev/mxsfb.c",
+      "use": "LCDIF register and serialized 32-bpp-on-8-bit-bus decode"
+    },
+    {
+      "name": "Upstream Linux Goodix touchscreen driver",
+      "url": "https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/input/touchscreen/goodix.c",
+      "use": "GT5688 identification, report protocol and reset/IRQ semantics"
+    },
+    {
+      "name": "Upstream QEMU i.MX6UL machine",
+      "url": "https://github.com/qemu/qemu/blob/master/hw/arm/fsl-imx6ul.c",
+      "use": "Existing emulated SoC inventory and missing-device baseline"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -12,12 +12,16 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/arm/fsl-imx6ul.h"
++#include "hw/arm/prime_g2_peripherals.h"
+ #include "hw/arm/boot.h"
+ #include "hw/arm/machines-qom.h"
+ #include "hw/core/boards.h"
+ #include "hw/core/qdev-properties.h"
+ #include "qemu/error-report.h"
++#include "qemu/log.h"
++#include "qemu/aio.h"
++#include "qemu/main-loop.h"
+ #include "system/qtest.h"
+ #include "system/reset.h"
+ #include "system/address-spaces.h"
+@@ -42,6 +46,43 @@ static void hp_prime_g2_route_spis(void *opaque)
+     }
+ }
+ 
++typedef struct HPPrimeG2BootState {
++    FslIMX6ULState *soc;
++} HPPrimeG2BootState;
++
++static void hp_prime_g2_enter_sdp(void *opaque)
++{
++    HPPrimeG2BootState *boot = opaque;
++
++    boot->soc->src.rom_downloader_active = true;
++    qemu_set_irq(boot->soc->src.rom_downloader, 1);
++}
++
++static void hp_prime_g2_nand_boot(void *opaque)
++{
++    HPPrimeG2BootState *boot = opaque;
++    Error *local_err = NULL;
++    uint32_t entry;
++
++    /* A watchdog reset after U-Boot's `bmode usb` belongs to the serial
++     * downloader.  Do not let the normal NAND path steal that reset. */
++    if (boot->soc->src.rom_downloader_active) {
++        return;
++    }
++    if (!prime_g2_nand_rom_load(&entry, &local_err)) {
++        qemu_log("hp-prime-g2-rom: NAND boot failed: %s; entering SDP\n",
++                 error_get_pretty(local_err));
++        error_free(local_err);
++        /* Device reset ordering clears SRC and USB after legacy machine
++         * reset handlers.  The real ROM starts SDP after reset completes,
++         * so defer this signal to the first main-loop iteration as well. */
++        aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                                hp_prime_g2_enter_sdp, boot);
++        return;
++    }
++    cpu_set_pc(CPU(&boot->soc->cpu), entry);
++}
++
+ static void mcimx6ul_evk_common_init(MachineState *machine,
+                                      bool prime_g2_ddr_mirror)
+ {
+@@ -166,9 +207,20 @@ static void mcimx6ul_evk_init(MachineState *machine)
+ 
+ static void hp_prime_g2_init(MachineState *machine)
+ {
++    HPPrimeG2BootState *boot;
++    FslIMX6ULState *soc;
++
+     mcimx6ul_evk_common_init(machine, true);
+     qemu_register_reset(hp_prime_g2_route_spis, NULL);
+     hp_prime_g2_route_spis(NULL);
++
++    soc = FSL_IMX6UL(object_resolve_path_component(OBJECT(machine), "soc"));
++    if (!qtest_enabled() && !machine->kernel_filename &&
++        prime_g2_nand_has_backing()) {
++        boot = g_new0(HPPrimeG2BootState, 1);
++        boot->soc = soc;
++        qemu_register_reset(hp_prime_g2_nand_boot, boot);
++    }
+ }
+ 
+ static void mcimx6ul_evk_machine_init(MachineClass *mc)

@@ -1,0 +1,104 @@
+--- a/ion/include/ion/events.h
++++ b/ion/include/ion/events.h
+@@ -174,2 +174,5 @@
+ constexpr Event PrimeChars = Event::ShiftKey(Keyboard::Key::Var);
++constexpr Event PrimeMathTemplates = Event::PlainKey(Keyboard::Key::PrimeAlphaC);
++constexpr Event PrimeUnits = Event::ShiftKey(Keyboard::Key::PrimeAlphaC);
++constexpr Event PrimeCalculus = Event::ShiftKey(Keyboard::Key::Six);
+ constexpr Event PrimeMemory = Event::ShiftKey(Keyboard::Key::Toolbox);
+--- a/ion/src/shared/keyboard/layout_B2/layout_events.cpp
++++ b/ion/src/shared/keyboard/layout_B2/layout_events.cpp
+@@ -9,1 +9,1 @@
+-  TL(), TL(), TL(), TL(), T("(\x11)/(\x11)"), T("(\x11)/(\x11)"),
++  TL(), TL(), TL(), TL(), TL(), T("(\x11)/(\x11)"),
+@@ -20,1 +20,1 @@
+-  TL(), U(), TL(), TL(), T("_"), T("(\x11)/(\x11)"),
++  TL(), U(), TL(), TL(), TL(), T("(\x11)/(\x11)"),
+@@ -24,2 +24,2 @@
+-  TL(), T("{\x11}"), T("[\x11,\x11]"), T("!"), TL(), T("abs(\x11)"),
+-  TL(), T("[\x11]"), T("sum(\x11,\x11,\x11,\x11)"), T("arg(\x11)"), T("^(-1)"), T("-"),
++  TL(), T("{\x11}"), T("[[\x11,\x11]]"), T("!"), TL(), T("abs(\x11)"),
++  TL(), T("["), TL(), T("arg(\x11)"), T("^(-1)"), T("_"),
+--- a/apps/math_toolbox.h
++++ b/apps/math_toolbox.h
+@@ -10,2 +10,9 @@
+   const ToolboxMessageTree * rootModel() const override;
++#if defined(PLATFORM_PRIME_G2)
++  // A one-dispatch request shared with derived math toolboxes. Resolve by
++  // label, never by a row index that changes with enabled features.
++  static void requestPrimeCategory(I18n::Message category);
++  void didBecomeFirstResponder() override;
++  static I18n::Message s_primeCategory;
++#endif
+ protected:
+--- a/apps/math_toolbox.cpp
++++ b/apps/math_toolbox.cpp
+@@ -925,3 +925,24 @@
+ 
++#if defined(PLATFORM_PRIME_G2)
++I18n::Message MathToolbox::s_primeCategory = I18n::Message::Default;
++
++void MathToolbox::requestPrimeCategory(I18n::Message category) {
++  s_primeCategory = category;
++}
++
++void MathToolbox::didBecomeFirstResponder() {
++  I18n::Message requested = s_primeCategory;
++  s_primeCategory = I18n::Message::Default;
++  Toolbox::didBecomeFirstResponder();
++  if (requested == I18n::Message::Default) return;
++  for (int row = 0; row < rootModel()->numberOfChildren(); ++row) {
++    if (rootModel()->childAtIndex(row)->label() == requested) {
++      selectSubMenu(row);
++      return;
++    }
++  }
++}
++#endif
++
+ bool MathToolbox::selectLeaf(int selectedRow, bool quitToolbox) {
+   ToolboxMessageTree * messageTree = (ToolboxMessageTree *)m_messageTreeModel->childAtIndex(selectedRow);
+--- a/apps/apps_container.cpp
++++ b/apps/apps_container.cpp
+@@ -163,2 +163,14 @@
+ #if defined(PLATFORM_PRIME_G2)
++  MathToolbox::requestPrimeCategory(I18n::Message::Default);
++#if !LIST_ARE_DEFINED
++  if (event == Ion::Events::PrimeList && s_activeApp != nullptr) {
++    updateAlphaLock();
++    s_activeApp->displayWarning(I18n::Message::PrimeListsUnavailable);
++    m_backlightDimmingTimer.reset();
++    m_suspendTimer.reset();
++    Ion::Backlight::setBrightness(GlobalPreferences::sharedGlobalPreferences()->brightnessLevel());
++    window()->redraw();
++    return true;
++  }
++#endif
+   // Translate Prime-specific semantic keys before the active responder sees
+@@ -166,3 +167,6 @@
+-  if (event == Ion::Events::PrimeEval && s_activeApp != nullptr &&
++  // Lefony evaluates exact and approximate outputs together. Shift+Enter
++  // must submit the expression, not disappear as an unhandled ShiftOK.
++  if ((event == Ion::Events::PrimeEval || event == Ion::Events::ShiftOK) &&
++      s_activeApp != nullptr &&
+       appIndexFromSnapshot(s_activeApp->snapshot()) != 0) {
+     event = Ion::Events::OK;
+@@ -170,3 +174,10 @@
++  } else if (event == Ion::Events::PrimeUnits || event == Ion::Events::PrimeCalculus ||
++             event == Ion::Events::PrimeList || event == Ion::Events::PrimeMatrix) {
++    I18n::Message category = event == Ion::Events::PrimeUnits ? I18n::Message::Unit :
++      event == Ion::Events::PrimeCalculus ? I18n::Message::Calculation :
++      event == Ion::Events::PrimeList ? I18n::Message::Lists : I18n::Message::MatricesAndVectors;
++    MathToolbox::requestPrimeCategory(category);
++    event = Ion::Events::Toolbox;
+   } else if (event == Ion::Events::PrimeMenu || event == Ion::Events::PrimeChars ||
+-             event == Ion::Events::PrimeList || event == Ion::Events::PrimeMatrix ||
++             event == Ion::Events::PrimeMathTemplates ||
+              event == Ion::Events::PrimeBase) {
+--- a/apps/shared.universal.i18n
++++ b/apps/shared.universal.i18n
+@@ -1,3 +1,4 @@
+ LogicalXorCommandWithArg = "xor(a,r)"
+ TwosComplementToBitsCommandWithArg = "tc(a,n)"
++PrimeListsUnavailable = "List catalog not available yet"
+ CeilingLog2CommandWithArg = "clog2(a)"

@@ -1,0 +1,44 @@
+# Generated build trees, outputs, local tool environments and diagnostics.
+/build/
+/dist/
+/.venv/
+/.private/
+/.cache/
+/tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+.coverage
+htmlcov/
+*.log
+*.ppm
+*.sock
+# Firmware, private captures, boot media and vendor documents never belong here.
+*.mtd
+*.readback
+*.bin
+*.elf
+*.imx
+*.img
+*.raw
+*.qcow2
+*.dtb
+*.zImage
+*.lfu
+*.pdf
+*.zip
+*.tar
+*.gz
+*.bz2
+*.xz
+# Local signing material. Only the deliberately public emulator fixtures below
+# may be checked in; these keys are not production credentials.
+.env
+.env.*
+*.key
+*.pem
+!tests/fixtures/prime_g2_emulator_update_private.pem
+!tests/fixtures/prime_g2_emulator_update_public.pem
+# Port build descriptions are source, despite their directory name.
+!ports/lefony-prime-g2/build/

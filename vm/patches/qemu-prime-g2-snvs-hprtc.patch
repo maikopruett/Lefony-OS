@@ -1,0 +1,305 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -615,6 +615,8 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+      * acknowledge and clear the source after an alarm or power event. */
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->snvs), 0,
+                        qdev_get_gpio_in(gic, FSL_IMX6UL_SNVS_IRQ));
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->snvs), 1,
++                       qdev_get_gpio_in(gic, FSL_IMX6UL_SRTC_IRQ));
+ 
+     /*
+      * Watchdogs
+diff --git a/hw/misc/imx7_snvs.c b/hw/misc/imx7_snvs.c
+index 7fbc5d6..5462c14 100644
+--- a/hw/misc/imx7_snvs.c
++++ b/hw/misc/imx7_snvs.c
+@@ -25,11 +25,97 @@
+ #include "system/runstate.h"
+ #include "trace.h"
+ 
+-#define RTC_FREQ    32768ULL
++#define RTC_FREQ          32768ULL
++#define RTC_MASK          ((1ULL << 47) - 1)
++#define HPCR_RTC_EN       BIT(0)
++#define HPCR_HPTA_EN      BIT(1)
++#define HPCR_DIS_PI       BIT(2)
++#define HPCR_PI_EN        BIT(3)
++#define HPCR_PI_FREQ_MASK 0xf
++#define HPCR_PI_FREQ_SHIFT 4
++#define HPSR_HPTA         BIT(0)
++#define HPSR_PI           BIT(1)
++#define HPSR_BTN          BIT(6)
++
++static uint64_t imx7_snvs_get_count(IMX7SNVSState *s);
++static uint64_t imx7_snvs_get_hp_count(IMX7SNVSState *s);
++
++static void imx7_snvs_update_irq(IMX7SNVSState *s)
++{
++    qemu_set_irq(s->irq, (s->hpsr & HPSR_BTN) != 0);
++    qemu_set_irq(s->alarm_irq, (s->hpsr & (HPSR_HPTA | HPSR_PI)) != 0);
++}
++
++static void imx7_snvs_alarm(void *opaque)
++{
++    IMX7SNVSState *s = opaque;
++
++    if (s->hpcr & HPCR_HPTA_EN) {
++        s->hpsr |= HPSR_HPTA;
++        imx7_snvs_update_irq(s);
++    }
++}
++
++static void imx7_snvs_reschedule_alarm(IMX7SNVSState *s)
++{
++    uint64_t now, delta, delta_ns;
++
++    timer_del(s->hp_alarm_timer);
++    if (!(s->hpcr & HPCR_HPTA_EN)) {
++        return;
++    }
++
++    now = imx7_snvs_get_hp_count(s) & RTC_MASK;
++    delta = (s->hp_alarm - now) & RTC_MASK;
++    delta_ns = muldiv64(delta, NANOSECONDS_PER_SECOND, RTC_FREQ);
++    timer_mod_ns(s->hp_alarm_timer,
++                 qemu_clock_get_ns(rtc_clock) + MAX(delta_ns, 1));
++}
++
++static bool imx7_snvs_periodic_enabled(IMX7SNVSState *s)
++{
++    const uint32_t mask = HPCR_RTC_EN | HPCR_PI_EN;
++
++    return (s->hpcr & mask) == mask && !(s->hpcr & HPCR_DIS_PI);
++}
++
++static void imx7_snvs_reschedule_periodic(IMX7SNVSState *s)
++{
++    uint64_t now, interval, delta, delta_ns;
++    unsigned frequency;
++
++    timer_del(s->hp_periodic_timer);
++    if (!imx7_snvs_periodic_enabled(s)) {
++        return;
++    }
++
++    /*
++     * The SNVS periodic interrupt fires whenever the selected HPRTCLR bit
++     * toggles.  Counter bit N toggles once every 2^N 32768 Hz ticks.
++     */
++    frequency = extract32(s->hpcr, HPCR_PI_FREQ_SHIFT, 4);
++    interval = 1ULL << (frequency & HPCR_PI_FREQ_MASK);
++    now = imx7_snvs_get_hp_count(s) & RTC_MASK;
++    delta = interval - (now & (interval - 1));
++    delta_ns = muldiv64(delta, NANOSECONDS_PER_SECOND, RTC_FREQ);
++    timer_mod_ns(s->hp_periodic_timer,
++                 qemu_clock_get_ns(rtc_clock) + MAX(delta_ns, 1));
++}
++
++static void imx7_snvs_periodic(void *opaque)
++{
++    IMX7SNVSState *s = opaque;
++
++    if (imx7_snvs_periodic_enabled(s)) {
++        s->hpsr |= HPSR_PI;
++        imx7_snvs_update_irq(s);
++        imx7_snvs_reschedule_periodic(s);
++    }
++}
+ 
+ static const VMStateDescription vmstate_imx7_snvs = {
+     .name = TYPE_IMX7_SNVS,
+-    .version_id = 3,
++    .version_id = 6,
+     .minimum_version_id = 1,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT64(tick_offset, IMX7SNVSState),
+@@ -37,6 +123,10 @@ static const VMStateDescription vmstate_imx7_snvs = {
+         VMSTATE_UINT32_V(hpcomr, IMX7SNVSState, 2),
+         VMSTATE_UINT32_V(hpcr, IMX7SNVSState, 2),
+         VMSTATE_UINT32_V(hpsr, IMX7SNVSState, 3),
++        VMSTATE_UINT64_V(hp_alarm, IMX7SNVSState, 4),
++        VMSTATE_TIMER_PTR_V(hp_alarm_timer, IMX7SNVSState, 4),
++        VMSTATE_UINT64_V(hp_tick_offset, IMX7SNVSState, 5),
++        VMSTATE_TIMER_PTR_V(hp_periodic_timer, IMX7SNVSState, 6),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -48,6 +138,13 @@ static uint64_t imx7_snvs_get_count(IMX7SNVSState *s)
+     return s->tick_offset + ticks;
+ }
+ 
++static uint64_t imx7_snvs_get_hp_count(IMX7SNVSState *s)
++{
++    uint64_t ticks = muldiv64(qemu_clock_get_ns(rtc_clock), RTC_FREQ,
++                              NANOSECONDS_PER_SECOND);
++    return s->hp_tick_offset + ticks;
++}
++
+ static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     IMX7SNVSState *s = IMX7_SNVS(opaque);
+@@ -63,6 +160,18 @@ static uint64_t imx7_snvs_read(void *opaque, hwaddr offset, unsigned size)
+     case SNVS_HPSR:
+         ret = s->hpsr;
+         break;
++    case SNVS_HPRTCMR:
++        ret = extract64(imx7_snvs_get_hp_count(s), 32, 15);
++        break;
++    case SNVS_HPRTCLR:
++        ret = extract64(imx7_snvs_get_hp_count(s), 0, 32);
++        break;
++    case SNVS_HPTAMR:
++        ret = extract64(s->hp_alarm, 32, 15);
++        break;
++    case SNVS_HPTALR:
++        ret = extract64(s->hp_alarm, 0, 32);
++        break;
+     case SNVS_LPSRTCMR:
+         ret = extract64(imx7_snvs_get_count(s), 32, 15);
+         break;
+@@ -87,7 +196,13 @@ static void imx7_snvs_reset(DeviceState *dev)
+     s->hpcomr = 0;
+     s->hpcr = 0;
+     s->hpsr = 0;
++    s->hp_alarm = 0;
++    s->hp_tick_offset = 0 - muldiv64(qemu_clock_get_ns(rtc_clock), RTC_FREQ,
++                                     NANOSECONDS_PER_SECOND);
++    timer_del(s->hp_alarm_timer);
++    timer_del(s->hp_periodic_timer);
+     qemu_irq_lower(s->irq);
++    qemu_irq_lower(s->alarm_irq);
+ }
+ 
+ static void imx7_snvs_write(void *opaque, hwaddr offset,
+@@ -99,7 +214,9 @@ static void imx7_snvs_write(void *opaque, hwaddr offset,
+ 
+     uint64_t new_value = 0, snvs_count = 0;
+ 
+-    if (offset == SNVS_LPSRTCMR || offset == SNVS_LPSRTCLR) {
++    if (offset == SNVS_HPRTCMR || offset == SNVS_HPRTCLR) {
++        snvs_count = imx7_snvs_get_hp_count(s);
++    } else if (offset == SNVS_LPSRTCMR || offset == SNVS_LPSRTCLR) {
+         snvs_count = imx7_snvs_get_count(s);
+     }
+ 
+@@ -109,11 +226,33 @@ static void imx7_snvs_write(void *opaque, hwaddr offset,
+         break;
+     case SNVS_HPCR:
+         s->hpcr = v;
++        imx7_snvs_reschedule_alarm(s);
++        imx7_snvs_reschedule_periodic(s);
++        imx7_snvs_update_irq(s);
++        break;
++    case SNVS_HPSR:
++        /* HPTA and the other latched HP status bits are write-one-clear. */
++        s->hpsr &= ~v;
++        imx7_snvs_update_irq(s);
++        break;
++    case SNVS_HPRTCMR:
++        new_value = deposit64(snvs_count, 32, 15, v);
++        break;
++    case SNVS_HPRTCLR:
++        new_value = deposit64(snvs_count, 0, 32, v);
++        break;
++    case SNVS_HPTAMR:
++        s->hp_alarm = deposit64(s->hp_alarm, 32, 15, v);
++        imx7_snvs_reschedule_alarm(s);
++        break;
++    case SNVS_HPTALR:
++        s->hp_alarm = deposit64(s->hp_alarm, 0, 32, v);
++        imx7_snvs_reschedule_alarm(s);
+         break;
+     case SNVS_DIAG_PWRKEY:
+         /* Emulator-only power-key ingress used by qtest and the UI proxy. */
+-        s->hpsr = v ? BIT(6) : 0;
+-        qemu_set_irq(s->irq, v != 0);
++        s->hpsr = deposit32(s->hpsr, 6, 1, v != 0);
++        imx7_snvs_update_irq(s);
+         break;
+     case SNVS_LPSRTCMR:
+         new_value = deposit64(snvs_count, 32, 32, v);
+@@ -133,7 +272,11 @@ static void imx7_snvs_write(void *opaque, hwaddr offset,
+     }
+     }
+ 
+-    if (offset == SNVS_LPSRTCMR || offset == SNVS_LPSRTCLR) {
++    if (offset == SNVS_HPRTCMR || offset == SNVS_HPRTCLR) {
++        s->hp_tick_offset += new_value - snvs_count;
++        imx7_snvs_reschedule_alarm(s);
++        imx7_snvs_reschedule_periodic(s);
++    } else if (offset == SNVS_LPSRTCMR || offset == SNVS_LPSRTCLR) {
+         s->tick_offset += new_value - snvs_count;
+     }
+ }
+@@ -166,10 +309,21 @@ static void imx7_snvs_init(Object *obj)
+ 
+     sysbus_init_mmio(sd, &s->mmio);
+     sysbus_init_irq(sd, &s->irq);
++    sysbus_init_irq(sd, &s->alarm_irq);
+ 
+     qemu_get_timedate(&tm, 0);
+     s->tick_offset = mktimegm(&tm) -
+         qemu_clock_get_ns(rtc_clock) / NANOSECONDS_PER_SECOND;
++    s->hp_alarm_timer = timer_new_ns(rtc_clock, imx7_snvs_alarm, s);
++    s->hp_periodic_timer = timer_new_ns(rtc_clock, imx7_snvs_periodic, s);
++}
++
++static void imx7_snvs_finalize(Object *obj)
++{
++    IMX7SNVSState *s = IMX7_SNVS(obj);
++
++    timer_free(s->hp_alarm_timer);
++    timer_free(s->hp_periodic_timer);
+ }
+ 
+ static void imx7_snvs_class_init(ObjectClass *klass, const void *data)
+@@ -186,6 +340,7 @@ static const TypeInfo imx7_snvs_info = {
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(IMX7SNVSState),
+     .instance_init = imx7_snvs_init,
++    .instance_finalize = imx7_snvs_finalize,
+     .class_init    = imx7_snvs_class_init,
+ };
+ 
+diff --git a/include/hw/misc/imx7_snvs.h b/include/hw/misc/imx7_snvs.h
+index 75f6723..4082947 100644
+--- a/include/hw/misc/imx7_snvs.h
++++ b/include/hw/misc/imx7_snvs.h
+@@ -13,6 +13,7 @@
+ #define IMX7_SNVS_H
+ 
+ #include "qemu/bitops.h"
++#include "qemu/timer.h"
+ #include "hw/core/sysbus.h"
+ #include "qom/object.h"
+ 
+@@ -21,6 +22,10 @@ enum IMX7SNVSRegisters {
+     SNVS_HPCOMR = 0x04,
+     SNVS_HPCR = 0x08,
+     SNVS_HPSR = 0x14,
++    SNVS_HPRTCMR = 0x24,
++    SNVS_HPRTCLR = 0x28,
++    SNVS_HPTAMR = 0x2c,
++    SNVS_HPTALR = 0x30,
+     SNVS_DIAG_PWRKEY = 0xfc,
+     SNVS_LPCR = 0x38,
+     SNVS_LPCR_TOP   = BIT(6),
+@@ -39,11 +44,16 @@ struct IMX7SNVSState {
+     MemoryRegion mmio;
+ 
+     uint64_t tick_offset;
++    uint64_t hp_tick_offset;
+     uint64_t lpcr;
+     uint32_t hpcomr;
+     uint32_t hpcr;
+     uint32_t hpsr;
++    uint64_t hp_alarm;
++    QEMUTimer *hp_alarm_timer;
++    QEMUTimer *hp_periodic_timer;
+     qemu_irq irq;
++    qemu_irq alarm_irq;
+ };
+ 
+ #endif /* IMX7_SNVS_H */
+

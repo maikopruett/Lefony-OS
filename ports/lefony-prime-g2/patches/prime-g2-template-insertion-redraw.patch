@@ -1,0 +1,21 @@
+--- a/escher/src/layout_field.cpp
++++ b/escher/src/layout_field.cpp
+@@ -360,2 +360,5 @@
+ bool LayoutField::handleEventWithText(const char * text, bool indentation, bool forceCursorRightOfText, bool shouldRemoveLastCharacter) {
++#if defined(PLATFORM_PRIME_G2)
++  KDSize previousInsertionSize = minimalSizeForOptimalDisplay();
++#endif
+   /* The text here can be:
+@@ -426,5 +429,12 @@
+     insertLayoutAtCursor(resultLayout, resultExpression, forceCursorRightOfText);
++    return true; // insertLayoutAtCursor already reloads the field.
+   }
++#if defined(PLATFORM_PRIME_G2)
++  // Popup insertion bypasses handleEvent's final reload. Cursor-built
++  // templates (power, square, root, matrix...) must refresh here too.
++  cursor->hideEmptyLayoutIfNeeded();
++  reload(previousInsertionSize);
++#endif
+   return true;
+ }
+ 

@@ -1,0 +1,219 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -566,6 +566,9 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+             sysbus_realize_and_unref(usbdev, &error_abort);
+             qdev_connect_gpio_out_named(DEVICE(usbdev), "cable", 0,
+                 qdev_get_gpio_in(DEVICE(&s->gpio[0]), 0));
++            qdev_connect_gpio_out_named(DEVICE(&s->src), "rom-downloader", 0,
++                qdev_get_gpio_in_named(DEVICE(usbdev),
++                                       "rom-downloader", 0));
+             qdev_connect_gpio_out_named(DEVICE(usbdev), "cable", 1,
+                 qdev_get_gpio_in(DEVICE(&s->gpio[0]), 3));
+         } else {
+@@ -637,6 +640,9 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+                         FSL_IMX6UL_WDOGn_ADDR[i]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->wdt[i]), 0,
+                            qdev_get_gpio_in(gic, FSL_IMX6UL_WDOGn_IRQ[i]));
++        qdev_connect_gpio_out_named(DEVICE(&s->wdt[i]), "reset", 0,
++            qdev_get_gpio_in_named(DEVICE(&s->src),
++                                   "watchdog-reset", i));
+     }
+ 
+     /*
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+index 8d2c417..7b0501e 100644
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "hw/core/irq.h"
+ #include "hw/misc/imx6_src.h"
+ #include "migration/vmstate.h"
+ #include "qemu/bitops.h"
+@@ -19,6 +20,11 @@
+ #include "hw/core/cpu.h"
+ #include "trace.h"
+ 
++#define IMX6_SRC_GPR10_BMODE BIT(28)
++#define IMX6_SRC_GPR9_BOOT_CFG_MASK 0x03ffffffu
++#define IMX6ULL_ROM_USB_CFG 0x20u
++#define IMX6UL_WDOG_COUNT 3
++
+ static const char *imx6_src_reg_name(uint32_t reg)
+ {
+     static char unknown[20];
+@@ -62,12 +67,23 @@ static const char *imx6_src_reg_name(uint32_t reg)
+     }
+ }
+ 
++static int imx6_src_post_load(void *opaque, int version_id)
++{
++    IMX6SRCState *s = opaque;
++    (void)version_id;
++    qemu_set_irq(s->rom_downloader, s->rom_downloader_active);
++    return 0;
++}
++
+ static const VMStateDescription vmstate_imx6_src = {
+     .name = TYPE_IMX6_SRC,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
++    .post_load = imx6_src_post_load,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT32_ARRAY(regs, IMX6SRCState, SRC_MAX),
++        VMSTATE_BOOL(watchdog_reset_pending, IMX6SRCState),
++        VMSTATE_BOOL(rom_downloader_active, IMX6SRCState),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+@@ -75,6 +91,12 @@ static const VMStateDescription vmstate_imx6_src = {
+ static void imx6_src_reset(DeviceState *dev)
+ {
+     IMX6SRCState *s = IMX6_SRC(dev);
++    uint32_t gpr9 = s->regs[SRC_GPR9];
++    uint32_t gpr10 = s->regs[SRC_GPR10];
++    bool watchdog_reset = s->watchdog_reset_pending;
++    bool rom_downloader = watchdog_reset &&
++        (gpr10 & IMX6_SRC_GPR10_BMODE) &&
++        ((gpr9 & IMX6_SRC_GPR9_BOOT_CFG_MASK) == IMX6ULL_ROM_USB_CFG);
+ 
+     trace_imx6_src_reset();
+ 
+@@ -84,6 +106,15 @@ static void imx6_src_reset(DeviceState *dev)
+     s->regs[SRC_SCR] = 0x521;
+     s->regs[SRC_SRSR] = 0x1;
+     s->regs[SRC_SIMR] = 0x1F;
++    if (watchdog_reset) {
++        /* GPR9/10 are in the SRC persistent domain used by U-Boot's
++         * `bmode usb`; a power-on/external reset still clears them. */
++        s->regs[SRC_GPR9] = gpr9;
++        s->regs[SRC_GPR10] = gpr10;
++    }
++    s->watchdog_reset_pending = false;
++    s->rom_downloader_active = rom_downloader;
++    qemu_set_irq(s->rom_downloader, rom_downloader);
+ }
+ 
+ static uint64_t imx6_src_read(void *opaque, hwaddr offset, unsigned size)
+@@ -264,6 +295,24 @@ static const struct MemoryRegionOps imx6_src_ops = {
+     },
+ };
+ 
++static void imx6_src_watchdog_reset(void *opaque, int line, int level)
++{
++    IMX6SRCState *s = opaque;
++    (void)line;
++    if (level) {
++        s->watchdog_reset_pending = true;
++    }
++}
++
++static void imx6_src_init(Object *obj)
++{
++    IMX6SRCState *s = IMX6_SRC(obj);
++    qdev_init_gpio_in_named(DEVICE(obj), imx6_src_watchdog_reset,
++                            "watchdog-reset", IMX6UL_WDOG_COUNT);
++    qdev_init_gpio_out_named(DEVICE(obj), &s->rom_downloader,
++                             "rom-downloader", 1);
++}
++
+ static void imx6_src_realize(DeviceState *dev, Error **errp)
+ {
+     IMX6SRCState *s = IMX6_SRC(dev);
+@@ -287,6 +336,7 @@ static const TypeInfo imx6_src_info = {
+     .name          = TYPE_IMX6_SRC,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(IMX6SRCState),
++    .instance_init = imx6_src_init,
+     .class_init    = imx6_src_class_init,
+ };
+ 
+diff --git a/hw/watchdog/wdt_imx2.c b/hw/watchdog/wdt_imx2.c
+index c83d410..a5c4454 100644
+--- a/hw/watchdog/wdt_imx2.c
++++ b/hw/watchdog/wdt_imx2.c
+@@ -19,6 +19,14 @@
+ #include "hw/watchdog/wdt_imx2.h"
+ #include "trace.h"
+ 
++static void imx2_wdt_perform_reset(IMX2WdtState *s)
++{
++    /* Let the SoC reset controller latch the source before QEMU schedules
++     * the system-wide reset action. */
++    qemu_irq_pulse(s->reset);
++    watchdog_perform_action();
++}
++
+ static void imx2_wdt_interrupt(void *opaque)
+ {
+     IMX2WdtState *s = IMX2_WDT(opaque);
+@@ -39,7 +47,7 @@ static void imx2_wdt_expired(void *opaque)
+ 
+     /* Perform watchdog action if watchdog is enabled */
+     if (s->wcr & IMX2_WDT_WCR_WDE) {
+-        watchdog_perform_action();
++        imx2_wdt_perform_reset(s);
+     }
+ }
+ 
+@@ -178,7 +186,7 @@ static void imx2_wdt_write(void *opaque, hwaddr addr,
+         }
+         if (!(value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS)) ||
+             (!(value & IMX2_WDT_WCR_WT) && (value & IMX2_WDT_WCR_WDE))) {
+-            watchdog_perform_action();
++            imx2_wdt_perform_reset(s);
+         }
+         s->wcr |= IMX2_WDT_WCR_SRS;
+         imx_wdt2_update_timer(s, true);
+@@ -249,6 +257,12 @@ static const VMStateDescription vmstate_imx2_wdt = {
+     }
+ };
+ 
++static void imx2_wdt_init(Object *obj)
++{
++    IMX2WdtState *s = IMX2_WDT(obj);
++    qdev_init_gpio_out_named(DEVICE(obj), &s->reset, "reset", 1);
++}
++
+ static void imx2_wdt_realize(DeviceState *dev, Error **errp)
+ {
+     IMX2WdtState *s = IMX2_WDT(dev);
+@@ -302,6 +316,7 @@ static const TypeInfo imx2_wdt_info = {
+     .name          = TYPE_IMX2_WDT,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(IMX2WdtState),
++    .instance_init = imx2_wdt_init,
+     .class_init    = imx2_wdt_class_init,
+ };
+ 
+diff --git a/include/hw/misc/imx6_src.h b/include/hw/misc/imx6_src.h
+index 801b5b6..50b6c01 100644
+--- a/include/hw/misc/imx6_src.h
++++ b/include/hw/misc/imx6_src.h
+@@ -68,6 +68,9 @@ struct IMX6SRCState {
+     MemoryRegion iomem;
+ 
+     uint32_t regs[SRC_MAX];
++    qemu_irq rom_downloader;
++    bool watchdog_reset_pending;
++    bool rom_downloader_active;
+ 
+ };
+ 
+diff --git a/include/hw/watchdog/wdt_imx2.h b/include/hw/watchdog/wdt_imx2.h
+index ad36b88..93ba32e 100644
+--- a/include/hw/watchdog/wdt_imx2.h
++++ b/include/hw/watchdog/wdt_imx2.h
+@@ -70,6 +70,7 @@ struct IMX2WdtState {
+     /*< public >*/
+     MemoryRegion mmio;
+     qemu_irq irq;
++    qemu_irq reset;
+ 
+     struct ptimer_state *timer;
+     struct ptimer_state *itimer;

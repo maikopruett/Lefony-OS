@@ -1,0 +1,175 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -19,6 +19,8 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/arm/fsl-imx6ul.h"
++#include "hw/arm/prime_g2_peripherals.h"
++#include "hw/i2c/i2c.h"
+ #include "hw/display/imx6ul_lcdif.h"
+ #include "hw/misc/unimp.h"
+ #include "hw/usb/imx-usb-phy.h"
+@@ -394,6 +395,49 @@
+ 
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c[i]), 0,
+                            qdev_get_gpio_in(gic, FSL_IMX6UL_I2Cn_IRQ[i]));
++    }
++
++    /* HP Prime G2 board devices on the captured buses. */
++    {
++        I2CSlave *pf1550 = i2c_slave_create_simple(
++            s->i2c[0].bus, TYPE_PRIME_G2_PF1550, 0x08);
++        qdev_connect_gpio_out_named(DEVICE(pf1550), "irq", 0,
++            qdev_get_gpio_in(DEVICE(&s->gpio[4]), 4));
++    }
++    {
++        I2CSlave *goodix = i2c_slave_create_simple(
++            s->i2c[1].bus, TYPE_PRIME_G2_GOODIX, 0x14);
++        qdev_connect_gpio_out(DEVICE(&s->gpio[0]), 24,
++            qdev_get_gpio_in_named(DEVICE(goodix), "reset", 0));
++        qdev_connect_gpio_out_named(DEVICE(goodix), "irq", 0,
++            qdev_get_gpio_in(DEVICE(&s->gpio[0]), 25));
++    }
++    {
++        DeviceState *ilitek = DEVICE(i2c_slave_create_simple(
++            s->i2c[1].bus, TYPE_PRIME_G2_ILITEK, 0x26));
++        qdev_connect_gpio_out_named(ilitek, "irq", 0,
++            qdev_get_gpio_in(DEVICE(&s->gpio[0]), 25));
++    }
++
++    {
++        DeviceState *kpp = qdev_new(TYPE_PRIME_G2_KPP);
++        SysBusDevice *ksbd = SYS_BUS_DEVICE(kpp);
++        sysbus_realize_and_unref(ksbd, &error_abort);
++        sysbus_mmio_map(ksbd, 0, FSL_IMX6UL_KPP_ADDR);
++        sysbus_connect_irq(ksbd, 0,
++                           qdev_get_gpio_in(gic, FSL_IMX6UL_KPP_IRQ));
++    }
++
++    {
++        DeviceState *nand = qdev_new(TYPE_PRIME_G2_NAND);
++        SysBusDevice *nsbd = SYS_BUS_DEVICE(nand);
++        sysbus_realize_and_unref(nsbd, &error_abort);
++        sysbus_mmio_map(nsbd, 0, FSL_IMX6UL_GPMI_ADDR);
++        sysbus_mmio_map(nsbd, 1, FSL_IMX6UL_BCH_ADDR);
++        sysbus_connect_irq(nsbd, 0,
++                           qdev_get_gpio_in(gic, FSL_IMX6UL_RAWNAND1_IRQ));
++        sysbus_connect_irq(nsbd, 1,
++                           qdev_get_gpio_in(gic, FSL_IMX6UL_RAWNAND2_IRQ));
+     }
+ 
+     /*
+diff --git a/hw/arm/meson.build b/hw/arm/meson.build
+--- a/hw/arm/meson.build
++++ b/hw/arm/meson.build
+@@ -91,7 +91,8 @@
+ stub_ss.add(files('smmuv3-accel-stubs.c'))
+ arm_common_ss.add(when: 'CONFIG_TEGRA241_CMDQV', if_true: files('tegra241-cmdqv.c'))
+ stub_ss.add(files('tegra241-cmdqv-stubs.c'))
+-arm_common_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files('fsl-imx6ul.c', 'mcimx6ul-evk.c'))
++arm_common_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files(
++  'fsl-imx6ul.c', 'mcimx6ul-evk.c', 'prime_g2_peripherals.c', 'prime_g2_bch.c'))
+ arm_common_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_soc.c'))
+ arm_common_ss.add(when: 'CONFIG_XEN', if_true: files(
+   'xen-stubs.c',
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -29,6 +29,8 @@
+     FIELD(CTRL1, CUR_FRAME_DONE_IRQ, 9, 1)
+     FIELD(CTRL1, CUR_FRAME_DONE_IRQ_EN, 13, 1)
+     FIELD(CTRL1, BYTE_PACKING_FORMAT, 16, 4)
++REG32(CTRL2, 0x20)
++    FIELD(CTRL2, OUTSTANDING_REQS, 21, 3)
+ REG32(V4_TRANSFER_COUNT, 0x30)
+     FIELD(V4_TRANSFER_COUNT, H_COUNT, 0, 16)
+     FIELD(V4_TRANSFER_COUNT, V_COUNT, 16, 16)
+@@ -103,12 +105,14 @@
+ 
+ static inline bool imx6ul_lcdif_reg_has_setclr(hwaddr reg)
+ {
++    /* Atomic SET/CLR/TOG aliases exist for control/timing/status registers. */
+     switch (reg) {
+-    case A_CTRL:
+-    case A_CTRL1:
+-        return true;
+-    default:
++    case A_V4_CUR_BUF:
++    case A_V4_NEXT_BUF:
++    case A_AS_NEXT_BUF:
+         return false;
++    default:
++        return imx6ul_lcdif_reg_exists(reg);
+     }
+ }
+ 
+@@ -157,6 +161,16 @@
+ {
+     uint32_t ctrl1 = s->regs[IMX6UL_LCDIF_REG_CTRL1];
+ 
++    if (s->regs[IMX6UL_LCDIF_REG_V4_NEXT_BUF] &&
++        s->regs[IMX6UL_LCDIF_REG_V4_NEXT_BUF] !=
++        s->regs[IMX6UL_LCDIF_REG_V4_CUR_BUF]) {
++        s->regs[IMX6UL_LCDIF_REG_V4_CUR_BUF] =
++            s->regs[IMX6UL_LCDIF_REG_V4_NEXT_BUF];
++        s->invalidate = true;
++        if (s->con) {
++            qemu_console_hw_invalidate(s->con);
++        }
++    }
+     ctrl1 = FIELD_DP32(ctrl1, CTRL1, CUR_FRAME_DONE_IRQ, 1);
+     s->regs[IMX6UL_LCDIF_REG_CTRL1] = ctrl1;
+     imx6ul_lcdif_update_irq(s);
+@@ -275,18 +288,27 @@
+     uint32_t cbcmr;
+     uint32_t pred;
+     uint32_t podf;
++    uint32_t parent_sel;
++    uint64_t parent_hz;
+ 
+     if (!s->prime_ccm) {
+         return 0;
+     }
+     cscdr2 = s->prime_ccm->ccm[CCM_CSCDR2];
+     cbcmr = s->prime_ccm->ccm[CCM_CBCMR];
+-    if (((cscdr2 >> 15) & 7) != 0 || ((cscdr2 >> 9) & 7) != 0 ||
++    parent_sel = (cscdr2 >> 15) & 7;
++    if ((cscdr2 >> 9) & 7 ||
+         ((s->prime_ccm->ccm[CCM_CCGR2] >> 28) & 3) == 0 ||
+         ((s->prime_ccm->ccm[CCM_CCGR3] >> 10) & 3) == 0) {
+         return 0;
+     }
++    /* Linux selects the 540 MHz video PLL (5); native uses PLL2 (0). */
++    parent_hz = parent_sel == 5 ? 540000000ULL :
++                parent_sel == 0 ? 528000000ULL : 0;
++    if (!parent_hz) {
++        return 0;
++    }
+     pred = ((cscdr2 >> 12) & 7) + 1;
+     podf = ((cbcmr >> 23) & 7) + 1;
+-    return 528000000ULL / pred / podf;
++    return parent_hz / pred / podf;
+ }
+@@ -846,16 +868,14 @@
+         qemu_console_hw_invalidate(s->con);
+         break;
+     case A_V4_NEXT_BUF:
+-        s->regs[IMX6UL_LCDIF_REG_V4_CUR_BUF] = s->regs[idx];
+-        imx6ul_lcdif_frame_done(s);
+-        s->invalidate = true;
+-        qemu_console_hw_invalidate(s->con);
++        /* Hardware latches NEXT at the following frame boundary. */
+         imx6ul_lcdif_maybe_schedule_frame(s);
+-        return;
++        break;
+     case A_AS_NEXT_BUF:
+-        imx6ul_lcdif_frame_done(s);
++        /* AS_NEXT_BUF requests the same VSYNC-bounded exchange. */
++        s->regs[IMX6UL_LCDIF_REG_V4_NEXT_BUF] = value;
+         imx6ul_lcdif_maybe_schedule_frame(s);
+-        return;
++        break;
+     default:
+         break;
+     }

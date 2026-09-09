@@ -1,0 +1,13 @@
+{
+  "schema": "mahalo.prime-g2.differential.v1",
+  "comparisons": [
+    {"physical": "derived.physical_width", "emulator": "display.width", "absolute_tolerance": 0},
+    {"physical": "derived.physical_height", "emulator": "display.height", "absolute_tolerance": 0},
+    {"physical": "records.LCDIF_TRANSFER_COUNT.decoded.horizontal_transfer_count", "emulator": "display.horizontal_transfer_count", "absolute_tolerance": 0},
+    {"physical": "records.LCDIF_TRANSFER_COUNT.decoded.vertical_transfer_count", "emulator": "display.vertical_transfer_count", "absolute_tolerance": 0},
+    {"physical": "records.LCDIF_VDCTRL1.decoded.vertical_period", "emulator": "display.vertical_period", "absolute_tolerance": 0},
+    {"physical": "records.LCDIF_VDCTRL2.decoded.horizontal_period", "emulator": "display.horizontal_period", "absolute_tolerance": 0},
+    {"physical": "records.LCDIF_CTRL2.decoded.outstanding_requests", "emulator": "display.outstanding_requests", "absolute_tolerance": 0},
+    {"physical": "derived.refresh_hz", "emulator_constant": 60.23102310231023, "absolute_tolerance": 0.1}
+  ]
+}

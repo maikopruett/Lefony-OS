@@ -1,0 +1,39 @@
+diff --git a/hw/timer/imx_gpt.c b/hw/timer/imx_gpt.c
+--- a/hw/timer/imx_gpt.c
++++ b/hw/timer/imx_gpt.c
+@@ -223,30 +223,25 @@
+     /* now, find the next timeout related to count */
+ 
+-    if (s->ir & GPT_IR_OF1IE) {
+-        timeout = imx_gpt_find_limit(count, s->ocr1, timeout);
+-    }
+-    if (s->ir & GPT_IR_OF2IE) {
+-        timeout = imx_gpt_find_limit(count, s->ocr2, timeout);
+-    }
+-    if (s->ir & GPT_IR_OF3IE) {
+-        timeout = imx_gpt_find_limit(count, s->ocr3, timeout);
+-    }
++    /* Status events occur independently of the interrupt enable mask. */
++    timeout = imx_gpt_find_limit(count, s->ocr1, timeout);
++    timeout = imx_gpt_find_limit(count, s->ocr2, timeout);
++    timeout = imx_gpt_find_limit(count, s->ocr3, timeout);
+ 
+     /* find the next set of interrupts to raise for next timer event */
+ 
+     s->next_int = 0;
+-    if ((s->ir & GPT_IR_OF1IE) && (timeout == s->ocr1)) {
++    if (timeout == s->ocr1) {
+         s->next_int |= GPT_SR_OF1;
+     }
+-    if ((s->ir & GPT_IR_OF2IE) && (timeout == s->ocr2)) {
++    if (timeout == s->ocr2) {
+         s->next_int |= GPT_SR_OF2;
+     }
+-    if ((s->ir & GPT_IR_OF3IE) && (timeout == s->ocr3)) {
++    if (timeout == s->ocr3) {
+         s->next_int |= GPT_SR_OF3;
+     }
+-    if ((s->ir & GPT_IR_ROVIE) && (timeout == GPT_TIMER_MAX)) {
++    if (timeout == GPT_TIMER_MAX) {
+         s->next_int |= GPT_SR_ROV;
+     }

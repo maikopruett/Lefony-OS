@@ -1,0 +1,10 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -238,2 +238,1 @@
+-    create_unimplemented_device("a7mpcore-usbmisc", FSL_IMX6UL_USBO2_USBMISC_ADDR,
+-                                FSL_IMX6UL_USBO2_USBMISC_SIZE);
++    /* USBNC is mapped by the Prime device-mode USB controller below. */
+@@ -581,1 +580,2 @@
+             sysbus_realize_and_unref(usbdev, &error_abort);
++            sysbus_mmio_map(usbdev, 1, FSL_IMX6UL_USBO2_USBMISC_ADDR);

@@ -1,0 +1,2958 @@
+{
+  "source_revision": "e40cc51e590b759eeee7f741e9cf02b78fe862ba",
+  "moved": [
+    {
+      "source": ".github/workflows/native-emulator.yml",
+      "destination": ".github/workflows/native-emulator.yml",
+      "source_sha256": "fb66bf38caec2518237cd3a30b959d0f3f2b2e9ecad0ea49ce2c4ae7d6c21210",
+      "destination_sha256": "c4a979c6c10a3adf632d363c40d9ae2293d02add555ceda2f14d3037c6049f12"
+    },
+    {
+      "source": "assets/lefony-logo.png",
+      "destination": "assets/lefony-logo.png",
+      "source_sha256": "2d657d4295756b6f22c9b7ad70fe4474c16a916e215e3cfa6247ab598c465db3",
+      "destination_sha256": "2d657d4295756b6f22c9b7ad70fe4474c16a916e215e3cfa6247ab598c465db3"
+    },
+    {
+      "source": "docs/HP-STOCK-EMULATOR-RESEARCH.md",
+      "destination": "docs/HP-STOCK-EMULATOR-RESEARCH.md",
+      "source_sha256": "8e57856d62a0b1b9a3dcfbdf4941edae131dc77b4e049f35b3fd6a679353e8b0",
+      "destination_sha256": "8e57856d62a0b1b9a3dcfbdf4941edae131dc77b4e049f35b3fd6a679353e8b0"
+    },
+    {
+      "source": "docs/LEFONY-DEVELOPMENT-USB.md",
+      "destination": "docs/LEFONY-DEVELOPMENT-USB.md",
+      "source_sha256": "7a73b1f796464d3383ca0c02e4d0be3d4aa0474386c918a46559d1340d18251e",
+      "destination_sha256": "7a73b1f796464d3383ca0c02e4d0be3d4aa0474386c918a46559d1340d18251e"
+    },
+    {
+      "source": "docs/LEFONY-UPDATE-ARCHITECTURE.md",
+      "destination": "docs/LEFONY-UPDATE-ARCHITECTURE.md",
+      "source_sha256": "b33ee2c7044d20aacea2c8c69c36b453a0b16e76546f55fccfb7ac366da693c5",
+      "destination_sha256": "b33ee2c7044d20aacea2c8c69c36b453a0b16e76546f55fccfb7ac366da693c5"
+    },
+    {
+      "source": "docs/PRIME-G2-AB-MIGRATION.md",
+      "destination": "docs/PRIME-G2-AB-MIGRATION.md",
+      "source_sha256": "c3084957992bc54895d8c79b715459beff94946856a7d76af33dc0153380ef3d",
+      "destination_sha256": "c3084957992bc54895d8c79b715459beff94946856a7d76af33dc0153380ef3d"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-DEVELOPMENT.md",
+      "destination": "docs/LEFONY-NATIVE-DEVELOPMENT.md",
+      "source_sha256": "9360575b94cb9e14f295d315eef75cb6b5a0e043edb85f06c23c62be8616a44a",
+      "destination_sha256": "1ec675904154ec5475f4414891e29a347d2e1cef6949e142f1f30ad4340a5794"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-LICENSING.md",
+      "destination": "docs/LEFONY-NATIVE-LICENSING.md",
+      "source_sha256": "4f358ead1f55dd12d79686bf372c468cab9ab99829a95965560ac88103de2fe3",
+      "destination_sha256": "77e3eb5ad2c1ea6d851b8d9f99f887847f99349df9bc081641cc93490696f5e6"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-PORT-CHECKLIST.md",
+      "destination": "docs/LEFONY-NATIVE-PORT-CHECKLIST.md",
+      "source_sha256": "caff06307039aa105902e0d6ec7ac5acda23895ed4f3a2563e022061e64074dc",
+      "destination_sha256": "b05ddbe612e8aff75399bf6dc6cb7850556c4ab490fe266c312004a94c3e8b35"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-PORT.md",
+      "destination": "docs/LEFONY-NATIVE-PORT.md",
+      "source_sha256": "029bd52a667d438b0b6e43354703f8417dfccf9539d3955a752755463dec84b1",
+      "destination_sha256": "f2ee0ae02e47018626e3c755b38345e334fdc6e162c1074b8648a26407ebfe5e"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-STORAGE-FORMAT.md",
+      "destination": "docs/LEFONY-NATIVE-STORAGE-FORMAT.md",
+      "source_sha256": "3175cd51d20f84899e399fc4a9c851841a5eb3c4cc7074b030d9dfe9e60c377a",
+      "destination_sha256": "3175cd51d20f84899e399fc4a9c851841a5eb3c4cc7074b030d9dfe9e60c377a"
+    },
+    {
+      "source": "docs/UPSILON-NATIVE-TOUCH.md",
+      "destination": "docs/LEFONY-NATIVE-TOUCH.md",
+      "source_sha256": "9873c4f6d0784f5e8c83c5ec508324830e1ea6a7e0863713eac911b0e6e8d090",
+      "destination_sha256": "9873c4f6d0784f5e8c83c5ec508324830e1ea6a7e0863713eac911b0e6e8d090"
+    },
+    {
+      "source": "docs/UPSILON-PRIME-INSTALLER.md",
+      "destination": "docs/LEFONY-INSTALLER.md",
+      "source_sha256": "a635c7501e56c211802a7928055a78c353f46dc9b5d063062cce336e74ad05f8",
+      "destination_sha256": "8778fa16e10a494695032682b9efbeaf4805df0aae1bbc1b4d5f55f44fd0973e"
+    },
+    {
+      "source": "hardware/prime_g2/BATTERY-CHARGER.md",
+      "destination": "hardware/prime_g2/BATTERY-CHARGER.md",
+      "source_sha256": "d6fb1b0cc4a189557b821a4ac643ff52654693303f22fa6d6aeae8dbfaa9382a",
+      "destination_sha256": "d6fb1b0cc4a189557b821a4ac643ff52654693303f22fa6d6aeae8dbfaa9382a"
+    },
+    {
+      "source": "hardware/prime_g2/BLACK-SCREEN-DIAGNOSIS.md",
+      "destination": "hardware/prime_g2/BLACK-SCREEN-DIAGNOSIS.md",
+      "source_sha256": "3af6b42b9f82561e6e231866e2bafa5f956da607bc3b3169e79e635b280594a1",
+      "destination_sha256": "3af6b42b9f82561e6e231866e2bafa5f956da607bc3b3169e79e635b280594a1"
+    },
+    {
+      "source": "hardware/prime_g2/EMULATOR-PARITY.md",
+      "destination": "hardware/prime_g2/EMULATOR-PARITY.md",
+      "source_sha256": "95d1399f7ef1e5fd69e39cb54266d9e05799a50e881df449887ce0f7a723e75d",
+      "destination_sha256": "11fe2aed318cd627f172e5d8c4e3f1dfefc27d09d909b20e902c4c30f91e58fc"
+    },
+    {
+      "source": "hardware/prime_g2/ILI9322-MODEL.md",
+      "destination": "hardware/prime_g2/ILI9322-MODEL.md",
+      "source_sha256": "f3c8051f31e4d9ba5695e99c9644102c2d5f34ce8d87fa0697809141864f4983",
+      "destination_sha256": "f3c8051f31e4d9ba5695e99c9644102c2d5f34ce8d87fa0697809141864f4983"
+    },
+    {
+      "source": "hardware/prime_g2/MMDC-CONFORMANCE.md",
+      "destination": "hardware/prime_g2/MMDC-CONFORMANCE.md",
+      "source_sha256": "c229fbc5c705ad1483c84a9c314e8b31736cecfaaf4fbecd6b9dbe060e30d9a8",
+      "destination_sha256": "c229fbc5c705ad1483c84a9c314e8b31736cecfaaf4fbecd6b9dbe060e30d9a8"
+    },
+    {
+      "source": "hardware/prime_g2/PWM-CONFORMANCE.md",
+      "destination": "hardware/prime_g2/PWM-CONFORMANCE.md",
+      "source_sha256": "bf9b3bfffd18932d0066996f1a4f2eea983c6c8294e621b79d41b46487a3868d",
+      "destination_sha256": "bf9b3bfffd18932d0066996f1a4f2eea983c6c8294e621b79d41b46487a3868d"
+    },
+    {
+      "source": "hardware/prime_g2/README.md",
+      "destination": "hardware/prime_g2/README.md",
+      "source_sha256": "b701c48f933bfce2d0b1e7af573028a3709fe855d8c48596e71954927545817e",
+      "destination_sha256": "13da88ed1b191be960cd1cc142a39f26a82a7b342f1839b4411b1d949aaf6f17"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/boot-dtb-hash.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/boot-dtb-hash.txt",
+      "source_sha256": "f700fccdcac81e62e3cfa67f32b85207ccfe141574c0ab24cc3d3d9ff7603b4c",
+      "destination_sha256": "f700fccdcac81e62e3cfa67f32b85207ccfe141574c0ab24cc3d3d9ff7603b4c"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/manifest.json",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/manifest.json",
+      "source_sha256": "0e7b84bfab7ef573e99084e27d71d78870347483b7eca8854a17c71d64fb8203",
+      "destination_sha256": "2bb3166d2677102446d48b754096fb251d6b8d30ecbadc1bf7ed119a79fb3505"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-ccm.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-ccm.txt",
+      "source_sha256": "3b7ae4e6beda90cedc219225f1f4b2ff1168ca910fce7fe80026a19e6e95390e",
+      "destination_sha256": "3b7ae4e6beda90cedc219225f1f4b2ff1168ca910fce7fe80026a19e6e95390e"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-gpio.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-gpio.txt",
+      "source_sha256": "8cc2e94bec08f81d4786292ae650ca80ed336bd0767dc3d03ce389d35e8c5d35",
+      "destination_sha256": "8cc2e94bec08f81d4786292ae650ca80ed336bd0767dc3d03ce389d35e8c5d35"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-iomuxc_display.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-iomuxc_display.txt",
+      "source_sha256": "ca234a5edfec4439c4ef7884fc073d804b62f4486391bf2cfa332349ec1d4960",
+      "destination_sha256": "ca234a5edfec4439c4ef7884fc073d804b62f4486391bf2cfa332349ec1d4960"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-kpp.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-kpp.txt",
+      "source_sha256": "3f8816625bae804726235899a32b1159046c6082da7d4ad189165493ee5ca628",
+      "destination_sha256": "3f8816625bae804726235899a32b1159046c6082da7d4ad189165493ee5ca628"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-lcdif.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-lcdif.txt",
+      "source_sha256": "bbd07018e17fddb78453dd553b1247cd071165227ba60670d493785deef93a72",
+      "destination_sha256": "bbd07018e17fddb78453dd553b1247cd071165227ba60670d493785deef93a72"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-pwm7.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-pwm7.txt",
+      "source_sha256": "2227093107c9fdfcd76176a4f36eeb466e54aa7b20a5ca100ff1ac8bab6ded5e",
+      "destination_sha256": "2227093107c9fdfcd76176a4f36eeb466e54aa7b20a5ca100ff1ac8bab6ded5e"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/registers-src.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/registers-src.txt",
+      "source_sha256": "1a62588dae6b32b46ac7b93f6be2d8f6c29975bad27b03922db5a5aa27fd7bb3",
+      "destination_sha256": "1a62588dae6b32b46ac7b93f6be2d8f6c29975bad27b03922db5a5aa27fd7bb3"
+    },
+    {
+      "source": "hardware/prime_g2/decoded/20260831T154107Z.json",
+      "destination": "hardware/prime_g2/decoded/20260831T154107Z.json",
+      "source_sha256": "d54ffefbf9896b3ad2d95114f75f157d4095944755b1b4e75b4063be259fa412",
+      "destination_sha256": "d54ffefbf9896b3ad2d95114f75f157d4095944755b1b4e75b4063be259fa412"
+    },
+    {
+      "source": "hardware/prime_g2/decoded/20260831T154107Z.md",
+      "destination": "hardware/prime_g2/decoded/20260831T154107Z.md",
+      "source_sha256": "a96649d430c0c0fe5679236bd2ff99dd9d8ae3b546489d920e61087058781740",
+      "destination_sha256": "a96649d430c0c0fe5679236bd2ff99dd9d8ae3b546489d920e61087058781740"
+    },
+    {
+      "source": "hardware/prime_g2/differential-contract.json",
+      "destination": "hardware/prime_g2/differential-contract.json",
+      "source_sha256": "6c2c3a49516278ff15b1f6886dcb250b642157599f042bec0c1cb6603f380d6b",
+      "destination_sha256": "6c2c3a49516278ff15b1f6886dcb250b642157599f042bec0c1cb6603f380d6b"
+    },
+    {
+      "source": "hardware/prime_g2/emulator-contract.json",
+      "destination": "hardware/prime_g2/emulator-contract.json",
+      "source_sha256": "7a2e64983c2766d05bd536e3a48ad372229f6936a31051ce1a3cc430ac7c88c6",
+      "destination_sha256": "7a2e64983c2766d05bd536e3a48ad372229f6936a31051ce1a3cc430ac7c88c6"
+    },
+    {
+      "source": "hardware/prime_g2/reference/battery-sampling-20260909.md",
+      "destination": "hardware/prime_g2/reference/battery-sampling-20260909.md",
+      "source_sha256": "baf087bbe4f40f3a83ff86cfd063ce6ce4557519cff9736e4ca3f0479d68c9e5",
+      "destination_sha256": "baf087bbe4f40f3a83ff86cfd063ce6ce4557519cff9736e4ca3f0479d68c9e5"
+    },
+    {
+      "source": "hardware/prime_g2/reference/calculation-touch-20260909.md",
+      "destination": "hardware/prime_g2/reference/calculation-touch-20260909.md",
+      "source_sha256": "3406b7418b922874b90f1a6dd51956a7dbe462528069cb417b8abde031cc9300",
+      "destination_sha256": "e7b0dd3d7424fd641a8eace283dd76eb1ef43d0bdec8e317877e2047a5711fa0"
+    },
+    {
+      "source": "hardware/prime_g2/reference/coordinate-touch-20260909.md",
+      "destination": "hardware/prime_g2/reference/coordinate-touch-20260909.md",
+      "source_sha256": "69792d2fa93e8a470b21062e1724558be04bfec7cfc8bb997814c21698d7a8a1",
+      "destination_sha256": "dc5875068fd18d5c53f77d64e25d195e7b4304ec335626129a93a1970017aae6"
+    },
+    {
+      "source": "hardware/prime_g2/reference/display-settings-20260909.md",
+      "destination": "hardware/prime_g2/reference/display-settings-20260909.md",
+      "source_sha256": "64972829b9d98cecd58714631741fc94ab6a8924a53d53096e09871529dfbc5f",
+      "destination_sha256": "64972829b9d98cecd58714631741fc94ab6a8924a53d53096e09871529dfbc5f"
+    },
+    {
+      "source": "hardware/prime_g2/reference/elapsed-clock-20260909.md",
+      "destination": "hardware/prime_g2/reference/elapsed-clock-20260909.md",
+      "source_sha256": "d759525c9521d9be36b1414ec20a12c6d8ef7772bfdf6b2b9087f907290fc8a6",
+      "destination_sha256": "d759525c9521d9be36b1414ec20a12c6d8ef7772bfdf6b2b9087f907290fc8a6"
+    },
+    {
+      "source": "hardware/prime_g2/reference/frame-presentation-20260909.md",
+      "destination": "hardware/prime_g2/reference/frame-presentation-20260909.md",
+      "source_sha256": "83fc8d1aa4c3c649ad12cafa0489e98acb7e5a0c795d176fa0ddf2875bae909f",
+      "destination_sha256": "83fc8d1aa4c3c649ad12cafa0489e98acb7e5a0c795d176fa0ddf2875bae909f"
+    },
+    {
+      "source": "hardware/prime_g2/reference/functions-touch-20260909.md",
+      "destination": "hardware/prime_g2/reference/functions-touch-20260909.md",
+      "source_sha256": "78961d4b1a8b34d4112eea7e6f69d33e7b403a06b603676ccca2dae50fa40de0",
+      "destination_sha256": "78961d4b1a8b34d4112eea7e6f69d33e7b403a06b603676ccca2dae50fa40de0"
+    },
+    {
+      "source": "hardware/prime_g2/reference/keypad-matrix.csv",
+      "destination": "hardware/prime_g2/reference/keypad-matrix.csv",
+      "source_sha256": "ff4db1cd0f8ae74bffce84b80ceaaf578095d1f61265ac8db6b35350349c4451",
+      "destination_sha256": "ff4db1cd0f8ae74bffce84b80ceaaf578095d1f61265ac8db6b35350349c4451"
+    },
+    {
+      "source": "hardware/prime_g2/reference/lefony-prinux-uboot-install-20260909.md",
+      "destination": "hardware/prime_g2/reference/lefony-prinux-uboot-install-20260909.md",
+      "source_sha256": "71b8d9edc62c4e11b484a56a49adb641b9e311fae9bfd350d0326d8915cfdf9d",
+      "destination_sha256": "1483e8ce86edc7ce19333f00569ac3f874bda4bdabbd59189724d1bab0e76531"
+    },
+    {
+      "source": "hardware/prime_g2/reference/main-timer-20260909.md",
+      "destination": "hardware/prime_g2/reference/main-timer-20260909.md",
+      "source_sha256": "b1a2f78d3abda72584c1712fe319afb01a33eb22a508f1b31ffcebaeccf1efe8",
+      "destination_sha256": "b1a2f78d3abda72584c1712fe319afb01a33eb22a508f1b31ffcebaeccf1efe8"
+    },
+    {
+      "source": "hardware/prime_g2/reference/math-template-palette-20260909.md",
+      "destination": "hardware/prime_g2/reference/math-template-palette-20260909.md",
+      "source_sha256": "41e33dd70d0292037a479352de8e2137268de6f2dd9b6e0cfe8f750e0b55cced",
+      "destination_sha256": "41e33dd70d0292037a479352de8e2137268de6f2dd9b6e0cfe8f750e0b55cced"
+    },
+    {
+      "source": "hardware/prime_g2/reference/native-usb-update-20260909.md",
+      "destination": "hardware/prime_g2/reference/native-usb-update-20260909.md",
+      "source_sha256": "beab8d0ac1b18e7edab1b39ccda9f35ed61473d581416e0830ea2489af33c98f",
+      "destination_sha256": "beab8d0ac1b18e7edab1b39ccda9f35ed61473d581416e0830ea2489af33c98f"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-clock-nand-status-20260907.json",
+      "destination": "hardware/prime_g2/reference/rom-clock-nand-status-20260907.json",
+      "source_sha256": "1886ffe92d838919e8e44236938270444e9e935cc48378ad3c9395598b321a1e",
+      "destination_sha256": "1886ffe92d838919e8e44236938270444e9e935cc48378ad3c9395598b321a1e"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-dma-buffers-20260907.json",
+      "destination": "hardware/prime_g2/reference/rom-dma-buffers-20260907.json",
+      "source_sha256": "c9ef55dbca4409e5be52210c3a735507315e867e65d79ff6710aa02aaf52695b",
+      "destination_sha256": "db9e6df9ad9e433ec2c7f4d35df7e535d892c4611e06d3274c9135483a16a328"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-dma-chain-20260907.json",
+      "destination": "hardware/prime_g2/reference/rom-dma-chain-20260907.json",
+      "source_sha256": "03cb62385c0c5a212b05828de42981d9794739f1108b09d6b22e4b05523fdb56",
+      "destination_sha256": "03cb62385c0c5a212b05828de42981d9794739f1108b09d6b22e4b05523fdb56"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-reset-clock-20260908T053848Z.json",
+      "destination": "hardware/prime_g2/reference/rom-reset-clock-20260908T053848Z.json",
+      "source_sha256": "a0acf47d53407a8c250284b909fbf621560b3b83602d8a8b3af0f4d14d118e1e",
+      "destination_sha256": "a0acf47d53407a8c250284b909fbf621560b3b83602d8a8b3af0f4d14d118e1e"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-src-snapshot.json",
+      "destination": "hardware/prime_g2/reference/rom-src-snapshot.json",
+      "source_sha256": "8c83bfa13c3cc2a3fa23768a15fbe3aa3ad19e59486610df27c6c0ad39098939",
+      "destination_sha256": "8c83bfa13c3cc2a3fa23768a15fbe3aa3ad19e59486610df27c6c0ad39098939"
+    },
+    {
+      "source": "hardware/prime_g2/reference/rom-usb-descriptors.json",
+      "destination": "hardware/prime_g2/reference/rom-usb-descriptors.json",
+      "source_sha256": "7d1e3c4dfdbabeba905c4925829dcc0cc7d0fe5ae1c341e139dc3590fc6f2296",
+      "destination_sha256": "7d1e3c4dfdbabeba905c4925829dcc0cc7d0fe5ae1c341e139dc3590fc6f2296"
+    },
+    {
+      "source": "hardware/prime_g2/reference/shift-shortcuts-20260909.md",
+      "destination": "hardware/prime_g2/reference/shift-shortcuts-20260909.md",
+      "source_sha256": "36fd21608826d92efb62b577d4bd2b148b037fefe684a8b07fbbd9b365705f0c",
+      "destination_sha256": "019fc1d75b83848cd5599049af3a05c8007a137621d1a442b57d21220708698c"
+    },
+    {
+      "source": "hardware/prime_g2/reference/sources.json",
+      "destination": "hardware/prime_g2/reference/sources.json",
+      "source_sha256": "30a0007366221e3955556cba985881782fd6416d2ed7fca2c73ae5951754a924",
+      "destination_sha256": "026b21471f39f5f0a64260275b1476c56c69a46dcd6ac581cfd9eefbd5f5eec4"
+    },
+    {
+      "source": "native/prime_g2/lefony_ab_physical.c",
+      "destination": "native/prime_g2/lefony_ab_physical.c",
+      "source_sha256": "78338aaa205887a5e65e9cc63080eb5feee753ce2e70ff80cd983b96caf5d288",
+      "destination_sha256": "78338aaa205887a5e65e9cc63080eb5feee753ce2e70ff80cd983b96caf5d288"
+    },
+    {
+      "source": "native/prime_g2/nand_boot_capsule.S",
+      "destination": "native/prime_g2/nand_boot_capsule.S",
+      "source_sha256": "583b47591665e0ddb757f152dff62cdc9a54ca719f7ab9306380fce4818cb821",
+      "destination_sha256": "583b47591665e0ddb757f152dff62cdc9a54ca719f7ab9306380fce4818cb821"
+    },
+    {
+      "source": "native/prime_g2/nand_boot_capsule.ld",
+      "destination": "native/prime_g2/nand_boot_capsule.ld",
+      "source_sha256": "f3a701edf8fafd60b6c271aa4bb126fe4f7c69d84229d6efb7fbe298773b7bc1",
+      "destination_sha256": "99c3a54431496535010b3e9c7ab18fc85e1596bc8bea6a405bfc046c4b37a1f9"
+    },
+    {
+      "source": "native/prime_g2/nand_layout.json",
+      "destination": "native/prime_g2/nand_layout.json",
+      "source_sha256": "7ae8bdf6a408544133e9cbc544a37e8e4b3fbcac2062c949ff4c3b9bb44c92d0",
+      "destination_sha256": "7ae8bdf6a408544133e9cbc544a37e8e4b3fbcac2062c949ff4c3b9bb44c92d0"
+    },
+    {
+      "source": "native/prime_g2/rom_recovery_stub.S",
+      "destination": "native/prime_g2/rom_recovery_stub.S",
+      "source_sha256": "32db8d5d0d193a06a8bc227d573349707937e45f1d00ba17aec37dbb1be68487",
+      "destination_sha256": "32db8d5d0d193a06a8bc227d573349707937e45f1d00ba17aec37dbb1be68487"
+    },
+    {
+      "source": "native/prime_g2/rom_recovery_stub.ld",
+      "destination": "native/prime_g2/rom_recovery_stub.ld",
+      "source_sha256": "988f315991d214870d47b1f1d30e111592709b5c630663def4c4bdfdeaf1dfdd",
+      "destination_sha256": "d20fa867623070049529edbce4eb28811969197812e2ef89934218258c5c548f"
+    },
+    {
+      "source": "native/prime_g2/u-boot-lefony-ab.patch",
+      "destination": "native/prime_g2/u-boot-lefony-ab.patch",
+      "source_sha256": "c199724c5ee2b23f575caa78088a5c2d13265e1277443bed80a46a9be9f335d1",
+      "destination_sha256": "c199724c5ee2b23f575caa78088a5c2d13265e1277443bed80a46a9be9f335d1"
+    },
+    {
+      "source": "native/prime_g2/upsilon_ab_boot.env",
+      "destination": "native/prime_g2/lefony_ab_boot.env",
+      "source_sha256": "10f72030ca9ea6a1ffc64c441c208818435f1765656568a1f9f1994af7b22e93",
+      "destination_sha256": "e9d3cf574edd42df4b61a6688456383c4f7a02f4c9ff88083cb968f126864575"
+    },
+    {
+      "source": "ports/upsilon-hpprime/Dockerfile.baremetal",
+      "destination": "ports/lefony-prime-g2/Dockerfile.baremetal",
+      "source_sha256": "39c219bd6a7ca9d2c84a785fdf3740b41784efa009b622fed4b4eaddcab7e9b9",
+      "destination_sha256": "39c219bd6a7ca9d2c84a785fdf3740b41784efa009b622fed4b4eaddcab7e9b9"
+    },
+    {
+      "source": "ports/upsilon-hpprime/Dockerfile.upstream-tests",
+      "destination": "ports/lefony-prime-g2/Dockerfile.upstream-tests",
+      "source_sha256": "2fae09faa8402fc8a41d9e864d92ccf6da50ddf128191c8eedd9844b64ae144f",
+      "destination_sha256": "2fae09faa8402fc8a41d9e864d92ccf6da50ddf128191c8eedd9844b64ae144f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/LEFONY_VERSION",
+      "destination": "ports/lefony-prime-g2/LEFONY_VERSION",
+      "source_sha256": "c2ef39e09593cca70be98a0fb0ab435b53e2eb3c3d4e812cd7d43794eafa7728",
+      "destination_sha256": "c2ef39e09593cca70be98a0fb0ab435b53e2eb3c3d4e812cd7d43794eafa7728"
+    },
+    {
+      "source": "ports/upsilon-hpprime/README.md",
+      "destination": "ports/lefony-prime-g2/README.md",
+      "source_sha256": "0a325d917556af6f044ee9e66ba66b72ef95cf56fc1af4f00e9c40508d6ac32f",
+      "destination_sha256": "5fd1876685fd1f77359d2f037c61933f6160e1d75ccc5969f370c380be7b4f50"
+    },
+    {
+      "source": "ports/upsilon-hpprime/UPSTREAM",
+      "destination": "ports/lefony-prime-g2/UPSTREAM",
+      "source_sha256": "9aa7558681d64581db53f3da0ba171830971dd3f20043972fadd13970a361d88",
+      "destination_sha256": "9aa7558681d64581db53f3da0ba171830971dd3f20043972fadd13970a361d88"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/battery_view.cpp",
+      "destination": "ports/lefony-prime-g2/apps/battery_view.cpp",
+      "source_sha256": "a62872ff9330902857826f25605d3895b7a9b0751b595864266f2159ab984117",
+      "destination_sha256": "a62872ff9330902857826f25605d3895b7a9b0751b595864266f2159ab984117"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/battery_view.h",
+      "destination": "ports/lefony-prime-g2/apps/battery_view.h",
+      "source_sha256": "1d1d66bb523ad99660cc2413b62d2d8c8e1896d97c0eb29ecbd79c760cda1792",
+      "destination_sha256": "1d1d66bb523ad99660cc2413b62d2d8c8e1896d97c0eb29ecbd79c760cda1792"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/lefony_usb_page.h",
+      "destination": "ports/lefony-prime-g2/apps/lefony_usb_page.h",
+      "source_sha256": "d18f7e905f0cb4cb4d480bc6806d2e4c951a311ed55af0a8d725095133b55577",
+      "destination_sha256": "d18f7e905f0cb4cb4d480bc6806d2e4c951a311ed55af0a8d725095133b55577"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_calculation_touch_impl.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_calculation_touch_impl.h",
+      "source_sha256": "a0ada087358cc21dc63d4b8b27a703fffd1a8b6509926661270ab6fe4a9e8b34",
+      "destination_sha256": "a0ada087358cc21dc63d4b8b27a703fffd1a8b6509926661270ab6fe4a9e8b34"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_frame.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_frame.h",
+      "source_sha256": "c3b4a4803ef20556b0444d143d06e11b80ec3094528e1831a6b4f98561dd77d3",
+      "destination_sha256": "c3b4a4803ef20556b0444d143d06e11b80ec3094528e1831a6b4f98561dd77d3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_g2_boot_progress.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_g2_boot_progress.h",
+      "source_sha256": "61e1cc85a2cba734ac329dd53dd1e1b40efefd23878acc28524c3c066d79e634",
+      "destination_sha256": "61e1cc85a2cba734ac329dd53dd1e1b40efefd23878acc28524c3c066d79e634"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_g2_persistent_datasets.cpp",
+      "destination": "ports/lefony-prime-g2/apps/prime_g2_persistent_datasets.cpp",
+      "source_sha256": "ba580f14021f664fd106906165c3a3c0263f1000da4548e753d4354c8f8f36d7",
+      "destination_sha256": "ba580f14021f664fd106906165c3a3c0263f1000da4548e753d4354c8f8f36d7"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_g2_persistent_preferences.cpp",
+      "destination": "ports/lefony-prime-g2/apps/prime_g2_persistent_preferences.cpp",
+      "source_sha256": "64cff35550e3fdf87860953f87d098363236ce0fe5f7c5fc01b3f68c6f926b44",
+      "destination_sha256": "64cff35550e3fdf87860953f87d098363236ce0fe5f7c5fc01b3f68c6f926b44"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_g2_test_state.cpp",
+      "destination": "ports/lefony-prime-g2/apps/prime_g2_test_state.cpp",
+      "source_sha256": "41615ac9007387c4453d483fb6bcb788ecb1cd562ddc000ca873448bde0fa418",
+      "destination_sha256": "41615ac9007387c4453d483fb6bcb788ecb1cd562ddc000ca873448bde0fa418"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_graph_gesture.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_graph_gesture.h",
+      "source_sha256": "7b2adc1910f9041b609cea98454166358c63f62bf5f74dc05b87087b60a74fdd",
+      "destination_sha256": "7b2adc1910f9041b609cea98454166358c63f62bf5f74dc05b87087b60a74fdd"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_graph_touch_impl.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_graph_touch_impl.h",
+      "source_sha256": "03b6e08e27fcaea50bd3fd45fd3cb352a8f23f2920bd8f37b636c586efdbfd5e",
+      "destination_sha256": "03b6e08e27fcaea50bd3fd45fd3cb352a8f23f2920bd8f37b636c586efdbfd5e"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_math_template_palette.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_math_template_palette.h",
+      "source_sha256": "a9dbc3bd2088e7940e85c49b43304b8cd295e3e951041b586254cddce123094f",
+      "destination_sha256": "a9dbc3bd2088e7940e85c49b43304b8cd295e3e951041b586254cddce123094f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_touch_controls_impl.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_touch_controls_impl.h",
+      "source_sha256": "099c249c7b008cc01fbdc813fbb45653c7b04eacf9bf21827f2fce1ff0eb5429",
+      "destination_sha256": "099c249c7b008cc01fbdc813fbb45653c7b04eacf9bf21827f2fce1ff0eb5429"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/prime_touch_table_impl.h",
+      "destination": "ports/lefony-prime-g2/apps/prime_touch_table_impl.h",
+      "source_sha256": "348738feb7a404a47f06d22cb16125be9118d3b3f341fb759edb3d9470d941cf",
+      "destination_sha256": "348738feb7a404a47f06d22cb16125be9118d3b3f341fb759edb3d9470d941cf"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/recovery/Makefile",
+      "destination": "ports/lefony-prime-g2/apps/recovery/Makefile",
+      "source_sha256": "67fbdac5cf0d23875c8a61e6e3e722c3fd4a5a758a15108c2238037bd65ed45b",
+      "destination_sha256": "67fbdac5cf0d23875c8a61e6e3e722c3fd4a5a758a15108c2238037bd65ed45b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/recovery/app.cpp",
+      "destination": "ports/lefony-prime-g2/apps/recovery/app.cpp",
+      "source_sha256": "a2386e05bbaba4a008bbd6c4eb31a42eb1f1983c0b1bca002fb14428717d0108",
+      "destination_sha256": "a2386e05bbaba4a008bbd6c4eb31a42eb1f1983c0b1bca002fb14428717d0108"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/recovery/app.h",
+      "destination": "ports/lefony-prime-g2/apps/recovery/app.h",
+      "source_sha256": "527d8f144feba0f2414592260e6f46957da2c2730fe75c3d59e5ec6efae0153a",
+      "destination_sha256": "527d8f144feba0f2414592260e6f46957da2c2730fe75c3d59e5ec6efae0153a"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/recovery/base.universal.i18n",
+      "destination": "ports/lefony-prime-g2/apps/recovery/base.universal.i18n",
+      "source_sha256": "3086324d11533b3655a046575bd514cc5e21231910d4c2d524d808db10c92c60",
+      "destination_sha256": "3086324d11533b3655a046575bd514cc5e21231910d4c2d524d808db10c92c60"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/settings/sub_menu/about_controller.cpp",
+      "destination": "ports/lefony-prime-g2/apps/settings/sub_menu/about_controller.cpp",
+      "source_sha256": "3efaf84b18f12f441a141d66de8b78e90e94d8bb390a714f431724080f48f1c5",
+      "destination_sha256": "9dee91b4b1ff5b5708074e6de0beb6a624e364a3ebec217555c0ab45504c825f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/settings/sub_menu/about_controller.h",
+      "destination": "ports/lefony-prime-g2/apps/settings/sub_menu/about_controller.h",
+      "source_sha256": "f8b8fff3eee7d4da3c0a92312d9989fe9578ba861dd178881f3a7ec7c909999e",
+      "destination_sha256": "f8b8fff3eee7d4da3c0a92312d9989fe9578ba861dd178881f3a7ec7c909999e"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/settings/sub_menu/lefony_recovery_controller.h",
+      "destination": "ports/lefony-prime-g2/apps/settings/sub_menu/lefony_recovery_controller.h",
+      "source_sha256": "72a9b4b368c2df2010bb48f7a0bc084012ee3358001e29d6e58f9c1b88bb35b7",
+      "destination_sha256": "72a9b4b368c2df2010bb48f7a0bc084012ee3358001e29d6e58f9c1b88bb35b7"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/settings/sub_menu/lefony_refresh_controller.h",
+      "destination": "ports/lefony-prime-g2/apps/settings/sub_menu/lefony_refresh_controller.h",
+      "source_sha256": "193506038e6497d7db1bbfa2663b2412061c597bbbcf5c2bbc3906e693d7c4d7",
+      "destination_sha256": "193506038e6497d7db1bbfa2663b2412061c597bbbcf5c2bbc3906e693d7c4d7"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/settings/sub_menu/lefony_usb_controller.h",
+      "destination": "ports/lefony-prime-g2/apps/settings/sub_menu/lefony_usb_controller.h",
+      "source_sha256": "142618b7c56f400cf5d227c197917856a6048fae0a61584061344fbf7de53e0b",
+      "destination_sha256": "142618b7c56f400cf5d227c197917856a6048fae0a61584061344fbf7de53e0b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/apps/suspend_timer.cpp",
+      "destination": "ports/lefony-prime-g2/apps/suspend_timer.cpp",
+      "source_sha256": "29d0669ac528b96d39d08377f9706750e4b537a9102a85294fb10a5d52d526a4",
+      "destination_sha256": "29d0669ac528b96d39d08377f9706750e4b537a9102a85294fb10a5d52d526a4"
+    },
+    {
+      "source": "ports/upsilon-hpprime/build/platform.prime_g2.mak",
+      "destination": "ports/lefony-prime-g2/build/platform.prime_g2.mak",
+      "source_sha256": "b54f7fc4498322d8e88626dd433f5cca52bf5da7f3ffdb75578702d3093f35e9",
+      "destination_sha256": "b54f7fc4498322d8e88626dd433f5cca52bf5da7f3ffdb75578702d3093f35e9"
+    },
+    {
+      "source": "ports/upsilon-hpprime/build/platform.prime_g2_vm.mak",
+      "destination": "ports/lefony-prime-g2/build/platform.prime_g2_vm.mak",
+      "source_sha256": "1a413a76b4f733aef8617215fbfed36abf8d01428068384050e8a8e1836fdec1",
+      "destination_sha256": "1a413a76b4f733aef8617215fbfed36abf8d01428068384050e8a8e1836fdec1"
+    },
+    {
+      "source": "ports/upsilon-hpprime/build/targets.prime_g2.mak",
+      "destination": "ports/lefony-prime-g2/build/targets.prime_g2.mak",
+      "source_sha256": "cc659dc56b1d3ff1a7c5f2a904f758957ac126148e35007a157c4353e9326ff1",
+      "destination_sha256": "cc659dc56b1d3ff1a7c5f2a904f758957ac126148e35007a157c4353e9326ff1"
+    },
+    {
+      "source": "ports/upsilon-hpprime/build/toolchain.armv7a-gcc.mak",
+      "destination": "ports/lefony-prime-g2/build/toolchain.armv7a-gcc.mak",
+      "source_sha256": "6ea22170accc14e5d976f594a985295b6abe729f4ac7b479916329627ce22b89",
+      "destination_sha256": "6ea22170accc14e5d976f594a985295b6abe729f4ac7b479916329627ce22b89"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/include/ion/touch.h",
+      "destination": "ports/lefony-prime-g2/ion/include/ion/touch.h",
+      "source_sha256": "303da5be6cffafc60a30a816138cc6d416c8cbb9def1f2f3ab07525b6218f255",
+      "destination_sha256": "303da5be6cffafc60a30a816138cc6d416c8cbb9def1f2f3ab07525b6218f255"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/Makefile",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/Makefile",
+      "source_sha256": "4956ff4aa6bbe2994e26ede6ce6f8dc447d8877cdab834011329fa2ba5f08628",
+      "destination_sha256": "4956ff4aa6bbe2994e26ede6ce6f8dc447d8877cdab834011329fa2ba5f08628"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/backlight.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/backlight.cpp",
+      "source_sha256": "1145cfb7ec5fa7c5593eb009814c94cfccdbb852f10266e1bc416f17ee97040f",
+      "destination_sha256": "1145cfb7ec5fa7c5593eb009814c94cfccdbb852f10266e1bc416f17ee97040f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/backlight.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/backlight.h",
+      "source_sha256": "76958f87a081b0b37c1410a46fdeb029b14f1c7e9e77f66791f565a4c23254d2",
+      "destination_sha256": "76958f87a081b0b37c1410a46fdeb029b14f1c7e9e77f66791f565a4c23254d2"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/battery_adc.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/battery_adc.cpp",
+      "source_sha256": "ae01806d2de68542251459d2b0794f8b0cd21eadebf594ef49395e347746c7cc",
+      "destination_sha256": "ae01806d2de68542251459d2b0794f8b0cd21eadebf594ef49395e347746c7cc"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/battery_adc.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/battery_adc.h",
+      "source_sha256": "156c3048e852b2870da0a9c6f2fe927b3af74bb5042354c5e0586b98c27ea60f",
+      "destination_sha256": "156c3048e852b2870da0a9c6f2fe927b3af74bb5042354c5e0586b98c27ea60f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/block_storage.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/block_storage.cpp",
+      "source_sha256": "0d1688d3049d5a9d791571f05c226b2cb0df660f31a8ff7bcafd515987c24be3",
+      "destination_sha256": "0d1688d3049d5a9d791571f05c226b2cb0df660f31a8ff7bcafd515987c24be3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/block_storage.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/block_storage.h",
+      "source_sha256": "30837bde23d2a75643fdc3527f776b12f1c487d58415c4cdd35f30ecc4ebe2b0",
+      "destination_sha256": "30837bde23d2a75643fdc3527f776b12f1c487d58415c4cdd35f30ecc4ebe2b0"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/board.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/board.cpp",
+      "source_sha256": "7bd9447bafb7ca527479195af510fde5c7e02bfc0de273630cc805b19d0eab6d",
+      "destination_sha256": "7bd9447bafb7ca527479195af510fde5c7e02bfc0de273630cc805b19d0eab6d"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/board.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/board.h",
+      "source_sha256": "454dfcebcbceffd16d3ff2b47e91198af2e7992f3f09e26ea8bfd603830cdb92",
+      "destination_sha256": "454dfcebcbceffd16d3ff2b47e91198af2e7992f3f09e26ea8bfd603830cdb92"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/boot/prime_g2.ld",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/boot/prime_g2.ld",
+      "source_sha256": "62866837394b5ff8205aeed976edacdc872917eab0c47e29d452101852e7fd15",
+      "destination_sha256": "62866837394b5ff8205aeed976edacdc872917eab0c47e29d452101852e7fd15"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/boot/runtime.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/boot/runtime.cpp",
+      "source_sha256": "4b7b614679aa0f290cd673f9ad9585d022e571a9609159859c4fae1821d5cddc",
+      "destination_sha256": "4b7b614679aa0f290cd673f9ad9585d022e571a9609159859c4fae1821d5cddc"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/boot/start.s",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/boot/start.s",
+      "source_sha256": "05cfd7c5839c2f77436f84875d6f82077ecb16b3400755c887e4bf9d9efe94ee",
+      "destination_sha256": "05cfd7c5839c2f77436f84875d6f82077ecb16b3400755c887e4bf9d9efe94ee"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/console.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/console.cpp",
+      "source_sha256": "117a88ac90c30ffb8be5a972cf020005a963a848dd48e30dce42c0ad477ae4f8",
+      "destination_sha256": "117a88ac90c30ffb8be5a972cf020005a963a848dd48e30dce42c0ad477ae4f8"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/development_update.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/development_update.cpp",
+      "source_sha256": "c87521b9eb91dfb6e0f755bb3d806a179cbd16751df5a18eb966181d153dc425",
+      "destination_sha256": "c87521b9eb91dfb6e0f755bb3d806a179cbd16751df5a18eb966181d153dc425"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/development_update.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/development_update.h",
+      "source_sha256": "0aaa8a83f5e609cb9402f02631816287c0f5c3fda905614b4c27d145b0265be2",
+      "destination_sha256": "0aaa8a83f5e609cb9402f02631816287c0f5c3fda905614b4c27d145b0265be2"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/diagnostics.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/diagnostics.cpp",
+      "source_sha256": "b7c88cbb374f267b77429501f4fe7cae924c9549a6e19ac86470332dbe41a2c3",
+      "destination_sha256": "b7c88cbb374f267b77429501f4fe7cae924c9549a6e19ac86470332dbe41a2c3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/diagnostics.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/diagnostics.h",
+      "source_sha256": "9425d6528c765b9d5cf9b19a2d677bbc8aef6c7b9eed6903bd5ba01fa2658c9d",
+      "destination_sha256": "9425d6528c765b9d5cf9b19a2d677bbc8aef6c7b9eed6903bd5ba01fa2658c9d"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/display.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/display.cpp",
+      "source_sha256": "ba2e41d415e80354f018d0a5815ab7df21fbeba9a16dc8916003a89965457e96",
+      "destination_sha256": "ba2e41d415e80354f018d0a5815ab7df21fbeba9a16dc8916003a89965457e96"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/display.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/display.h",
+      "source_sha256": "21219778b1ff8498fb83a9b0f10f135ee1b9da3fb6cd31f8e175a843e6a3da9b",
+      "destination_sha256": "21219778b1ff8498fb83a9b0f10f135ee1b9da3fb6cd31f8e175a843e6a3da9b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/elapsed_clock.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/elapsed_clock.h",
+      "source_sha256": "93b8c2bb8370903562fa32afb6076fb8a088c636b771030f7e338584e52cdb68",
+      "destination_sha256": "93b8c2bb8370903562fa32afb6076fb8a088c636b771030f7e338584e52cdb68"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/emulator.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/emulator.cpp",
+      "source_sha256": "efbcdcfa99e96f9f844eae2a47c6c631f7c6abdf1ce546654991df2dc3b6c17c",
+      "destination_sha256": "423864d97eb39965bc43d926072191d25c483aff575bdf23b6b36885092cb4ad"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/emulator.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/emulator.h",
+      "source_sha256": "2417aa72ee8f50080bc52da350989397b692faffb6068f6c8dac0edaa2f2e466",
+      "destination_sha256": "2417aa72ee8f50080bc52da350989397b692faffb6068f6c8dac0edaa2f2e466"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/events.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/events.cpp",
+      "source_sha256": "7a5a412ea32b4fda942124fb5d689b044df60b7108a9dd0ab6959b818e736d88",
+      "destination_sha256": "7a5a412ea32b4fda942124fb5d689b044df60b7108a9dd0ab6959b818e736d88"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/frame_presenter.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/frame_presenter.h",
+      "source_sha256": "eabf1baeb2813a2af3113f6cb315f02fb0050c6d10625dddb16c899ffb6e91b2",
+      "destination_sha256": "eabf1baeb2813a2af3113f6cb315f02fb0050c6d10625dddb16c899ffb6e91b2"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/i2c.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/i2c.cpp",
+      "source_sha256": "74cf5c59d879d3624cefd89eab4f61cba1d55763f26b6354fc748e18c3313835",
+      "destination_sha256": "74cf5c59d879d3624cefd89eab4f61cba1d55763f26b6354fc748e18c3313835"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/i2c.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/i2c.h",
+      "source_sha256": "1997c36517d163ffbe8487abf202c03800d221278e08bdda7e941f58e4fa88fe",
+      "destination_sha256": "1997c36517d163ffbe8487abf202c03800d221278e08bdda7e941f58e4fa88fe"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/interrupts.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/interrupts.cpp",
+      "source_sha256": "85ca6f7136a205ce4d73319d164cb8e172075890ab6140aaa48ff3fad90f4ff9",
+      "destination_sha256": "85ca6f7136a205ce4d73319d164cb8e172075890ab6140aaa48ff3fad90f4ff9"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/interrupts.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/interrupts.h",
+      "source_sha256": "44a8f34d8d13b5e65b732ca92871675c7a02d5bb5cfbafc23ff3141f7011767e",
+      "destination_sha256": "44a8f34d8d13b5e65b732ca92871675c7a02d5bb5cfbafc23ff3141f7011767e"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/keyboard.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/keyboard.cpp",
+      "source_sha256": "75cbb05cc306860bc6c2a219f725721665d39cc681701643c47626a9b1fb824a",
+      "destination_sha256": "75cbb05cc306860bc6c2a219f725721665d39cc681701643c47626a9b1fb824a"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/keymap.inc",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/keymap.inc",
+      "source_sha256": "1d5cae569e03b8e0ec62246f13cad5a55b042c2da2751e44893166c253065362",
+      "destination_sha256": "1d5cae569e03b8e0ec62246f13cad5a55b042c2da2751e44893166c253065362"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/nand_physical.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/nand_physical.cpp",
+      "source_sha256": "648e0c771a19a1b2a78da0dacde5ba15fc8819fe83a6263d2f43b45b9af0dd25",
+      "destination_sha256": "648e0c771a19a1b2a78da0dacde5ba15fc8819fe83a6263d2f43b45b9af0dd25"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/nand_physical.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/nand_physical.h",
+      "source_sha256": "caec9beb293e7bf2bb635e32bf0f668c2a51828fbd133f9f14b05496c5bcd5d3",
+      "destination_sha256": "caec9beb293e7bf2bb635e32bf0f668c2a51828fbd133f9f14b05496c5bcd5d3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/nand_update.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/nand_update.cpp",
+      "source_sha256": "712767018a062a612d56b694471fa4c115077aad90d20e70b3b8800583f602bf",
+      "destination_sha256": "712767018a062a612d56b694471fa4c115077aad90d20e70b3b8800583f602bf"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/nand_update.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/nand_update.h",
+      "source_sha256": "1626ac7c75205c03eeb88bdaf535da95afc93745256c9afe50ab7e5c73a096fe",
+      "destination_sha256": "1626ac7c75205c03eeb88bdaf535da95afc93745256c9afe50ab7e5c73a096fe"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/persistence.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/persistence.cpp",
+      "source_sha256": "87907e7aae9a05341558c499439733236aba98ef5ab3fc2b04e75aa911cba4a5",
+      "destination_sha256": "863b14069871fc55b28364f484e9580d84a7cf60e02360877fc6df712414bf82"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/persistence.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/persistence.h",
+      "source_sha256": "de916326cf330db2ee8939bca49685cd22882f7071b5e708939be250c876ed78",
+      "destination_sha256": "de916326cf330db2ee8939bca49685cd22882f7071b5e708939be250c876ed78"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/platform.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/platform.cpp",
+      "source_sha256": "d404c4267467fed29279049c709260c5c73cd4ca904c3a63a1a8381a6821aea8",
+      "destination_sha256": "d404c4267467fed29279049c709260c5c73cd4ca904c3a63a1a8381a6821aea8"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/refresh_trial.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/refresh_trial.h",
+      "source_sha256": "980d0ac7b9d36b0c5379225dab5fb8a22fb61ec30bcb4a7e29f8e04fb8c21db8",
+      "destination_sha256": "980d0ac7b9d36b0c5379225dab5fb8a22fb61ec30bcb4a7e29f8e04fb8c21db8"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/registers.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/registers.h",
+      "source_sha256": "e9ac1efd144225f4fb0cc60f8b4273e2414a1227274a046542a81e646a1117ab",
+      "destination_sha256": "e9ac1efd144225f4fb0cc60f8b4273e2414a1227274a046542a81e646a1117ab"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/services.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/services.cpp",
+      "source_sha256": "0d9c98f5e0ebd4a8b4d37903d4865636c99bb6a4a56fd53b535e922d91f864f1",
+      "destination_sha256": "7fea17cc4323c925cc4ca52bc942be6c49376888deb0b37025f5a1791e38f60e"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/services.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/services.h",
+      "source_sha256": "5e00dbd912ef9e8babc65c8da9df98374b8a42257b09c5679f08f57cdfc5baad",
+      "destination_sha256": "5e00dbd912ef9e8babc65c8da9df98374b8a42257b09c5679f08f57cdfc5baad"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/support.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/support.cpp",
+      "source_sha256": "fe12bb4f1a5234f847592eb5a43062160447174cc998e8fb138c5c6a2a03ff76",
+      "destination_sha256": "fe12bb4f1a5234f847592eb5a43062160447174cc998e8fb138c5c6a2a03ff76"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/system.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/system.cpp",
+      "source_sha256": "10d21d6a37beaaab561a38023b16037f02c0c3ea3816585c9fe79f967a8a0798",
+      "destination_sha256": "10d21d6a37beaaab561a38023b16037f02c0c3ea3816585c9fe79f967a8a0798"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/system.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/system.h",
+      "source_sha256": "48ea57fe6189153be82acd21a0d73895807ecab8dccf6f8505af3178fca9db2c",
+      "destination_sha256": "48ea57fe6189153be82acd21a0d73895807ecab8dccf6f8505af3178fca9db2c"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/timing.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/timing.cpp",
+      "source_sha256": "c5058718b708f8b99c62755216c3c799cb04082ea2b82d0f7b586164d9a6bb1a",
+      "destination_sha256": "c5058718b708f8b99c62755216c3c799cb04082ea2b82d0f7b586164d9a6bb1a"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/timing.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/timing.h",
+      "source_sha256": "231b28d1cb120aa6294ae79c32af1bd210a8b976b5c61d9422f7ef3fba06a161",
+      "destination_sha256": "231b28d1cb120aa6294ae79c32af1bd210a8b976b5c61d9422f7ef3fba06a161"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/touch.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/touch.cpp",
+      "source_sha256": "01ee1f20782e1e8e49d71bcb09157d5801cc9965e7aff9afbaeb7d132e303478",
+      "destination_sha256": "01ee1f20782e1e8e49d71bcb09157d5801cc9965e7aff9afbaeb7d132e303478"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/touch.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/touch.h",
+      "source_sha256": "388cd7ade2d0b607a18f1b6d9714dab9bd2f57d7b8d1d6c194d154b3676eeb33",
+      "destination_sha256": "388cd7ade2d0b607a18f1b6d9714dab9bd2f57d7b8d1d6c194d154b3676eeb33"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/touch_tracker.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/touch_tracker.h",
+      "source_sha256": "02ac2a39296bb740e22a659c395f4ba711ccb4df2fd9059bb19613fd24653210",
+      "destination_sha256": "02ac2a39296bb740e22a659c395f4ba711ccb4df2fd9059bb19613fd24653210"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/uart.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/uart.cpp",
+      "source_sha256": "a2aca16b58e7e30d5122cb822e8f221e1f92f5359e3ffccc863aaec3ae63e3ac",
+      "destination_sha256": "a2aca16b58e7e30d5122cb822e8f221e1f92f5359e3ffccc863aaec3ae63e3ac"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/uart.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/uart.h",
+      "source_sha256": "6340e1b16586d0981ceb128906a17b45d11a4fbf557cf2ca008e4487317e0500",
+      "destination_sha256": "6340e1b16586d0981ceb128906a17b45d11a4fbf557cf2ca008e4487317e0500"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/update_trust_root.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/update_trust_root.h",
+      "source_sha256": "fc1e801390e10817149f39e558fe87dbe38deedd7aaf2f58ab3a3bb0f8185fee",
+      "destination_sha256": "fc1e801390e10817149f39e558fe87dbe38deedd7aaf2f58ab3a3bb0f8185fee"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/usb.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/usb.cpp",
+      "source_sha256": "5a4a9d07ebb2b795ba29b217ec871c070c0ae02d7e81530c0a0a3155b98afa06",
+      "destination_sha256": "5a4a9d07ebb2b795ba29b217ec871c070c0ae02d7e81530c0a0a3155b98afa06"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/usb_diagnostics.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/usb_diagnostics.cpp",
+      "source_sha256": "47a6edf61a00227830907a644d5f5e15f685acf75301eea002faa65cd141cf38",
+      "destination_sha256": "47a6edf61a00227830907a644d5f5e15f685acf75301eea002faa65cd141cf38"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/usb_diagnostics.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/usb_diagnostics.h",
+      "source_sha256": "b8ba6eb30c7716cf79064a0a09a00e57e30dfb863769a0940739a19d4be09fe2",
+      "destination_sha256": "b8ba6eb30c7716cf79064a0a09a00e57e30dfb863769a0940739a19d4be09fe2"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/watchdog.cpp",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/watchdog.cpp",
+      "source_sha256": "b4e36bd9def1008943ca831bacadaf413caa8d54c6f447c7aaadbd7160a19426",
+      "destination_sha256": "b4e36bd9def1008943ca831bacadaf413caa8d54c6f447c7aaadbd7160a19426"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2/watchdog.h",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2/watchdog.h",
+      "source_sha256": "a754ee776c1fa46ca28f1536244f3cd92d63d61a84424fab28cd8171a21729be",
+      "destination_sha256": "a754ee776c1fa46ca28f1536244f3cd92d63d61a84424fab28cd8171a21729be"
+    },
+    {
+      "source": "ports/upsilon-hpprime/ion/src/prime_g2_vm/Makefile",
+      "destination": "ports/lefony-prime-g2/ion/src/prime_g2_vm/Makefile",
+      "source_sha256": "06793cbda417a2595f95dec5f8bf100c3cfb1061e134ab4e259fb14d8c75759f",
+      "destination_sha256": "06793cbda417a2595f95dec5f8bf100c3cfb1061e134ab4e259fb14d8c75759f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/lefony-branding.patch",
+      "destination": "ports/lefony-prime-g2/patches/lefony-branding.patch",
+      "source_sha256": "494801c4029b1f6a9610b9ad496b97b03de8de42be1fa9f31efda80d2854670c",
+      "destination_sha256": "494801c4029b1f6a9610b9ad496b97b03de8de42be1fa9f31efda80d2854670c"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/native-memory-telemetry.patch",
+      "destination": "ports/lefony-prime-g2/patches/native-memory-telemetry.patch",
+      "source_sha256": "533347691d5daa8cf8da33c4a8e674cfe8b3c9c00316a88a75d7e70e113d8fda",
+      "destination_sha256": "533347691d5daa8cf8da33c4a8e674cfe8b3c9c00316a88a75d7e70e113d8fda"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/physical-boot-progress.patch",
+      "destination": "ports/lefony-prime-g2/patches/physical-boot-progress.patch",
+      "source_sha256": "61b9942955222c76f4ec0370b91cc11fbc2bf9acde33a4b7edacf31a8a1a2dfd",
+      "destination_sha256": "61b9942955222c76f4ec0370b91cc11fbc2bf9acde33a4b7edacf31a8a1a2dfd"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/physical-event-progress.patch",
+      "destination": "ports/lefony-prime-g2/patches/physical-event-progress.patch",
+      "source_sha256": "edfe7dafada589684ae8fd48deb9a4960b98abc73020ec947a1f436740e79fb4",
+      "destination_sha256": "edfe7dafada589684ae8fd48deb9a4960b98abc73020ec947a1f436740e79fb4"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-alpha-layout.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-alpha-layout.patch",
+      "source_sha256": "d7f451581f5f48592873e9f23c8fd8f42f77000d9414252a18a0c48228a73edf",
+      "destination_sha256": "d7f451581f5f48592873e9f23c8fd8f42f77000d9414252a18a0c48228a73edf"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-dedicated-navigation.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-dedicated-navigation.patch",
+      "source_sha256": "ed9fc6c0ba587ca126bcfd73caa6217d06ebebba8cf6c98943eca93af2388a23",
+      "destination_sha256": "ed9fc6c0ba587ca126bcfd73caa6217d06ebebba8cf6c98943eca93af2388a23"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-keyboard-layout.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-keyboard-layout.patch",
+      "source_sha256": "3a21044e64eb8eb9779f23b6cd8609bf1d1ea18ef5b5023eced1deb3c7d52be8",
+      "destination_sha256": "3a21044e64eb8eb9779f23b6cd8609bf1d1ea18ef5b5023eced1deb3c7d52be8"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-math-template-palette.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-math-template-palette.patch",
+      "source_sha256": "3e1a3f940f156c04edf84348a6f167e21266904b6bcf624f1be4d19258dd1467",
+      "destination_sha256": "3e1a3f940f156c04edf84348a6f167e21266904b6bcf624f1be4d19258dd1467"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-power-status.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-power-status.patch",
+      "source_sha256": "5dc3277d1a571caa1f653852aa4df6f46fabb0679f841dfd8012293d2df952c0",
+      "destination_sha256": "5dc3277d1a571caa1f653852aa4df6f46fabb0679f841dfd8012293d2df952c0"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-shift-shortcuts.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-shift-shortcuts.patch",
+      "source_sha256": "e9c225ce12843f574ad21009f5e5b1c0e900223ee46ecd4e16ac7f05dd924b91",
+      "destination_sha256": "e9c225ce12843f574ad21009f5e5b1c0e900223ee46ecd4e16ac7f05dd924b91"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-single-step-dpad.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-single-step-dpad.patch",
+      "source_sha256": "7a24aa45e614c13b9f9399cab4ad5954b94d83fb710eba23ab2fdad1dd1333a5",
+      "destination_sha256": "7a24aa45e614c13b9f9399cab4ad5954b94d83fb710eba23ab2fdad1dd1333a5"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/prime-g2-template-insertion-redraw.patch",
+      "destination": "ports/lefony-prime-g2/patches/prime-g2-template-insertion-redraw.patch",
+      "source_sha256": "b9fdadb0f7da7c1320b02b52ef81b023ee4bc310b00cd69a938c2dc16a937c66",
+      "destination_sha256": "b9fdadb0f7da7c1320b02b52ef81b023ee4bc310b00cd69a938c2dc16a937c66"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/storage-rename-cache.patch",
+      "destination": "ports/lefony-prime-g2/patches/storage-rename-cache.patch",
+      "source_sha256": "e1035b61fde42addba245eccb817efe9d97951a6560e6e30e4a6a66cbb8c4170",
+      "destination_sha256": "e1035b61fde42addba245eccb817efe9d97951a6560e6e30e4a6a66cbb8c4170"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/unaligned-storage.patch",
+      "destination": "ports/lefony-prime-g2/patches/unaligned-storage.patch",
+      "source_sha256": "871f5213c70903dc167ffa8354bdf4b1854b2901efd2abbc6fe67c89bca618bb",
+      "destination_sha256": "871f5213c70903dc167ffa8354bdf4b1854b2901efd2abbc6fe67c89bca618bb"
+    },
+    {
+      "source": "ports/upsilon-hpprime/patches/upstream-tests-linux-arm64.patch",
+      "destination": "ports/lefony-prime-g2/patches/upstream-tests-linux-arm64.patch",
+      "source_sha256": "c18cc3cb8965b11a844f08c9f81fbedd78998da1cba13321ce2ab2ac5f8ec193",
+      "destination_sha256": "c18cc3cb8965b11a844f08c9f81fbedd78998da1cba13321ce2ab2ac5f8ec193"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light.json",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light.json",
+      "source_sha256": "8d74e5adcd65befc38599c111c991f5695a7028ea9c115c0c5042ed96d54b6f2",
+      "destination_sha256": "8d74e5adcd65befc38599c111c991f5695a7028ea9c115c0c5042ed96d54b6f2"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/atomic_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/atomic_icon.png",
+      "source_sha256": "e07bcc59c0e8bbc42a7fbd10c8892674ccaf4125c5e490529cf6b2a9c39e3fe7",
+      "destination_sha256": "e07bcc59c0e8bbc42a7fbd10c8892674ccaf4125c5e490529cf6b2a9c39e3fe7"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/calculation_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/calculation_icon.png",
+      "source_sha256": "6248a0a8ee95fc2e1aa38003be443ba0ec66b061e846df0c60036d25380856e9",
+      "destination_sha256": "6248a0a8ee95fc2e1aa38003be443ba0ec66b061e846df0c60036d25380856e9"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/code_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/code_icon.png",
+      "source_sha256": "a360a7a25fb89a038880d88b154ec834648511874fe7dc9b7a5d05e04418c531",
+      "destination_sha256": "a360a7a25fb89a038880d88b154ec834648511874fe7dc9b7a5d05e04418c531"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/external_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/external_icon.png",
+      "source_sha256": "de70ba8cd3932ff48025a2a81601d9b4949bf8c041037062664f938b8e5e5ae3",
+      "destination_sha256": "de70ba8cd3932ff48025a2a81601d9b4949bf8c041037062664f938b8e5e5ae3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/graph_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/graph_icon.png",
+      "source_sha256": "1fb6cc2e9df570bf315204a4dfcc522bf6ed9ac228c7f4c2d10c08f884841709",
+      "destination_sha256": "1fb6cc2e9df570bf315204a4dfcc522bf6ed9ac228c7f4c2d10c08f884841709"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/probability_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/probability_icon.png",
+      "source_sha256": "4ed44c1fbe9cfe4b07818310f50f33c2008f87087807cbb23fe4a740b62e9321",
+      "destination_sha256": "4ed44c1fbe9cfe4b07818310f50f33c2008f87087807cbb23fe4a740b62e9321"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/reader_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/reader_icon.png",
+      "source_sha256": "9d227fc29074a71902413a715be8949137126c7000553bd48628a0e186b8518c",
+      "destination_sha256": "9d227fc29074a71902413a715be8949137126c7000553bd48628a0e186b8518c"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/regression_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/regression_icon.png",
+      "source_sha256": "086641f486ac258e69875a12978bda50dae1eecde688c5c42c746fe979a2f4d7",
+      "destination_sha256": "086641f486ac258e69875a12978bda50dae1eecde688c5c42c746fe979a2f4d7"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/rpn_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/rpn_icon.png",
+      "source_sha256": "2775b10c0b2810df074c6ff9e95491acca65be5301c7bb6f3031ff7bb2a7f5bd",
+      "destination_sha256": "2775b10c0b2810df074c6ff9e95491acca65be5301c7bb6f3031ff7bb2a7f5bd"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/sequence_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/sequence_icon.png",
+      "source_sha256": "c2731a910b77459011c6fd3e50bdc5731bbc577f62ee1fb85091309ae7906441",
+      "destination_sha256": "c2731a910b77459011c6fd3e50bdc5731bbc577f62ee1fb85091309ae7906441"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/settings_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/settings_icon.png",
+      "source_sha256": "4f72f9f073fdb06e318014acad31cea55d927b40b0afdaabc53e91fc691c11d4",
+      "destination_sha256": "4f72f9f073fdb06e318014acad31cea55d927b40b0afdaabc53e91fc691c11d4"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/solver_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/solver_icon.png",
+      "source_sha256": "7d3f7053e25148a48340c702f11ddd75d8f90c401bc7c30c5051f2eae76842df",
+      "destination_sha256": "7d3f7053e25148a48340c702f11ddd75d8f90c401bc7c30c5051f2eae76842df"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/apps/stat_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/apps/stat_icon.png",
+      "source_sha256": "468eda47f88394227876333f19df851cba0eff0a386096066c64ccff21e2ec8b",
+      "destination_sha256": "468eda47f88394227876333f19df851cba0eff0a386096066c64ccff21e2ec8b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/bootloader/cable.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/bootloader/cable.png",
+      "source_sha256": "6b6a65ddd65fb4f827be9468a7450dbb3eb7e7b7eed7fabc7f48f6e147116d83",
+      "destination_sha256": "6b6a65ddd65fb4f827be9468a7450dbb3eb7e7b7eed7fabc7f48f6e147116d83"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/bootloader/computer.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/bootloader/computer.png",
+      "source_sha256": "5a293820cc819524f109f75f1c8e4597df2d85bfb36635f9aa630883814e867e",
+      "destination_sha256": "5a293820cc819524f109f75f1c8e4597df2d85bfb36635f9aa630883814e867e"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/exam_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/exam_icon.png",
+      "source_sha256": "8eb536d8d35f34c4a1a54f779e28261311151ba633c0a82822a645e99948a88f",
+      "destination_sha256": "8eb536d8d35f34c4a1a54f779e28261311151ba633c0a82822a645e99948a88f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/logo_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/logo_icon.png",
+      "source_sha256": "6faede68856f2c567439fc1352a1cba63d7cf8ef1ad25df45d6f2ffaff23995f",
+      "destination_sha256": "6faede68856f2c567439fc1352a1cba63d7cf8ef1ad25df45d6f2ffaff23995f"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/binomial_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/binomial_icon.png",
+      "source_sha256": "8dac1e7c901f80e5c220deb2dcbed6253ce413e3970f1ee701071a1bce5e1f6d",
+      "destination_sha256": "8dac1e7c901f80e5c220deb2dcbed6253ce413e3970f1ee701071a1bce5e1f6d"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/calcul1_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/calcul1_icon.png",
+      "source_sha256": "6cf45525f43b9b052330efa5dee3c7c7835972f4dff2b10a6d4671d5ec550527",
+      "destination_sha256": "6cf45525f43b9b052330efa5dee3c7c7835972f4dff2b10a6d4671d5ec550527"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/calcul2_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/calcul2_icon.png",
+      "source_sha256": "f1438194ebd5a6b7052b663eef3967b24a067ed63486f54ce2e1d8594a35d57b",
+      "destination_sha256": "f1438194ebd5a6b7052b663eef3967b24a067ed63486f54ce2e1d8594a35d57b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/calcul3_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/calcul3_icon.png",
+      "source_sha256": "e79bd1d26e2fb48ea71f83a41f1594c93781435c0bcbdcefd0f3fa779e127f6b",
+      "destination_sha256": "e79bd1d26e2fb48ea71f83a41f1594c93781435c0bcbdcefd0f3fa779e127f6b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/calcul4_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/calcul4_icon.png",
+      "source_sha256": "c71a6c804254fd9ff7ccde5421309aa5c3118e3b084243b7ae03e57e86d05adc",
+      "destination_sha256": "c71a6c804254fd9ff7ccde5421309aa5c3118e3b084243b7ae03e57e86d05adc"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/chi_squared_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/chi_squared_icon.png",
+      "source_sha256": "46d784f347475991592827c4b53fb86d492a2e789e4573d808705b1014539e0d",
+      "destination_sha256": "46d784f347475991592827c4b53fb86d492a2e789e4573d808705b1014539e0d"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/exponential_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/exponential_icon.png",
+      "source_sha256": "a9870131b74149f0d3dcd49939bc28e9a057bf822f9b226f44d1164607dfa1cc",
+      "destination_sha256": "a9870131b74149f0d3dcd49939bc28e9a057bf822f9b226f44d1164607dfa1cc"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/fisher_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/fisher_icon.png",
+      "source_sha256": "d9911bc16cec1acb448ed8d450656addd485a55a5107dce5ba48c7edaa3be944",
+      "destination_sha256": "d9911bc16cec1acb448ed8d450656addd485a55a5107dce5ba48c7edaa3be944"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_binomial_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_binomial_icon.png",
+      "source_sha256": "1ab845a895f473a0c86c029e0864b4f26b3736306bd19f6e60415796e3c7a197",
+      "destination_sha256": "1ab845a895f473a0c86c029e0864b4f26b3736306bd19f6e60415796e3c7a197"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_calcul1_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_calcul1_icon.png",
+      "source_sha256": "7648244730c28716b2ecf0a65a3fa0e4e7111ebcea915ad59355ea7637ad7a8d",
+      "destination_sha256": "7648244730c28716b2ecf0a65a3fa0e4e7111ebcea915ad59355ea7637ad7a8d"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_calcul2_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_calcul2_icon.png",
+      "source_sha256": "5d85375fa164ecdf581f8feb873d92257fc0941da392d3f8827b628a554dcde4",
+      "destination_sha256": "5d85375fa164ecdf581f8feb873d92257fc0941da392d3f8827b628a554dcde4"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_calcul3_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_calcul3_icon.png",
+      "source_sha256": "dac8caf5b2651b4218a5b74ba008738859c7e4eb22a45301c821bd49544fd5d9",
+      "destination_sha256": "dac8caf5b2651b4218a5b74ba008738859c7e4eb22a45301c821bd49544fd5d9"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_calcul4_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_calcul4_icon.png",
+      "source_sha256": "9e884fb8f9905c79050746210f4de32030b49435c1a56924cdc2854b4300dda0",
+      "destination_sha256": "9e884fb8f9905c79050746210f4de32030b49435c1a56924cdc2854b4300dda0"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_chi_squared_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_chi_squared_icon.png",
+      "source_sha256": "0e72a788f44be0c553f569213e49859dbc763b7c866e2959475f7081769b56b0",
+      "destination_sha256": "0e72a788f44be0c553f569213e49859dbc763b7c866e2959475f7081769b56b0"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_exponential_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_exponential_icon.png",
+      "source_sha256": "7ce901d21b3b40e5202ab7e27a34a25b951cf0db1ecb74a1095c163fb01e3158",
+      "destination_sha256": "7ce901d21b3b40e5202ab7e27a34a25b951cf0db1ecb74a1095c163fb01e3158"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_fisher_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_fisher_icon.png",
+      "source_sha256": "1c8dada683b4266272ce61cf8b255c3570ee7e8b4a96b1046ec7c5bb072fea6b",
+      "destination_sha256": "1c8dada683b4266272ce61cf8b255c3570ee7e8b4a96b1046ec7c5bb072fea6b"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_geometric_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_geometric_icon.png",
+      "source_sha256": "ae2d7ce79a5e09e829698639bd871ec3d25f5e1d958f644a160d1f8835f0bef5",
+      "destination_sha256": "ae2d7ce79a5e09e829698639bd871ec3d25f5e1d958f644a160d1f8835f0bef5"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_normal_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_normal_icon.png",
+      "source_sha256": "41dd9e8839d7d593d88b6a6d9715176420c25635a6a857399b99ea9565a1b27a",
+      "destination_sha256": "41dd9e8839d7d593d88b6a6d9715176420c25635a6a857399b99ea9565a1b27a"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_poisson_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_poisson_icon.png",
+      "source_sha256": "9c86b77eb8aa474ced88757b0d38b92fe60dc4a14a9bcd38a879ee0e54e3c84c",
+      "destination_sha256": "9c86b77eb8aa474ced88757b0d38b92fe60dc4a14a9bcd38a879ee0e54e3c84c"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_student_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_student_icon.png",
+      "source_sha256": "64e5737ee389cf1aa822dc75427ceee413f05154b6f05a9c9278c74c24241404",
+      "destination_sha256": "64e5737ee389cf1aa822dc75427ceee413f05154b6f05a9c9278c74c24241404"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/focused_uniform_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/focused_uniform_icon.png",
+      "source_sha256": "1c09e9b1daae47faf7b209800ac6fdd4dc57a33e30ea9ea861d883cc7fc811e3",
+      "destination_sha256": "1c09e9b1daae47faf7b209800ac6fdd4dc57a33e30ea9ea861d883cc7fc811e3"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/geometric_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/geometric_icon.png",
+      "source_sha256": "dbf5ffd916ee8c161a50d17710f0405cbc4ec13856434fd07f785de9106bf251",
+      "destination_sha256": "dbf5ffd916ee8c161a50d17710f0405cbc4ec13856434fd07f785de9106bf251"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/normal_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/normal_icon.png",
+      "source_sha256": "761a509b932fce44360117da2d87e64dacebd7981a5b042cf884eec7fb242cab",
+      "destination_sha256": "761a509b932fce44360117da2d87e64dacebd7981a5b042cf884eec7fb242cab"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/poisson_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/poisson_icon.png",
+      "source_sha256": "6f835a424301c6b71f117e20b0cca1e24a0bc70fd3a24775877c6d734c9d7014",
+      "destination_sha256": "6f835a424301c6b71f117e20b0cca1e24a0bc70fd3a24775877c6d734c9d7014"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/student_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/student_icon.png",
+      "source_sha256": "3a491d45dd8b08ec41b17202094f92100b650220c993c9113f899cc8328085c8",
+      "destination_sha256": "3a491d45dd8b08ec41b17202094f92100b650220c993c9113f899cc8328085c8"
+    },
+    {
+      "source": "ports/upsilon-hpprime/themes/themes/local/lefony_light/probability/uniform_icon.png",
+      "destination": "ports/lefony-prime-g2/themes/themes/local/lefony_light/probability/uniform_icon.png",
+      "source_sha256": "eac5878ea44a25be2c21415833f53d58d70d51c5e2a0032d5c0331e416ac1818",
+      "destination_sha256": "eac5878ea44a25be2c21415833f53d58d70d51c5e2a0032d5c0331e416ac1818"
+    },
+    {
+      "source": "scripts/analyze_hp_prime_bootmode.py",
+      "destination": "scripts/analyze_hp_prime_bootmode.py",
+      "source_sha256": "e56a481d83d0197def42c68eccb0c98d81fa01c631f4c13b9ec4f99851a10051",
+      "destination_sha256": "e56a481d83d0197def42c68eccb0c98d81fa01c631f4c13b9ec4f99851a10051"
+    },
+    {
+      "source": "scripts/analyze_prime_g2_rom_dma.py",
+      "destination": "scripts/analyze_prime_g2_rom_dma.py",
+      "source_sha256": "98171b0255f950617c2ad71d756bb5bffe1b7173ba8404afcfd44b0adf5ac1e6",
+      "destination_sha256": "98171b0255f950617c2ad71d756bb5bffe1b7173ba8404afcfd44b0adf5ac1e6"
+    },
+    {
+      "source": "scripts/build_prime_g2_nand_capsule.sh",
+      "destination": "scripts/build_prime_g2_nand_capsule.sh",
+      "source_sha256": "106990bef898e7b0a6ec7be8197d8d041ddb0579b065476aca1452a143a3e5d1",
+      "destination_sha256": "3722df3ef9b94c7530a8065454d901b96ce45456a3167775dc64eafa132cc183"
+    },
+    {
+      "source": "scripts/build_prime_g2_physical_updater_uboot.sh",
+      "destination": "scripts/build_prime_g2_physical_updater_uboot.sh",
+      "source_sha256": "4d6edce8fa2de72ba29041f192278d357bb6ff04bdc870ad4df2e70be0da8697",
+      "destination_sha256": "e13db17588129575df2638677afe3fe0c62fc8159d86dc40554d2e9db4f88562"
+    },
+    {
+      "source": "scripts/build_prime_g2_rom_recovery_stub.sh",
+      "destination": "scripts/build_prime_g2_rom_recovery_stub.sh",
+      "source_sha256": "65f6eb1903c7cbb4984e3cc393f6f3cd090bc8db390decbdd6bc31d9b5c9fada",
+      "destination_sha256": "d57b31decb294d456826d2ebb70151b4323a3919811a543b7be7bc4e78872c3c"
+    },
+    {
+      "source": "scripts/build_prime_g2_signed_update.sh",
+      "destination": "scripts/build_prime_g2_signed_update.sh",
+      "source_sha256": "7654027d1c15866350836cfe34003ee8f677aa6a65ba6709d373b2710ac546bb",
+      "destination_sha256": "7654027d1c15866350836cfe34003ee8f677aa6a65ba6709d373b2710ac546bb"
+    },
+    {
+      "source": "scripts/build_upsilon_prime_g2_native.sh",
+      "destination": "scripts/build_lefony_prime_g2.sh",
+      "source_sha256": "b10770dc7782733e90a185dd352480f0548d411b10a71e01e25e4e9f10635c2e",
+      "destination_sha256": "43ebce90046bb52ffc29d3b891898b560380b4dd6f4de28cf3217eb72446a6e1"
+    },
+    {
+      "source": "scripts/build_upsilon_prime_g2_vm_native.sh",
+      "destination": "scripts/build_lefony_prime_g2_vm.sh",
+      "source_sha256": "5bce37faf72d3c6d4b715b1cb499e0b9d031cc6538b258f91fcc3369cfbb3e23",
+      "destination_sha256": "a0d3ff976b059f3ed1d865d74b5baa97db7c8c843e667600f3ed3903a2ee5065"
+    },
+    {
+      "source": "scripts/capture_prime_g2_linux_hardware.py",
+      "destination": "scripts/capture_prime_g2_linux_hardware.py",
+      "source_sha256": "238ffd87f16380ca9e91e37768b986cada3f104951a57dd930e49279fbc25b9f",
+      "destination_sha256": "238ffd87f16380ca9e91e37768b986cada3f104951a57dd930e49279fbc25b9f"
+    },
+    {
+      "source": "scripts/capture_prime_g2_rom_hid.c",
+      "destination": "scripts/capture_prime_g2_rom_hid.c",
+      "source_sha256": "3c05dce1617abedc79de661908937882deac826b8b53153d282cfd7b21134049",
+      "destination_sha256": "3c05dce1617abedc79de661908937882deac826b8b53153d282cfd7b21134049"
+    },
+    {
+      "source": "scripts/capture_prime_g2_rom_usb.py",
+      "destination": "scripts/capture_prime_g2_rom_usb.py",
+      "source_sha256": "66489fee4dbe36a0d17d2386e3983c0f840b567acdc20dbb587a6e7469b29136",
+      "destination_sha256": "66489fee4dbe36a0d17d2386e3983c0f840b567acdc20dbb587a6e7469b29136"
+    },
+    {
+      "source": "scripts/compare_prime_g2_traces.py",
+      "destination": "scripts/compare_prime_g2_traces.py",
+      "source_sha256": "9fe010c5adf18706c71e1574c4bd7871630cd7d59c0eaaf8c53576ea5db70a50",
+      "destination_sha256": "9fe010c5adf18706c71e1574c4bd7871630cd7d59c0eaaf8c53576ea5db70a50"
+    },
+    {
+      "source": "scripts/decode_prime_g2_registers.py",
+      "destination": "scripts/decode_prime_g2_registers.py",
+      "source_sha256": "40cdb67b0158195a5810892a258c665e98e259a2390d52e28b3a63d04516596e",
+      "destination_sha256": "40cdb67b0158195a5810892a258c665e98e259a2390d52e28b3a63d04516596e"
+    },
+    {
+      "source": "scripts/inspect_prime_g2_ddr.py",
+      "destination": "scripts/inspect_prime_g2_ddr.py",
+      "source_sha256": "291035a3c1af0422feba7a5973ea561ecd868437e9df5ceb1c12a52761976bbb",
+      "destination_sha256": "291035a3c1af0422feba7a5973ea561ecd868437e9df5ceb1c12a52761976bbb"
+    },
+    {
+      "source": "scripts/lefony_build_history.py",
+      "destination": "scripts/lefony_build_history.py",
+      "source_sha256": "155fc9f38be88ce91b97152f0e931854e39130b52fa57cfd3d5f059303f130b6",
+      "destination_sha256": "155fc9f38be88ce91b97152f0e931854e39130b52fa57cfd3d5f059303f130b6"
+    },
+    {
+      "source": "scripts/lefony_uboot_history.py",
+      "destination": "scripts/lefony_uboot_history.py",
+      "source_sha256": "cdfb4309ff212914d5db4dd06c51b1fd3f931399ddf9e186489dfc01a8fff6b1",
+      "destination_sha256": "cdfb4309ff212914d5db4dd06c51b1fd3f931399ddf9e186489dfc01a8fff6b1"
+    },
+    {
+      "source": "scripts/make_lefony_icon_theme.py",
+      "destination": "scripts/make_lefony_icon_theme.py",
+      "source_sha256": "f1807b752b31a45b78549a422e35493bd5f0185467ce38d095cf43e5fd294f0d",
+      "destination_sha256": "82a9b868c09ee9000519eb86f0361b3bf46c9ef94d363058e52c3a1b2b75b317"
+    },
+    {
+      "source": "scripts/pad_uboot.py",
+      "destination": "scripts/pad_uboot.py",
+      "source_sha256": "a073bda096982608ce0e8d032713009506dc1e59492910168d1195b9d0de4e76",
+      "destination_sha256": "a073bda096982608ce0e8d032713009506dc1e59492910168d1195b9d0de4e76"
+    },
+    {
+      "source": "scripts/patch_uboot_env.py",
+      "destination": "scripts/patch_uboot_env.py",
+      "source_sha256": "a6683a06f181e0bace9b41890ab033980ac6c0a02503558d62cd151e6c437a49",
+      "destination_sha256": "a6683a06f181e0bace9b41890ab033980ac6c0a02503558d62cd151e6c437a49"
+    },
+    {
+      "source": "scripts/prepare_hp_prime_nand_fixture.py",
+      "destination": "scripts/prepare_hp_prime_nand_fixture.py",
+      "source_sha256": "01e32fdbf65007e36cc0a83c06041283e696ef840aa9d9fa9be4272ae856d83f",
+      "destination_sha256": "01e32fdbf65007e36cc0a83c06041283e696ef840aa9d9fa9be4272ae856d83f"
+    },
+    {
+      "source": "scripts/prepare_hp_prime_stock_fixture.py",
+      "destination": "scripts/prepare_hp_prime_stock_fixture.py",
+      "source_sha256": "3ee45e6c4563605d80516ff73af04588badc1327811361a2fa227bb7e78ed396",
+      "destination_sha256": "3ee45e6c4563605d80516ff73af04588badc1327811361a2fa227bb7e78ed396"
+    },
+    {
+      "source": "scripts/prepare_prime_brightness.py",
+      "destination": "scripts/prepare_prime_brightness.py",
+      "source_sha256": "81bf612809a83d6d90a338ab42ea9df561806505e4ad1a655044038e76c98c96",
+      "destination_sha256": "81bf612809a83d6d90a338ab42ea9df561806505e4ad1a655044038e76c98c96"
+    },
+    {
+      "source": "scripts/prepare_prime_display.py",
+      "destination": "scripts/prepare_prime_display.py",
+      "source_sha256": "e2aa621775b20b5e025d2375f2b73d43e89e99a8c985cf968a18fe1abe1e84b2",
+      "destination_sha256": "0d331f03a2cc17040b6fc9bc061e857e4e99d5f37553a3081d24dfd75e22385b"
+    },
+    {
+      "source": "scripts/prepare_prime_functions_touch.py",
+      "destination": "scripts/prepare_prime_functions_touch.py",
+      "source_sha256": "e4f1f223da33903bb8d8b76f840f8c8b3ac94e0547775b9e385bb40c9fd9930c",
+      "destination_sha256": "e4f1f223da33903bb8d8b76f840f8c8b3ac94e0547775b9e385bb40c9fd9930c"
+    },
+    {
+      "source": "scripts/prepare_prime_settings.py",
+      "destination": "scripts/prepare_prime_settings.py",
+      "source_sha256": "26551cb487d563e1f37418f49d9de225cc1951ceeea6a4ccf43f98851174c1a5",
+      "destination_sha256": "7ca4ad63e11434eaea3b2d2dfdc56ddc36e0ce4742ed32703c994a3533b1b33e"
+    },
+    {
+      "source": "scripts/prepare_prime_touch.py",
+      "destination": "scripts/prepare_prime_touch.py",
+      "source_sha256": "a6bcfd94e03556a9ec80988223cc2c28667eaf21648227ede6a5108f161e91fe",
+      "destination_sha256": "b8541bcee72db4ee7709be256159b263f6027101aad6e51d659e6be35090e65e"
+    },
+    {
+      "source": "scripts/prime_g2_ab_metadata.py",
+      "destination": "scripts/prime_g2_ab_metadata.py",
+      "source_sha256": "69e16cbd77eea5e4e4a141ea5e5b32715fec4c960167102777f05ad31b04d1bd",
+      "destination_sha256": "69e16cbd77eea5e4e4a141ea5e5b32715fec4c960167102777f05ad31b04d1bd"
+    },
+    {
+      "source": "scripts/prime_g2_nand_clocks.py",
+      "destination": "scripts/prime_g2_nand_clocks.py",
+      "source_sha256": "c19f917669a6f73f5b0b6212934f0c39560d190650106e17b824166ba50efdbe",
+      "destination_sha256": "c19f917669a6f73f5b0b6212934f0c39560d190650106e17b824166ba50efdbe"
+    },
+    {
+      "source": "scripts/prime_g2_nand_update.py",
+      "destination": "scripts/prime_g2_nand_update.py",
+      "source_sha256": "d019f5491295d2fc5b0fe762b93eedb513d2478e2e2225d45d2e440ba0c091ed",
+      "destination_sha256": "1da945f64eb96fa61809ede0037afa752236083d61065dc64451bf6b38795c0a"
+    },
+    {
+      "source": "scripts/prime_g2_provision_ab.py",
+      "destination": "scripts/prime_g2_provision_ab.py",
+      "source_sha256": "07720e474021c4e336c788fb37cb77a4e02f6e299d0218fc506d84e721621b5f",
+      "destination_sha256": "07720e474021c4e336c788fb37cb77a4e02f6e299d0218fc506d84e721621b5f"
+    },
+    {
+      "source": "scripts/prime_g2_raw_read_plan.py",
+      "destination": "scripts/prime_g2_raw_read_plan.py",
+      "source_sha256": "171de9dd0cb451e0e44674b64a4812a58bc33e0d442f92facd27d06fbb2acba5",
+      "destination_sha256": "171de9dd0cb451e0e44674b64a4812a58bc33e0d442f92facd27d06fbb2acba5"
+    },
+    {
+      "source": "scripts/prime_g2_readonly_nand_backup.py",
+      "destination": "scripts/prime_g2_readonly_nand_backup.py",
+      "source_sha256": "1727e32cf89d58700bf6e7cee811694e1c9d0577f413366554b5a1639ca013ec",
+      "destination_sha256": "1727e32cf89d58700bf6e7cee811694e1c9d0577f413366554b5a1639ca013ec"
+    },
+    {
+      "source": "scripts/prime_g2_update_capsule.py",
+      "destination": "scripts/prime_g2_update_capsule.py",
+      "source_sha256": "9de1295bda38a3e61f0bfedbea6cb5c0210c2eea0d4da5868f0399a764667a92",
+      "destination_sha256": "9de1295bda38a3e61f0bfedbea6cb5c0210c2eea0d4da5868f0399a764667a92"
+    },
+    {
+      "source": "scripts/prime_g2_update_key.py",
+      "destination": "scripts/prime_g2_update_key.py",
+      "source_sha256": "c85289e27e3b689217cf026eeee94c8214730d532a0ac4f42967d0be692f94e6",
+      "destination_sha256": "c85289e27e3b689217cf026eeee94c8214730d532a0ac4f42967d0be692f94e6"
+    },
+    {
+      "source": "scripts/prime_g2_usb_diag.py",
+      "destination": "scripts/prime_g2_usb_diag.py",
+      "source_sha256": "0f8206aea22229bee360e02efff732583a95dc9448007768a7f2fd63280ca4f1",
+      "destination_sha256": "0f8206aea22229bee360e02efff732583a95dc9448007768a7f2fd63280ca4f1"
+    },
+    {
+      "source": "scripts/retire_unverified_prime_history.py",
+      "destination": "scripts/retire_unverified_prime_history.py",
+      "source_sha256": "90cda7d90116cbc9add3ecec23282ab555b0138e4d6bd51c614063980d3d4cfa",
+      "destination_sha256": "90cda7d90116cbc9add3ecec23282ab555b0138e4d6bd51c614063980d3d4cfa"
+    },
+    {
+      "source": "scripts/upsilon_prime_installer.py",
+      "destination": "scripts/lefony_installer.py",
+      "source_sha256": "d926afd646e8ea866dd0504d7f485e8538a17d6c81b1ef5bc10491173133282e",
+      "destination_sha256": "196274dec479b6d709382ce9e1a1ee816603ab4fb98e7e3508a2921a48da71b8"
+    },
+    {
+      "source": "tests/fixtures/prime_g2_emulator_update_private.pem",
+      "destination": "tests/fixtures/prime_g2_emulator_update_private.pem",
+      "source_sha256": "8103c3448b7257026cc0f9639524f5c1b4c9cdb60670f01b47a56aa76cc5f54b",
+      "destination_sha256": "8103c3448b7257026cc0f9639524f5c1b4c9cdb60670f01b47a56aa76cc5f54b"
+    },
+    {
+      "source": "tests/fixtures/prime_g2_emulator_update_public.pem",
+      "destination": "tests/fixtures/prime_g2_emulator_update_public.pem",
+      "source_sha256": "90f5157ff9743a69ef05250c207ecbadaeb072d0513848739eb4a3e1245a0c6c",
+      "destination_sha256": "90f5157ff9743a69ef05250c207ecbadaeb072d0513848739eb4a3e1245a0c6c"
+    },
+    {
+      "source": "tests/test_capture_prime_g2_linux_hardware.py",
+      "destination": "tests/test_capture_prime_g2_linux_hardware.py",
+      "source_sha256": "9e7485a9a15c5a009754a3191241ade1a8690341ff0451ced1ca581030162b93",
+      "destination_sha256": "9e7485a9a15c5a009754a3191241ade1a8690341ff0451ced1ca581030162b93"
+    },
+    {
+      "source": "tests/test_hp_prime_rom_recovery.py",
+      "destination": "tests/test_hp_prime_rom_recovery.py",
+      "source_sha256": "c5e5b80ea2520e9f72538243e15ed016664acc025f2f863115c8a00969f3b1bf",
+      "destination_sha256": "a2d0e61ddf1db38d99ec501ac487b552c92d9abc3cc4e15f275d2766fc459745"
+    },
+    {
+      "source": "tests/test_hp_prime_stock_nand.py",
+      "destination": "tests/test_hp_prime_stock_nand.py",
+      "source_sha256": "cb18d2aa07e0cf152e2ee690bc223cb86bb4cc60fdfd98cacfcafbbb609e65b2",
+      "destination_sha256": "cb18d2aa07e0cf152e2ee690bc223cb86bb4cc60fdfd98cacfcafbbb609e65b2"
+    },
+    {
+      "source": "tests/test_hp_prime_stock_transition.py",
+      "destination": "tests/test_hp_prime_stock_transition.py",
+      "source_sha256": "d6568784b1f794abbd921d0bcf84ecad715f1286f69af521aabacc078c7c40d6",
+      "destination_sha256": "d6568784b1f794abbd921d0bcf84ecad715f1286f69af521aabacc078c7c40d6"
+    },
+    {
+      "source": "tests/test_hp_prime_stock_update.py",
+      "destination": "tests/test_hp_prime_stock_update.py",
+      "source_sha256": "1871b8c80ac0ba36be6b5a95823bafa899f2ec692d7bad6cefe42005c7e9f123",
+      "destination_sha256": "1871b8c80ac0ba36be6b5a95823bafa899f2ec692d7bad6cefe42005c7e9f123"
+    },
+    {
+      "source": "tests/test_installer_latest_history.py",
+      "destination": "tests/test_installer_latest_history.py",
+      "source_sha256": "5d22e8224a2a0be66d231707498c6df81591846fc1ec67e699d7b8fef52e962d",
+      "destination_sha256": "c1726f30c1e55b6ec7f739557f3d05062601fc577926660c4d30c14962e53ec5"
+    },
+    {
+      "source": "tests/test_lefony_branding.py",
+      "destination": "tests/test_lefony_branding.py",
+      "source_sha256": "99cbde0d7fd662a77be650955dc3eb917dde91ddfb44d455f1f671c089c1438e",
+      "destination_sha256": "f1fc9e5990670eed2f076ecd9093921b4b38ee8f71c193e96e270cbbe96c57c6"
+    },
+    {
+      "source": "tests/test_lefony_build_history.py",
+      "destination": "tests/test_lefony_build_history.py",
+      "source_sha256": "25084cf52912665ed7fe15b5af6a43c0e66957eeec8dd0df923a746a6931a1d7",
+      "destination_sha256": "6fc98f852c8065643fb954d6d57a6fe3f3dcc898a1d682f9602511f0350167c1"
+    },
+    {
+      "source": "tests/test_lefony_uboot_history.py",
+      "destination": "tests/test_lefony_uboot_history.py",
+      "source_sha256": "b8a523ce7b0cff0b1bc608ccec1c474d929f3fe83e637777e56f31e8fa694d7d",
+      "destination_sha256": "b8a523ce7b0cff0b1bc608ccec1c474d929f3fe83e637777e56f31e8fa694d7d"
+    },
+    {
+      "source": "tests/test_physical_display_contract.py",
+      "destination": "tests/test_physical_display_contract.py",
+      "source_sha256": "6daf5b617d241e2608d6a7b29d13fb3b536586fc8490db8ff14d234c02d75bee",
+      "destination_sha256": "b604c286e768b6f073fa4357c3f446dbc77c6001804651b5795221ed542ee669"
+    },
+    {
+      "source": "tests/test_prepare_hp_prime_nand_fixture.py",
+      "destination": "tests/test_prepare_hp_prime_nand_fixture.py",
+      "source_sha256": "8401c1bec037ab8a439a63a11e4021e32a3c787cfbbc108b44bad4c20f0e3894",
+      "destination_sha256": "8401c1bec037ab8a439a63a11e4021e32a3c787cfbbc108b44bad4c20f0e3894"
+    },
+    {
+      "source": "tests/test_prepare_hp_prime_stock_fixture.py",
+      "destination": "tests/test_prepare_hp_prime_stock_fixture.py",
+      "source_sha256": "c9a840fb17919bf1008012a19a1818fca7c8ff16b54cca97845fb8c04e47f1fc",
+      "destination_sha256": "c9a840fb17919bf1008012a19a1818fca7c8ff16b54cca97845fb8c04e47f1fc"
+    },
+    {
+      "source": "tests/test_prime_battery_clock.py",
+      "destination": "tests/test_prime_battery_clock.py",
+      "source_sha256": "ab738115e492c16ac58ee60b6254b945be08b7d2faf6e16f7dc0969e9ae1a4c0",
+      "destination_sha256": "7278c9a1a8d47f8f8590ec604933966597c5e0a45c37c9a206a8e4b32f040a23"
+    },
+    {
+      "source": "tests/test_prime_bch.py",
+      "destination": "tests/test_prime_bch.py",
+      "source_sha256": "733c0efc785a63d3d156485663e4fa601703b98868d2c8327f8f39bee4ab621d",
+      "destination_sha256": "733c0efc785a63d3d156485663e4fa601703b98868d2c8327f8f39bee4ab621d"
+    },
+    {
+      "source": "tests/test_prime_boot_audit.py",
+      "destination": "tests/test_prime_boot_audit.py",
+      "source_sha256": "d959c0ac625c167d91ae7525151278911be48a5af3d130c2b11f4c17aa0b26b8",
+      "destination_sha256": "d959c0ac625c167d91ae7525151278911be48a5af3d130c2b11f4c17aa0b26b8"
+    },
+    {
+      "source": "tests/test_prime_control.py",
+      "destination": "tests/test_prime_control.py",
+      "source_sha256": "cf3aa05c1448610905b0a81b7d40031f4226a08f937a950ca3d7236de754146d",
+      "destination_sha256": "cf3aa05c1448610905b0a81b7d40031f4226a08f937a950ca3d7236de754146d"
+    },
+    {
+      "source": "tests/test_prime_coordinate_touch.py",
+      "destination": "tests/test_prime_coordinate_touch.py",
+      "source_sha256": "221e623bc613a46820585d908184f1f8fdd4da8ab4ac2467412d44599931e19c",
+      "destination_sha256": "14796e9e09e076a587879e934149dd41b101c070e98012885514115903df524a"
+    },
+    {
+      "source": "tests/test_prime_display_settings.py",
+      "destination": "tests/test_prime_display_settings.py",
+      "source_sha256": "6783452be6474fa513457c7fc7104cdcc15a9b3a1c57a72c21b905169f378356",
+      "destination_sha256": "25eaaf6215db16bce10c65c59ec131286fe4e76ababe53c6aac59c580648e488"
+    },
+    {
+      "source": "tests/test_prime_frame_presentation.py",
+      "destination": "tests/test_prime_frame_presentation.py",
+      "source_sha256": "0e38eb56ff7e55a14c07437462515633671888e3fc4b556435f6fd67fa2f49b8",
+      "destination_sha256": "327bee8a998c3a1b4eeccc13421a0736107355490eebb707e63cc65003be8698"
+    },
+    {
+      "source": "tests/test_prime_g2_ab_bootloader.py",
+      "destination": "tests/test_prime_g2_ab_bootloader.py",
+      "source_sha256": "983bd6382fd438078e5c9834b0881192696f94b1b45bb574b0fcb929cff3e255",
+      "destination_sha256": "ada6fd8202827fbb0d78ff009a48cfcbeb448b9b1a1a09193a8304b107c6397e"
+    },
+    {
+      "source": "tests/test_prime_g2_ab_metadata.py",
+      "destination": "tests/test_prime_g2_ab_metadata.py",
+      "source_sha256": "45bfad2306f0eca971480173991dc8fd4d737936a300de80b5e9679e594c320c",
+      "destination_sha256": "45bfad2306f0eca971480173991dc8fd4d737936a300de80b5e9679e594c320c"
+    },
+    {
+      "source": "tests/test_prime_g2_charger_status.py",
+      "destination": "tests/test_prime_g2_charger_status.py",
+      "source_sha256": "6d5c4e75e5edcd2d9060e48f545f323b6056bb28428a7dfdf0e99541d20d6b8d",
+      "destination_sha256": "55efb1636a60fa2880e9600f7d6b01264c78b6572b72e4dee92533f04a26c61e"
+    },
+    {
+      "source": "tests/test_prime_g2_ddr_audit.py",
+      "destination": "tests/test_prime_g2_ddr_audit.py",
+      "source_sha256": "5922814a1ea83f79ef75272087e9495d5067a00d11362c42d62503b4ca6f73c7",
+      "destination_sha256": "5922814a1ea83f79ef75272087e9495d5067a00d11362c42d62503b4ca6f73c7"
+    },
+    {
+      "source": "tests/test_prime_g2_ddr_inspect.py",
+      "destination": "tests/test_prime_g2_ddr_inspect.py",
+      "source_sha256": "6015fc9147ef1fce04e25e2eb13ba8cbb5748444981574c36b647049f3107f40",
+      "destination_sha256": "6015fc9147ef1fce04e25e2eb13ba8cbb5748444981574c36b647049f3107f40"
+    },
+    {
+      "source": "tests/test_prime_g2_display_emulator_contract.py",
+      "destination": "tests/test_prime_g2_display_emulator_contract.py",
+      "source_sha256": "1778b6c30710cc2c9e4880db3a07eb4e630f3e89683faf24d99e2e1df641d205",
+      "destination_sha256": "bc18108356a246300f90ff18328e08760ba9c8ee280264edeb991740e7b4072b"
+    },
+    {
+      "source": "tests/test_prime_g2_hardware_reference.py",
+      "destination": "tests/test_prime_g2_hardware_reference.py",
+      "source_sha256": "2ed2958866a4e4e53e3c691b2f57c4155925f25aed9565ddaf645a33f529a117",
+      "destination_sha256": "b86bc97ec510fcbb7239369ec42fa9703f64bddc783badcae9f07258d836a4b9"
+    },
+    {
+      "source": "tests/test_prime_g2_keyboard_navigation.py",
+      "destination": "tests/test_prime_g2_keyboard_navigation.py",
+      "source_sha256": "25856dbaa431c61bad86a677c46a23760f49d89f73e73628c72eb9baeba73d76",
+      "destination_sha256": "c7a3240f1c9a7f75e54cf932ec6ca8a9c33566576175a9f77ecbea7cb3217f54"
+    },
+    {
+      "source": "tests/test_prime_g2_nand_capsule.py",
+      "destination": "tests/test_prime_g2_nand_capsule.py",
+      "source_sha256": "d2eda7f6e5ec0b487e0a12eca104114898fe3c34812967ff1946f266199cd165",
+      "destination_sha256": "d2eda7f6e5ec0b487e0a12eca104114898fe3c34812967ff1946f266199cd165"
+    },
+    {
+      "source": "tests/test_prime_g2_nand_update.py",
+      "destination": "tests/test_prime_g2_nand_update.py",
+      "source_sha256": "8fdaf7c01b90bfd8a039e492f500fa8f54171c0abe052a4cb55cf64e2e4fd4dc",
+      "destination_sha256": "8fdaf7c01b90bfd8a039e492f500fa8f54171c0abe052a4cb55cf64e2e4fd4dc"
+    },
+    {
+      "source": "tests/test_prime_g2_peripheral_models.py",
+      "destination": "tests/test_prime_g2_peripheral_models.py",
+      "source_sha256": "67fa1f3ed7d5dc460d20c91a6acf9e6c386c153a7060725052044403c8efaefa",
+      "destination_sha256": "ad68e66e0e8907387876e13794a5648e7f150007a8d80ce47128bce189d3857b"
+    },
+    {
+      "source": "tests/test_prime_g2_recovery_app.py",
+      "destination": "tests/test_prime_g2_recovery_app.py",
+      "source_sha256": "6dcef2d5fbf4383e3c5c760aa3fc0e163c370eb003b9db96ded045a6ee40b73c",
+      "destination_sha256": "b89e85e1b4ea6dfb210b1cb04b2673441526148c0898ec14ba9e74545573feed"
+    },
+    {
+      "source": "tests/test_prime_g2_recovery_exit.py",
+      "destination": "tests/test_prime_g2_recovery_exit.py",
+      "source_sha256": "6bd6a031949e0fd6ba2156b517cbee705f57f893ea8200f1819a2a86436557ed",
+      "destination_sha256": "7a4fa29747c4fb3e266af70e28466529c1039ae41975f88f863ce7e9f42a030e"
+    },
+    {
+      "source": "tests/test_prime_g2_register_decoder.py",
+      "destination": "tests/test_prime_g2_register_decoder.py",
+      "source_sha256": "9e4a137792fa0c18dcdd1b95687dddf3899c3965ce1f919b5a8a49396a5dd4f9",
+      "destination_sha256": "9e4a137792fa0c18dcdd1b95687dddf3899c3965ce1f919b5a8a49396a5dd4f9"
+    },
+    {
+      "source": "tests/test_prime_g2_update_capsule.py",
+      "destination": "tests/test_prime_g2_update_capsule.py",
+      "source_sha256": "b0d84997ce3f64307c50db49eda78d90d5552fd2f8f0d5b99f7f1985b603968b",
+      "destination_sha256": "b0d84997ce3f64307c50db49eda78d90d5552fd2f8f0d5b99f7f1985b603968b"
+    },
+    {
+      "source": "tests/test_prime_g2_update_key.py",
+      "destination": "tests/test_prime_g2_update_key.py",
+      "source_sha256": "bbf3fa2ce449e78647093fd83b7724d805fd9de6774fa10403762dcd5cc4cc85",
+      "destination_sha256": "bbf3fa2ce449e78647093fd83b7724d805fd9de6774fa10403762dcd5cc4cc85"
+    },
+    {
+      "source": "tests/test_prime_g2_usb_diag.py",
+      "destination": "tests/test_prime_g2_usb_diag.py",
+      "source_sha256": "307b3487783185b505f7cdd3d257f58d67c6723a61684a5f293725c63f1a9aca",
+      "destination_sha256": "1e11ab77dee2124e0224d83437b43558698262c92e7de7b379575da8abb313b7"
+    },
+    {
+      "source": "tests/test_prime_gpmi_bch.py",
+      "destination": "tests/test_prime_gpmi_bch.py",
+      "source_sha256": "1128578c9f592fd96f42b16c30ea985133c7f2f7a6b37d2b147055957e1518c9",
+      "destination_sha256": "1128578c9f592fd96f42b16c30ea985133c7f2f7a6b37d2b147055957e1518c9"
+    },
+    {
+      "source": "tests/test_prime_graph_touch.py",
+      "destination": "tests/test_prime_graph_touch.py",
+      "source_sha256": "67314220ec671f27e940c39e19dc260fe4c56b47b8f0529bfded659fb047b538",
+      "destination_sha256": "02590d04d6cc775749d8aa960b920c213baa9ca88438d5efdd2a428240e177ce"
+    },
+    {
+      "source": "tests/test_prime_math_template_palette.py",
+      "destination": "tests/test_prime_math_template_palette.py",
+      "source_sha256": "4ec22e350ba84e0f79c02c502536452dc85c98138d8c54ada6d6734fa4b16338",
+      "destination_sha256": "937e0a5626a24b4bc6eee9577f1efaa85544f30c2b84da580bc280c7718b0996"
+    },
+    {
+      "source": "tests/test_prime_nand_clocks.py",
+      "destination": "tests/test_prime_nand_clocks.py",
+      "source_sha256": "9357b487f898242eec405880423bc7fb1e726735efadbafe839dc904d539e456",
+      "destination_sha256": "9357b487f898242eec405880423bc7fb1e726735efadbafe839dc904d539e456"
+    },
+    {
+      "source": "tests/test_prime_nand_image.py",
+      "destination": "tests/test_prime_nand_image.py",
+      "source_sha256": "248d1f1fdc5da54c1f0e454cc12e62c9f2d398e1f997ba57fdeed55abe736950",
+      "destination_sha256": "248d1f1fdc5da54c1f0e454cc12e62c9f2d398e1f997ba57fdeed55abe736950"
+    },
+    {
+      "source": "tests/test_prime_raw_read_plan.py",
+      "destination": "tests/test_prime_raw_read_plan.py",
+      "source_sha256": "0fd54ac6d10565d840c89d6acb0fcec9dec30a895133a72e67b42ca50cc7433e",
+      "destination_sha256": "0fd54ac6d10565d840c89d6acb0fcec9dec30a895133a72e67b42ca50cc7433e"
+    },
+    {
+      "source": "tests/test_prime_rom_clock_capture.py",
+      "destination": "tests/test_prime_rom_clock_capture.py",
+      "source_sha256": "8372a96db8999b66e8ae1d514ee0ce3af1ccf236965ec438244fb8638d77c17e",
+      "destination_sha256": "8372a96db8999b66e8ae1d514ee0ce3af1ccf236965ec438244fb8638d77c17e"
+    },
+    {
+      "source": "tests/test_prime_rom_dma_analysis.py",
+      "destination": "tests/test_prime_rom_dma_analysis.py",
+      "source_sha256": "25ef27ff0d8734de1e54e2acbbc3b6b6b802c95a91957bb52eb423a15f07473e",
+      "destination_sha256": "25ef27ff0d8734de1e54e2acbbc3b6b6b802c95a91957bb52eb423a15f07473e"
+    },
+    {
+      "source": "tests/test_prime_settings_identity.py",
+      "destination": "tests/test_prime_settings_identity.py",
+      "source_sha256": "a860296b46e4a102ab9403fb3841d0b451278e95e226fadaed54196ab8ec8155",
+      "destination_sha256": "3eaf578a6568992c820a9ff1e3adcfdc86a4f91fe9735c8b97287cd605bc5cf2"
+    },
+    {
+      "source": "tests/test_upsilon_prime_installer.py",
+      "destination": "tests/test_lefony_installer.py",
+      "source_sha256": "fb791aad53970138e1efaaf6172e819a2a3f0ae61010c45afb7da192809353aa",
+      "destination_sha256": "70f9317a936059e2023689ed57e5244c11d708edc6b0d84b3fe9cb7459cbe658"
+    },
+    {
+      "source": "vm/Dockerfile.u-boot",
+      "destination": "vm/Dockerfile.u-boot",
+      "source_sha256": "018425e2f89d69380132e4cd495f568a699e460f2fc13b8627fb19e917c1a1b1",
+      "destination_sha256": "018425e2f89d69380132e4cd495f568a699e460f2fc13b8627fb19e917c1a1b1"
+    },
+    {
+      "source": "vm/README.md",
+      "destination": "vm/README.md",
+      "source_sha256": "39c6507071552c314ed63a67352cd5faee67c24ce508a049308981e9bb47412e",
+      "destination_sha256": "e63767d99c56bc8a3b20a65381ea71e57f678b4049f1d3438b03059762dcf30c"
+    },
+    {
+      "source": "vm/audit-prime-g2-boot.py",
+      "destination": "vm/audit-prime-g2-boot.py",
+      "source_sha256": "95a96571bd07f4dc320f1b9b5441ddc1d9a78c12a02042664cdfe6f01dbb6606",
+      "destination_sha256": "95a96571bd07f4dc320f1b9b5441ddc1d9a78c12a02042664cdfe6f01dbb6606"
+    },
+    {
+      "source": "vm/audit-prime-g2-ddr-boot.py",
+      "destination": "vm/audit-prime-g2-ddr-boot.py",
+      "source_sha256": "123ae6994e50374e2717d49be65efc62fe2abd9d6767e73084050f487cac404c",
+      "destination_sha256": "123ae6994e50374e2717d49be65efc62fe2abd9d6767e73084050f487cac404c"
+    },
+    {
+      "source": "vm/audit-prime-g2-reset-domains.py",
+      "destination": "vm/audit-prime-g2-reset-domains.py",
+      "source_sha256": "d1945c4c4cc61b4e708b75904e7efbb6a5c28e085ca6ba054a581bc060444847",
+      "destination_sha256": "d1945c4c4cc61b4e708b75904e7efbb6a5c28e085ca6ba054a581bc060444847"
+    },
+    {
+      "source": "vm/bch-oracle-compat/asm/byteorder.h",
+      "destination": "vm/bch-oracle-compat/asm/byteorder.h",
+      "source_sha256": "70eac863e99a42f2ec6e77c7561105ae30bf48dfda35ba8b808882a6caad7643",
+      "destination_sha256": "70eac863e99a42f2ec6e77c7561105ae30bf48dfda35ba8b808882a6caad7643"
+    },
+    {
+      "source": "vm/bch-oracle-compat/endian.h",
+      "destination": "vm/bch-oracle-compat/endian.h",
+      "source_sha256": "def4dcc42d4bca34c155630fc50e1736059718ca89d4a6f77de91c2ca500dee1",
+      "destination_sha256": "def4dcc42d4bca34c155630fc50e1736059718ca89d4a6f77de91c2ca500dee1"
+    },
+    {
+      "source": "vm/bch-oracle-compat/linux/types.h",
+      "destination": "vm/bch-oracle-compat/linux/types.h",
+      "source_sha256": "dd1e65241020275e480c9f023566ad3d27cad42dfac5d4d1b9c176732d1eede5",
+      "destination_sha256": "dd1e65241020275e480c9f023566ad3d27cad42dfac5d4d1b9c176732d1eede5"
+    },
+    {
+      "source": "vm/bch-oracle-compat/oracle.c",
+      "destination": "vm/bch-oracle-compat/oracle.c",
+      "source_sha256": "802aff65b676caf641cf4e13aef36d8ed2e73e87a60b1c616d6da4c415130211",
+      "destination_sha256": "802aff65b676caf641cf4e13aef36d8ed2e73e87a60b1c616d6da4c415130211"
+    },
+    {
+      "source": "vm/build-native-boot-media.sh",
+      "destination": "vm/build-native-boot-media.sh",
+      "source_sha256": "62489f36d068adcb249b3ceeb0370330c495e899792d3c41ff54a9dc52499dcb",
+      "destination_sha256": "d4a79f2329a0db466ebb12e5e0134c18cdc0d8f5ca4f0b2f1aebf1173a3c34f6"
+    },
+    {
+      "source": "vm/build-prime-g2-qemu.sh",
+      "destination": "vm/build-prime-g2-qemu.sh",
+      "source_sha256": "1628aa9ebfc567349264b1289d7a8e058450835590eda28f57c22718e0e8fa45",
+      "destination_sha256": "19c084dc060bb0ed429d7f1c19d78891dccf31d9584f3d5a59601704a387dd54"
+    },
+    {
+      "source": "vm/build-u-boot.sh",
+      "destination": "vm/build-u-boot.sh",
+      "source_sha256": "83f5d30b4ee808fb39ab4505b4f8ad16bf342f2b40204e3dc27aaaab61371246",
+      "destination_sha256": "a75946a84e5f449ef2b280528c6c2416327199ba0c64b60bc492cd26389e6004"
+    },
+    {
+      "source": "vm/capture-native-failure.sh",
+      "destination": "vm/capture-native-failure.sh",
+      "source_sha256": "28551eee5b40b473bb11243e33dbc304d7c9c47b4857629c1310a5eea29850ec",
+      "destination_sha256": "28551eee5b40b473bb11243e33dbc304d7c9c47b4857629c1310a5eea29850ec"
+    },
+    {
+      "source": "vm/generate-native-sbom.py",
+      "destination": "vm/generate-native-sbom.py",
+      "source_sha256": "cc3f2ed6bc3a3286c463a372c7d70731d2bad73613312a93a624748334b0a355",
+      "destination_sha256": "e101bd7b13c8291df9f5edc168f21c48ffba6258da51807d2d1e312aff71cfdf"
+    },
+    {
+      "source": "vm/guest/prime-g2-ddr-gate.S",
+      "destination": "vm/guest/prime-g2-ddr-gate.S",
+      "source_sha256": "8c227a89886a81617d5bc400bbf10e90f7b69caa225e1577aa233c3c7f9da183",
+      "destination_sha256": "8c227a89886a81617d5bc400bbf10e90f7b69caa225e1577aa233c3c7f9da183"
+    },
+    {
+      "source": "vm/guest/prime-g2-pwm-irq.S",
+      "destination": "vm/guest/prime-g2-pwm-irq.S",
+      "source_sha256": "6bb742eda32a2716521c2b72f6b66f4039c4bb9f06ec5d0fd87129b607560e38",
+      "destination_sha256": "6bb742eda32a2716521c2b72f6b66f4039c4bb9f06ec5d0fd87129b607560e38"
+    },
+    {
+      "source": "vm/hp_prime_stock_nand.py",
+      "destination": "vm/hp_prime_stock_nand.py",
+      "source_sha256": "886930afb8760e9e86e0d5bc5a503219c24c196b214e3294e4439c1946103951",
+      "destination_sha256": "886930afb8760e9e86e0d5bc5a503219c24c196b214e3294e4439c1946103951"
+    },
+    {
+      "source": "vm/hp_prime_stock_transition.py",
+      "destination": "vm/hp_prime_stock_transition.py",
+      "source_sha256": "2d74f3539a50c4aa38575fa05ece554b69ff3585252c8b037de746dd9febe8dc",
+      "destination_sha256": "2d74f3539a50c4aa38575fa05ece554b69ff3585252c8b037de746dd9febe8dc"
+    },
+    {
+      "source": "vm/hp_prime_stock_update.py",
+      "destination": "vm/hp_prime_stock_update.py",
+      "source_sha256": "3b9dcf998e9016683b84fa3746efcf7a7dee6fe02bebefbf025ff3f49b2a106f",
+      "destination_sha256": "3b9dcf998e9016683b84fa3746efcf7a7dee6fe02bebefbf025ff3f49b2a106f"
+    },
+    {
+      "source": "vm/input-proxy.py",
+      "destination": "vm/input-proxy.py",
+      "source_sha256": "2ea866ccae64c23db4ade3e4f7b546aa780dd13412d02ac446852251a33427c8",
+      "destination_sha256": "736b449ca521e4ae39e19424ad708bdbfa45b89484f4acc2708370d2d6122ce8"
+    },
+    {
+      "source": "vm/inspect-ppm.py",
+      "destination": "vm/inspect-ppm.py",
+      "source_sha256": "1dcf9df154ad7f44abaaf3c6b109d07ad0ea3e4ef2972561b303541a1e2de486",
+      "destination_sha256": "1dcf9df154ad7f44abaaf3c6b109d07ad0ea3e4ef2972561b303541a1e2de486"
+    },
+    {
+      "source": "vm/native-ab-update-test.py",
+      "destination": "vm/native-ab-update-test.py",
+      "source_sha256": "2120461c4ac96e9e5f7341bf2ba71dce8bd35a009838ae670fddc50a4f8f821c",
+      "destination_sha256": "2120461c4ac96e9e5f7341bf2ba71dce8bd35a009838ae670fddc50a4f8f821c"
+    },
+    {
+      "source": "vm/native-app-test.py",
+      "destination": "vm/native-app-test.py",
+      "source_sha256": "218516999c340b3687440d883378ecb3d9eee77bde1aa9b267766462d519c552",
+      "destination_sha256": "218516999c340b3687440d883378ecb3d9eee77bde1aa9b267766462d519c552"
+    },
+    {
+      "source": "vm/native-keypad-test.py",
+      "destination": "vm/native-keypad-test.py",
+      "source_sha256": "2cc41b5005c412dbf5994227c9f4d1e6c9703b9c2cb40a877ca35233e00046f2",
+      "destination_sha256": "e134d1015421141479fbfcfd9f2c03e183a68b5237d042d10bedd099a2c2c974"
+    },
+    {
+      "source": "vm/native-performance-test.py",
+      "destination": "vm/native-performance-test.py",
+      "source_sha256": "b8490784a1e1d17baee7fdbd94a08a6a775f6a450dfd852b53aef0cba78b7d0a",
+      "destination_sha256": "b8490784a1e1d17baee7fdbd94a08a6a775f6a450dfd852b53aef0cba78b7d0a"
+    },
+    {
+      "source": "vm/native-protocol-fuzz.py",
+      "destination": "vm/native-protocol-fuzz.py",
+      "source_sha256": "8eba9585499039953bc757d8ac1c5c25531b1fe7a609ae76a2fc0f7c08834a47",
+      "destination_sha256": "8eba9585499039953bc757d8ac1c5c25531b1fe7a609ae76a2fc0f7c08834a47"
+    },
+    {
+      "source": "vm/native-soak-test.py",
+      "destination": "vm/native-soak-test.py",
+      "source_sha256": "d5ee32b590d4e4f944a5774c1e7895f48761c460c9ab19f85b7a2519984e082f",
+      "destination_sha256": "d5ee32b590d4e4f944a5774c1e7895f48761c460c9ab19f85b7a2519984e082f"
+    },
+    {
+      "source": "vm/native-storage-fuzz.py",
+      "destination": "vm/native-storage-fuzz.py",
+      "source_sha256": "8185edfb8d35b19866586dc5979d32d642296df783a5b4ddebf46682f35628e3",
+      "destination_sha256": "8185edfb8d35b19866586dc5979d32d642296df783a5b4ddebf46682f35628e3"
+    },
+    {
+      "source": "vm/native-suite.py",
+      "destination": "vm/native-suite.py",
+      "source_sha256": "3fab54ea7dfd42ef922ce073fa19388f5d62bab9f179306d0c38563f25950704",
+      "destination_sha256": "505cbd9150538537f68082193f41ccc381e69944d3900a6e97ef9e15de9c8691"
+    },
+    {
+      "source": "vm/native-usb-test.py",
+      "destination": "vm/native-usb-test.py",
+      "source_sha256": "d512e0b806afdab30a0844dad59b30d71b743d2198207b2f3fc13c1c38b966c5",
+      "destination_sha256": "d512e0b806afdab30a0844dad59b30d71b743d2198207b2f3fc13c1c38b966c5"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-adc.patch",
+      "destination": "vm/patches/qemu-prime-g2-adc.patch",
+      "source_sha256": "838e36d3662cd8d7334851b554fb18075b60ca981982a3fce11d76f5829fa6e5",
+      "destination_sha256": "838e36d3662cd8d7334851b554fb18075b60ca981982a3fce11d76f5829fa6e5"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-apbh.patch",
+      "destination": "vm/patches/qemu-prime-g2-apbh.patch",
+      "source_sha256": "13986516ba3c28c45d5b01fb128fb988e4e4205e9fad2d0b0c0ace2322cfc46b",
+      "destination_sha256": "13986516ba3c28c45d5b01fb128fb988e4e4205e9fad2d0b0c0ace2322cfc46b"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-boot-straps.patch",
+      "destination": "vm/patches/qemu-prime-g2-boot-straps.patch",
+      "source_sha256": "36460ebc32342daf702f3070a71aec3f5ed4ee5783c9818888269b2056acc59d",
+      "destination_sha256": "36460ebc32342daf702f3070a71aec3f5ed4ee5783c9818888269b2056acc59d"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-ddr-gate.patch",
+      "destination": "vm/patches/qemu-prime-g2-ddr-gate.patch",
+      "source_sha256": "254aa6bcc6cbda58e77a02aa2333540ba6cecf2ead45981932f75882d872cf84",
+      "destination_sha256": "254aa6bcc6cbda58e77a02aa2333540ba6cecf2ead45981932f75882d872cf84"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-electrical-fidelity.patch",
+      "destination": "vm/patches/qemu-prime-g2-electrical-fidelity.patch",
+      "source_sha256": "7118ca4881daeecb69cab4915afb6620532f1738cc589607ceb9e7786702c9c5",
+      "destination_sha256": "7118ca4881daeecb69cab4915afb6620532f1738cc589607ceb9e7786702c9c5"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-gpio-pad-status.patch",
+      "destination": "vm/patches/qemu-prime-g2-gpio-pad-status.patch",
+      "source_sha256": "4b9628dff5dd1f0717bfdf9b9e4ecf24cb608dd5c5f1b02712de6cb5126fefb2",
+      "destination_sha256": "4b9628dff5dd1f0717bfdf9b9e4ecf24cb608dd5c5f1b02712de6cb5126fefb2"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-gpio-pulls.patch",
+      "destination": "vm/patches/qemu-prime-g2-gpio-pulls.patch",
+      "source_sha256": "f3aa84dcd1936d73bfca6ba42ded4f2fce4da6354468b1d8e3b6359ce7fe71bb",
+      "destination_sha256": "f3aa84dcd1936d73bfca6ba42ded4f2fce4da6354468b1d8e3b6359ce7fe71bb"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-gpt-state.patch",
+      "destination": "vm/patches/qemu-prime-g2-gpt-state.patch",
+      "source_sha256": "a7132a6159beb776a2baa195265910d562e829882066757c397b14feca1f0164",
+      "destination_sha256": "a7132a6159beb776a2baa195265910d562e829882066757c397b14feca1f0164"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-gpt-status.patch",
+      "destination": "vm/patches/qemu-prime-g2-gpt-status.patch",
+      "source_sha256": "4a1547adc75382da9bf5f87bb6052532db0fef0ec7beaad6530849df69046d4e",
+      "destination_sha256": "4a1547adc75382da9bf5f87bb6052532db0fef0ec7beaad6530849df69046d4e"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-ili9322-datasheet.patch",
+      "destination": "vm/patches/qemu-prime-g2-ili9322-datasheet.patch",
+      "source_sha256": "16f751bcab41a50adc12a24526f7875c8781981a4d3cd73d91e99573bfaaa70d",
+      "destination_sha256": "16f751bcab41a50adc12a24526f7875c8781981a4d3cd73d91e99573bfaaa70d"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-mmdc.patch",
+      "destination": "vm/patches/qemu-prime-g2-mmdc.patch",
+      "source_sha256": "3a678f0bb14a17dded6f1ababf68ed8f9451022e6f7177fbb67e999867c32876",
+      "destination_sha256": "3a678f0bb14a17dded6f1ababf68ed8f9451022e6f7177fbb67e999867c32876"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-nand-clocks.patch",
+      "destination": "vm/patches/qemu-prime-g2-nand-clocks.patch",
+      "source_sha256": "7bb27ee90909159c25ea07c2163e68eb70e2945aedaaf429032e2b5966b03316",
+      "destination_sha256": "7bb27ee90909159c25ea07c2163e68eb70e2945aedaaf429032e2b5966b03316"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-nand-rom.patch",
+      "destination": "vm/patches/qemu-prime-g2-nand-rom.patch",
+      "source_sha256": "583c564dcc9cc84aa6648251406057fdf5cc7de540056b25a04a9b197618378b",
+      "destination_sha256": "583c564dcc9cc84aa6648251406057fdf5cc7de540056b25a04a9b197618378b"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-panel.patch",
+      "destination": "vm/patches/qemu-prime-g2-panel.patch",
+      "source_sha256": "c7d68b22f43189285f1946f5b2339227b88f81b2922c25cd06c71119c40c5adc",
+      "destination_sha256": "c7d68b22f43189285f1946f5b2339227b88f81b2922c25cd06c71119c40c5adc"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-peripherals.patch",
+      "destination": "vm/patches/qemu-prime-g2-peripherals.patch",
+      "source_sha256": "cd360bd70485a09a67cd20db1652099c0b21bb5bbda5412eddde4be48c9538e5",
+      "destination_sha256": "cd360bd70485a09a67cd20db1652099c0b21bb5bbda5412eddde4be48c9538e5"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-clocks.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-clocks.patch",
+      "source_sha256": "5835b3e68384b4929b8dbe8e0410edb8aa0a14018729a6b52c866fb4c8633065",
+      "destination_sha256": "5835b3e68384b4929b8dbe8e0410edb8aa0a14018729a6b52c866fb4c8633065"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-counter.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-counter.patch",
+      "source_sha256": "15425a1237a50085a125d3d00558a78aab9abe5b5862ab1973987bc2f4a83a5d",
+      "destination_sha256": "15425a1237a50085a125d3d00558a78aab9abe5b5862ab1973987bc2f4a83a5d"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-events.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-events.patch",
+      "source_sha256": "19b9c0607cb06069c7e047000d4e53b81661d31ce85db3f67bf4b3fabb979618",
+      "destination_sha256": "19b9c0607cb06069c7e047000d4e53b81661d31ce85db3f67bf4b3fabb979618"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-fifo.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-fifo.patch",
+      "source_sha256": "7ca9a4f42ba7b7b56ab00eac7a1052ee8a2d04252db6dc9e5574ae09e6fb09ec",
+      "destination_sha256": "7ca9a4f42ba7b7b56ab00eac7a1052ee8a2d04252db6dc9e5574ae09e6fb09ec"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-sources.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-sources.patch",
+      "source_sha256": "74df7404e1c812a169c409407da86226e9eb9ceebc8488be32acd15db3df23c1",
+      "destination_sha256": "74df7404e1c812a169c409407da86226e9eb9ceebc8488be32acd15db3df23c1"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-pwm-swap.patch",
+      "destination": "vm/patches/qemu-prime-g2-pwm-swap.patch",
+      "source_sha256": "f260a540128549aaf4ebff35d764a9102f520d4521fdc850b926995b170005ac",
+      "destination_sha256": "f260a540128549aaf4ebff35d764a9102f520d4521fdc850b926995b170005ac"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-refresh-clock.patch",
+      "destination": "vm/patches/qemu-prime-g2-refresh-clock.patch",
+      "source_sha256": "70d349230074f3d3699226804cd1f48c3cff62f25529575e13d095d1791f6b32",
+      "destination_sha256": "70d349230074f3d3699226804cd1f48c3cff62f25529575e13d095d1791f6b32"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-reset-status.patch",
+      "destination": "vm/patches/qemu-prime-g2-reset-status.patch",
+      "source_sha256": "8f6e49b906a2faad12dbd0dd7dff5ff14dbe45126304e95cfc1782b28887d30e",
+      "destination_sha256": "8f6e49b906a2faad12dbd0dd7dff5ff14dbe45126304e95cfc1782b28887d30e"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-rom-recovery.patch",
+      "destination": "vm/patches/qemu-prime-g2-rom-recovery.patch",
+      "source_sha256": "7ee378844942acb15eaa9ab3915cdebff383149840c6bdf75c02bd618b91e7cf",
+      "destination_sha256": "7ee378844942acb15eaa9ab3915cdebff383149840c6bdf75c02bd618b91e7cf"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-snvs-hprtc.patch",
+      "destination": "vm/patches/qemu-prime-g2-snvs-hprtc.patch",
+      "source_sha256": "1bdfdc5c33af532e9c742924aab69c51fece8e0f03fd8d0b5c9a167193715fe4",
+      "destination_sha256": "1bdfdc5c33af532e9c742924aab69c51fece8e0f03fd8d0b5c9a167193715fe4"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-snvs-pwrkey.patch",
+      "destination": "vm/patches/qemu-prime-g2-snvs-pwrkey.patch",
+      "source_sha256": "8a289776289740cb276f7c6dc112f28633e9321df389ef6dc2699de7aaa2bd56",
+      "destination_sha256": "8a289776289740cb276f7c6dc112f28633e9321df389ef6dc2699de7aaa2bd56"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-stock-boot.patch",
+      "destination": "vm/patches/qemu-prime-g2-stock-boot.patch",
+      "source_sha256": "6d96d5ea33a605a09d71e38e168d472eeec10cc49adac3eb4df7b65040c94a0f",
+      "destination_sha256": "6d96d5ea33a605a09d71e38e168d472eeec10cc49adac3eb4df7b65040c94a0f"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-usbnc.patch",
+      "destination": "vm/patches/qemu-prime-g2-usbnc.patch",
+      "source_sha256": "63d2f1ce03246286966bdbce9c22b6286d9099869d7a605b51f008dcddae2610",
+      "destination_sha256": "63d2f1ce03246286966bdbce9c22b6286d9099869d7a605b51f008dcddae2610"
+    },
+    {
+      "source": "vm/patches/qemu-prime-g2-usbotg-device.patch",
+      "destination": "vm/patches/qemu-prime-g2-usbotg-device.patch",
+      "source_sha256": "a4cb2882ecfe2a39303386fae7b182e4e544befcb2206b644f091f41365dd4d7",
+      "destination_sha256": "a4cb2882ecfe2a39303386fae7b182e4e544befcb2206b644f091f41365dd4d7"
+    },
+    {
+      "source": "vm/patches/u-boot-lefony-ab-command.patch",
+      "destination": "vm/patches/u-boot-lefony-ab-command.patch",
+      "source_sha256": "d466fdd497579a5c2d354fb761f72698a43212f9e42a953b81388c0c6a583f92",
+      "destination_sha256": "d466fdd497579a5c2d354fb761f72698a43212f9e42a953b81388c0c6a583f92"
+    },
+    {
+      "source": "vm/patches/u-boot-qemu-memory.patch",
+      "destination": "vm/patches/u-boot-qemu-memory.patch",
+      "source_sha256": "06c86071bffd6d732cf59efd1a304fe34e0100475b68f3a2a20a15cf01d0dcbf",
+      "destination_sha256": "06c86071bffd6d732cf59efd1a304fe34e0100475b68f3a2a20a15cf01d0dcbf"
+    },
+    {
+      "source": "vm/ppm-content-compare.py",
+      "destination": "vm/ppm-content-compare.py",
+      "source_sha256": "037db685e83d148751ab48ecff2e75e187f86ff917707eb242538dde589d5ca8",
+      "destination_sha256": "037db685e83d148751ab48ecff2e75e187f86ff917707eb242538dde589d5ca8"
+    },
+    {
+      "source": "vm/prime-calculation-touch-check.py",
+      "destination": "vm/prime-calculation-touch-check.py",
+      "source_sha256": "bae281be1350209efd2e0441ae70d5db990759434105ae19c7254e801adbd1d9",
+      "destination_sha256": "bae281be1350209efd2e0441ae70d5db990759434105ae19c7254e801adbd1d9"
+    },
+    {
+      "source": "vm/prime-console.sh",
+      "destination": "vm/prime-console.sh",
+      "source_sha256": "d632dba4a92ccec8792275828d70ce6a16980dbf97f6e3fffa046b93ceb2f70e",
+      "destination_sha256": "d632dba4a92ccec8792275828d70ce6a16980dbf97f6e3fffa046b93ceb2f70e"
+    },
+    {
+      "source": "vm/prime-control.py",
+      "destination": "vm/prime-control.py",
+      "source_sha256": "b14165d4a100675fd4f8872d4b993b936265f91fbd23680f8650c78ebeee3278",
+      "destination_sha256": "e4083114cbf9da5f747b5946d56a5bb76c60364d09c8ef596cbee487a8f97dea"
+    },
+    {
+      "source": "vm/prime-display-settings-check.py",
+      "destination": "vm/prime-display-settings-check.py",
+      "source_sha256": "8c93d460910c230435df56fc1c86d8cc4bfe317c9ac54ca3cdea870e3515ce12",
+      "destination_sha256": "8c93d460910c230435df56fc1c86d8cc4bfe317c9ac54ca3cdea870e3515ce12"
+    },
+    {
+      "source": "vm/prime-functions-touch-check.py",
+      "destination": "vm/prime-functions-touch-check.py",
+      "source_sha256": "0b80a2b11b4fb4a43f185f82c619c629f4bf40398d448421cd3f08fb9d4760ea",
+      "destination_sha256": "0b80a2b11b4fb4a43f185f82c619c629f4bf40398d448421cd3f08fb9d4760ea"
+    },
+    {
+      "source": "vm/prime_bch.py",
+      "destination": "vm/prime_bch.py",
+      "source_sha256": "5a84d740f42f12b6bb8172c6bcd9233038718c248c51a2305dc48e8ebba75122",
+      "destination_sha256": "5a84d740f42f12b6bb8172c6bcd9233038718c248c51a2305dc48e8ebba75122"
+    },
+    {
+      "source": "vm/prime_bch_native.py",
+      "destination": "vm/prime_bch_native.py",
+      "source_sha256": "bef5a8d6fa69ae41b28b20005bfa86f4f5031d4b2f44fb516b28fdb536ed4867",
+      "destination_sha256": "bef5a8d6fa69ae41b28b20005bfa86f4f5031d4b2f44fb516b28fdb536ed4867"
+    },
+    {
+      "source": "vm/prime_gpmi_bch.py",
+      "destination": "vm/prime_gpmi_bch.py",
+      "source_sha256": "287b66f978b4aeeca3ef2d09b50bd33ea2db274ffb54c3bc2834ae831b1db0ae",
+      "destination_sha256": "287b66f978b4aeeca3ef2d09b50bd33ea2db274ffb54c3bc2834ae831b1db0ae"
+    },
+    {
+      "source": "vm/prime_nand_image.py",
+      "destination": "vm/prime_nand_image.py",
+      "source_sha256": "6eebbcc6a80974bc5f069ff0ad06ef5653c34f30df592d88571783569ebb5049",
+      "destination_sha256": "6eebbcc6a80974bc5f069ff0ad06ef5653c34f30df592d88571783569ebb5049"
+    },
+    {
+      "source": "vm/prime_usb_host.py",
+      "destination": "vm/prime_usb_host.py",
+      "source_sha256": "7a5bb198647f9ba4f57e195240e3412f257614678a594e8e92a4016034a088de",
+      "destination_sha256": "7a5bb198647f9ba4f57e195240e3412f257614678a594e8e92a4016034a088de"
+    },
+    {
+      "source": "vm/qemu/README.md",
+      "destination": "vm/qemu/README.md",
+      "source_sha256": "b475fde4caefa5928b8ba281ba030c8b9584256e33eb38741d0217a8bbee77fa",
+      "destination_sha256": "b475fde4caefa5928b8ba281ba030c8b9584256e33eb38741d0217a8bbee77fa"
+    },
+    {
+      "source": "vm/qemu/prime_g2_bch.c",
+      "destination": "vm/qemu/prime_g2_bch.c",
+      "source_sha256": "1f698011e184f49c883d4b677af341c6b7328353f5e75ec584e2a2758d7f7de9",
+      "destination_sha256": "1f698011e184f49c883d4b677af341c6b7328353f5e75ec584e2a2758d7f7de9"
+    },
+    {
+      "source": "vm/qemu/prime_g2_bch.h",
+      "destination": "vm/qemu/prime_g2_bch.h",
+      "source_sha256": "d7fe5bb4fcfce3f4eebb9826fa3b1d5f004021582d3afd9da3ea05a124242035",
+      "destination_sha256": "d7fe5bb4fcfce3f4eebb9826fa3b1d5f004021582d3afd9da3ea05a124242035"
+    },
+    {
+      "source": "vm/qemu/prime_g2_peripherals.c",
+      "destination": "vm/qemu/prime_g2_peripherals.c",
+      "source_sha256": "5b75fd17ea4741a194df701e015b31f45f6dbf79d078850b2cf984ce07c0db8e",
+      "destination_sha256": "5b75fd17ea4741a194df701e015b31f45f6dbf79d078850b2cf984ce07c0db8e"
+    },
+    {
+      "source": "vm/qemu/prime_g2_peripherals.h",
+      "destination": "vm/qemu/prime_g2_peripherals.h",
+      "source_sha256": "5eee4c1f64ad9910c0ad9b3a48d2da6b82d6adc53f18ba59a563dfc25ecaa67c",
+      "destination_sha256": "5eee4c1f64ad9910c0ad9b3a48d2da6b82d6adc53f18ba59a563dfc25ecaa67c"
+    },
+    {
+      "source": "vm/qmp-screendump.py",
+      "destination": "vm/qmp-screendump.py",
+      "source_sha256": "85d6339fe38ea8a17076186952a7ce82ad8479b1a638dd8e31cc4db3ad3d5223",
+      "destination_sha256": "85d6339fe38ea8a17076186952a7ce82ad8479b1a638dd8e31cc4db3ad3d5223"
+    },
+    {
+      "source": "vm/run-hp-prime-stock-vm.sh",
+      "destination": "vm/run-hp-prime-stock-vm.sh",
+      "source_sha256": "a8f9d8ea9357bdd78666181cbb0cbfb89b5a380566276ae6f50929df9895f1da",
+      "destination_sha256": "a8f9d8ea9357bdd78666181cbb0cbfb89b5a380566276ae6f50929df9895f1da"
+    },
+    {
+      "source": "vm/run-native-vm.sh",
+      "destination": "vm/run-native-vm.sh",
+      "source_sha256": "aed30bfce3f460825c1e4cf1ca0e00e068bd74d1d101d067fe8a7ee4f90d86ae",
+      "destination_sha256": "ac6eb9491f8971625a67c5e858084b36d42868c348bca1b011a68da6dbb0f23e"
+    },
+    {
+      "source": "vm/test-native-ab-update.sh",
+      "destination": "vm/test-native-ab-update.sh",
+      "source_sha256": "e36260c26108ddc48dcbe152a7a128c1fee300734cec57ab8d4cae9700732a1b",
+      "destination_sha256": "e36260c26108ddc48dcbe152a7a128c1fee300734cec57ab8d4cae9700732a1b"
+    },
+    {
+      "source": "vm/test-native-apps.sh",
+      "destination": "vm/test-native-apps.sh",
+      "source_sha256": "3951a933c86c7fb6b8492491cf7045256c2e923a36f2c9d26a5dfa6e301be9a9",
+      "destination_sha256": "3951a933c86c7fb6b8492491cf7045256c2e923a36f2c9d26a5dfa6e301be9a9"
+    },
+    {
+      "source": "vm/test-native-boot-recovery.sh",
+      "destination": "vm/test-native-boot-recovery.sh",
+      "source_sha256": "f916f880f7a214307bb5b7bcd65534f5053985e9f8d9dae3a2bf6796543dc64a",
+      "destination_sha256": "b1e611fcd431740b288615ab8bf538fb34b05c25b193b0bd056a5bdf89279bf8"
+    },
+    {
+      "source": "vm/test-native-cold-boots.sh",
+      "destination": "vm/test-native-cold-boots.sh",
+      "source_sha256": "399b2b5dfce75de45a0c90e3381e0252c4397948bb2aa98019d43217b7cacf67",
+      "destination_sha256": "399b2b5dfce75de45a0c90e3381e0252c4397948bb2aa98019d43217b7cacf67"
+    },
+    {
+      "source": "vm/test-native-cold-reset.sh",
+      "destination": "vm/test-native-cold-reset.sh",
+      "source_sha256": "ec988320688c1de698f39faf1dd6155cfb9431bfff95801cdc2d894421935ffb",
+      "destination_sha256": "ec988320688c1de698f39faf1dd6155cfb9431bfff95801cdc2d894421935ffb"
+    },
+    {
+      "source": "vm/test-native-comprehensive.sh",
+      "destination": "vm/test-native-comprehensive.sh",
+      "source_sha256": "e7c1a2bc8dec9608de2f67bd3132dc58cdc025abc336d301f146ee95255edf7d",
+      "destination_sha256": "e7c1a2bc8dec9608de2f67bd3132dc58cdc025abc336d301f146ee95255edf7d"
+    },
+    {
+      "source": "vm/test-native-direct.sh",
+      "destination": "vm/test-native-direct.sh",
+      "source_sha256": "a82a93eaaf23ddf50dbbed73fb18bb62cb53e28e6821a2461de8c02c999eefee",
+      "destination_sha256": "a82a93eaaf23ddf50dbbed73fb18bb62cb53e28e6821a2461de8c02c999eefee"
+    },
+    {
+      "source": "vm/test-native-display-fidelity.sh",
+      "destination": "vm/test-native-display-fidelity.sh",
+      "source_sha256": "0a92b9734dd437cf7da26c71c2b2262c6b55b14c8541ac6445ec04f99286a137",
+      "destination_sha256": "0a92b9734dd437cf7da26c71c2b2262c6b55b14c8541ac6445ec04f99286a137"
+    },
+    {
+      "source": "vm/test-native-display.sh",
+      "destination": "vm/test-native-display.sh",
+      "source_sha256": "6550c53061531900265ae88971dbac6f184e550e596232c9b4aae70602218927",
+      "destination_sha256": "6550c53061531900265ae88971dbac6f184e550e596232c9b4aae70602218927"
+    },
+    {
+      "source": "vm/test-native-exceptions.sh",
+      "destination": "vm/test-native-exceptions.sh",
+      "source_sha256": "92973480cb0ebfe6283ebc1a4599978db16d9d8d780bba3cc228f8d1688c33b6",
+      "destination_sha256": "92973480cb0ebfe6283ebc1a4599978db16d9d8d780bba3cc228f8d1688c33b6"
+    },
+    {
+      "source": "vm/test-native-keypad.sh",
+      "destination": "vm/test-native-keypad.sh",
+      "source_sha256": "ee86ffce0c672905048d4d60ab6a69ab0b3411471ad0887a30620500761babf6",
+      "destination_sha256": "ee86ffce0c672905048d4d60ab6a69ab0b3411471ad0887a30620500761babf6"
+    },
+    {
+      "source": "vm/test-native-performance.sh",
+      "destination": "vm/test-native-performance.sh",
+      "source_sha256": "a921497954b965152d299e24b70fe17eed8bce0efe3fee4ae3d2363acddaa85f",
+      "destination_sha256": "a921497954b965152d299e24b70fe17eed8bce0efe3fee4ae3d2363acddaa85f"
+    },
+    {
+      "source": "vm/test-native-persistence.sh",
+      "destination": "vm/test-native-persistence.sh",
+      "source_sha256": "859cc10710ec6fda6b028590448a92992142fcfbb65d71515202f22d91466bc0",
+      "destination_sha256": "079d2b7cc68dd34a411f0ae54b5caba512f482ed9a3ff8ad22dbcaae38c7d17f"
+    },
+    {
+      "source": "vm/test-native-power-loss.sh",
+      "destination": "vm/test-native-power-loss.sh",
+      "source_sha256": "f9c3c9fdcf878c71fc746efb46a61574cd2cbd55facac7b9b82353e3f2c25694",
+      "destination_sha256": "f9c3c9fdcf878c71fc746efb46a61574cd2cbd55facac7b9b82353e3f2c25694"
+    },
+    {
+      "source": "vm/test-native-preferences.sh",
+      "destination": "vm/test-native-preferences.sh",
+      "source_sha256": "9e2c8a79e1198ed7e6ed8e9e04be931fb91c134cb0cb137fbcf1017df323a193",
+      "destination_sha256": "73218d971dd6e25b0eec7ea3aee6c1fce07069c5ee574044823d7342611afc65"
+    },
+    {
+      "source": "vm/test-native-protocol-fuzz.sh",
+      "destination": "vm/test-native-protocol-fuzz.sh",
+      "source_sha256": "73d82673511791c71b08cf413c6a897635a49541fdc5a15b415397745c317d34",
+      "destination_sha256": "73d82673511791c71b08cf413c6a897635a49541fdc5a15b415397745c317d34"
+    },
+    {
+      "source": "vm/test-native-protocol.sh",
+      "destination": "vm/test-native-protocol.sh",
+      "source_sha256": "3026ece179173ca464dedd8a7fed51f58c4ff997496494e5efca3378c514459e",
+      "destination_sha256": "3026ece179173ca464dedd8a7fed51f58c4ff997496494e5efca3378c514459e"
+    },
+    {
+      "source": "vm/test-native-readonly.sh",
+      "destination": "vm/test-native-readonly.sh",
+      "source_sha256": "957431a43ee7848064bc1535ba5f14bf2bfefc36a8a5bcfdca4b1c32837782ca",
+      "destination_sha256": "957431a43ee7848064bc1535ba5f14bf2bfefc36a8a5bcfdca4b1c32837782ca"
+    },
+    {
+      "source": "vm/test-native-runtime-hardware.sh",
+      "destination": "vm/test-native-runtime-hardware.sh",
+      "source_sha256": "818cbd54df0e5ad9f459f32209494aa7a32121a4462310d31c25ac32c9d8e882",
+      "destination_sha256": "818cbd54df0e5ad9f459f32209494aa7a32121a4462310d31c25ac32c9d8e882"
+    },
+    {
+      "source": "vm/test-native-services.sh",
+      "destination": "vm/test-native-services.sh",
+      "source_sha256": "34ed1b4dc3d78fcb58cf434e02e9b91c5ba179b8728fc16a26af6c4d1060395f",
+      "destination_sha256": "34ed1b4dc3d78fcb58cf434e02e9b91c5ba179b8728fc16a26af6c4d1060395f"
+    },
+    {
+      "source": "vm/test-native-soak.sh",
+      "destination": "vm/test-native-soak.sh",
+      "source_sha256": "d3a593d80a5ac7f1df2019df441b805ade5641dbbf990f839fac96cd7d8256cf",
+      "destination_sha256": "d3a593d80a5ac7f1df2019df441b805ade5641dbbf990f839fac96cd7d8256cf"
+    },
+    {
+      "source": "vm/test-native-storage-boundaries.sh",
+      "destination": "vm/test-native-storage-boundaries.sh",
+      "source_sha256": "be1b7d476ddf4335dffb083826e6f135ff76ab4a60d5ec6ee44d21d4661378ae",
+      "destination_sha256": "be1b7d476ddf4335dffb083826e6f135ff76ab4a60d5ec6ee44d21d4661378ae"
+    },
+    {
+      "source": "vm/test-native-storage-fuzz.sh",
+      "destination": "vm/test-native-storage-fuzz.sh",
+      "source_sha256": "8bb5c9cb438e0b716b85de77b7f1787de1cbedc2f114ef19fe3c0ff5b572aa03",
+      "destination_sha256": "8bb5c9cb438e0b716b85de77b7f1787de1cbedc2f114ef19fe3c0ff5b572aa03"
+    },
+    {
+      "source": "vm/test-native-touch.sh",
+      "destination": "vm/test-native-touch.sh",
+      "source_sha256": "e94f084be3f317897519f07db9511e9c6b4684f7d669b60d8c045e78d3bca8bc",
+      "destination_sha256": "e94f084be3f317897519f07db9511e9c6b4684f7d669b60d8c045e78d3bca8bc"
+    },
+    {
+      "source": "vm/test-native-usb.sh",
+      "destination": "vm/test-native-usb.sh",
+      "source_sha256": "6c0211bb5155d0e2027dc5e1aa6879ced4c5eb91828e5c235207a6f91ea3734e",
+      "destination_sha256": "6c0211bb5155d0e2027dc5e1aa6879ced4c5eb91828e5c235207a6f91ea3734e"
+    },
+    {
+      "source": "vm/test-native-vm.sh",
+      "destination": "vm/test-native-vm.sh",
+      "source_sha256": "edbe4dd4e003297a8b3cc8c9de86a9b2d62006e69c7d195bc88301e1dc0ff015",
+      "destination_sha256": "edbe4dd4e003297a8b3cc8c9de86a9b2d62006e69c7d195bc88301e1dc0ff015"
+    },
+    {
+      "source": "vm/test-prime-battery-usb.py",
+      "destination": "vm/test-prime-battery-usb.py",
+      "source_sha256": "e3325847e2fab767474e6d2a32f3779816f9b6fab8a9bf1976a4df79601863f7",
+      "destination_sha256": "e3325847e2fab767474e6d2a32f3779816f9b6fab8a9bf1976a4df79601863f7"
+    },
+    {
+      "source": "vm/test-prime-bch-c.py",
+      "destination": "vm/test-prime-bch-c.py",
+      "source_sha256": "28c4978c0318d188fb680f4b968158fd922ba931408da9bac6135d615c475e54",
+      "destination_sha256": "28c4978c0318d188fb680f4b968158fd922ba931408da9bac6135d615c475e54"
+    },
+    {
+      "source": "vm/test-prime-bch-sanitize.c",
+      "destination": "vm/test-prime-bch-sanitize.c",
+      "source_sha256": "03f1f9620e1ba58524238d88afd41a9c42b68d1511d338c1eb58902e812d37c8",
+      "destination_sha256": "03f1f9620e1ba58524238d88afd41a9c42b68d1511d338c1eb58902e812d37c8"
+    },
+    {
+      "source": "vm/test-prime-bch.py",
+      "destination": "vm/test-prime-bch.py",
+      "source_sha256": "5a803223afce6759fe91824d9af18f6a12735838ee7aff7fb1e9866fa03be1eb",
+      "destination_sha256": "5a803223afce6759fe91824d9af18f6a12735838ee7aff7fb1e9866fa03be1eb"
+    },
+    {
+      "source": "vm/test-prime-coordinate-touch.py",
+      "destination": "vm/test-prime-coordinate-touch.py",
+      "source_sha256": "a9313b1e70b3a30d0ea7ef2aed1cb7326100352f8bb5b9a9039d8d0f3a50b3f6",
+      "destination_sha256": "5d1aee7d37883341d822f425fb794bbcc3406e7f1a7ab96bf89c64ddfa4b2095"
+    },
+    {
+      "source": "vm/test-prime-dev-usb.py",
+      "destination": "vm/test-prime-dev-usb.py",
+      "source_sha256": "57a620fab7740310dfa35f07cc97b6391206b9f7abd044518ac668ffc0001922",
+      "destination_sha256": "57a620fab7740310dfa35f07cc97b6391206b9f7abd044518ac668ffc0001922"
+    },
+    {
+      "source": "vm/test-prime-display-clock.py",
+      "destination": "vm/test-prime-display-clock.py",
+      "source_sha256": "f129c29042fa6bd7dae5f6b102f3269a9d6e516a8ad36d5662fb1ffccadcf89d",
+      "destination_sha256": "f129c29042fa6bd7dae5f6b102f3269a9d6e516a8ad36d5662fb1ffccadcf89d"
+    },
+    {
+      "source": "vm/test-prime-g2-apbh-irq.py",
+      "destination": "vm/test-prime-g2-apbh-irq.py",
+      "source_sha256": "ca017a2de033a632a9413e27b88f5eab6fda5c37d2c5615a91aaccb9451c57d0",
+      "destination_sha256": "ca017a2de033a632a9413e27b88f5eab6fda5c37d2c5615a91aaccb9451c57d0"
+    },
+    {
+      "source": "vm/test-prime-g2-apbh-pause.py",
+      "destination": "vm/test-prime-g2-apbh-pause.py",
+      "source_sha256": "51c13d740d6dad048952e7f35e7533004c94234f8e72802849700423e88f9eee",
+      "destination_sha256": "51c13d740d6dad048952e7f35e7533004c94234f8e72802849700423e88f9eee"
+    },
+    {
+      "source": "vm/test-prime-g2-apbh-reset.py",
+      "destination": "vm/test-prime-g2-apbh-reset.py",
+      "source_sha256": "8f07a13fa470983a91a75a19dd0741d9a3fe5d442171935b3e434ee9b702fba1",
+      "destination_sha256": "8f07a13fa470983a91a75a19dd0741d9a3fe5d442171935b3e434ee9b702fba1"
+    },
+    {
+      "source": "vm/test-prime-g2-bch-irq.py",
+      "destination": "vm/test-prime-g2-bch-irq.py",
+      "source_sha256": "6447b273e6df449def35df3cf6eeec27f4e372cb0574b66027a437de4e753d96",
+      "destination_sha256": "6447b273e6df449def35df3cf6eeec27f4e372cb0574b66027a437de4e753d96"
+    },
+    {
+      "source": "vm/test-prime-g2-dbbt.py",
+      "destination": "vm/test-prime-g2-dbbt.py",
+      "source_sha256": "1a5cc7651798f607695b7368324df13c9f352347ef901cfe42fbe949f0c614ab",
+      "destination_sha256": "1a5cc7651798f607695b7368324df13c9f352347ef901cfe42fbe949f0c614ab"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-cpu.py",
+      "destination": "vm/test-prime-g2-ddr-cpu.py",
+      "source_sha256": "9f2cf1b0c72329777f8c403955ba4a8d692f43e687961869228f360d8aed84fb",
+      "destination_sha256": "9f2cf1b0c72329777f8c403955ba4a8d692f43e687961869228f360d8aed84fb"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-gate.py",
+      "destination": "vm/test-prime-g2-ddr-gate.py",
+      "source_sha256": "85939c53eceb669a1626bc56fd263ce39e332f2835ba1064da43936fd8b9b815",
+      "destination_sha256": "85939c53eceb669a1626bc56fd263ce39e332f2835ba1064da43936fd8b9b815"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-load-order.py",
+      "destination": "vm/test-prime-g2-ddr-load-order.py",
+      "source_sha256": "1649203d911c87cb69e34b8f95ea414694329dee5c2d91ee912770669b3ec28d",
+      "destination_sha256": "1649203d911c87cb69e34b8f95ea414694329dee5c2d91ee912770669b3ec28d"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-order.py",
+      "destination": "vm/test-prime-g2-ddr-order.py",
+      "source_sha256": "a53f774f2ec43036aaf9b0cd2f8eb4b64b2c9d3c77c79ba4b4d241319129249f",
+      "destination_sha256": "a53f774f2ec43036aaf9b0cd2f8eb4b64b2c9d3c77c79ba4b4d241319129249f"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-power.py",
+      "destination": "vm/test-prime-g2-ddr-power.py",
+      "source_sha256": "b640c232559d5bf13d4e6f9175d7b29c3072b197b28f45710705dd4f9e8e998b",
+      "destination_sha256": "b640c232559d5bf13d4e6f9175d7b29c3072b197b28f45710705dd4f9e8e998b"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-self-refresh.py",
+      "destination": "vm/test-prime-g2-ddr-self-refresh.py",
+      "source_sha256": "e4936f18326f345cbfd05d83701e365a9c047c017d30aeaf2173ba92533b6016",
+      "destination_sha256": "e4936f18326f345cbfd05d83701e365a9c047c017d30aeaf2173ba92533b6016"
+    },
+    {
+      "source": "vm/test-prime-g2-ddr-usb.py",
+      "destination": "vm/test-prime-g2-ddr-usb.py",
+      "source_sha256": "5ad1f9431dd84fcc4b1b499c1efec61bd244d8abdee6a3ae2daa366c5671af09",
+      "destination_sha256": "5ad1f9431dd84fcc4b1b499c1efec61bd244d8abdee6a3ae2daa366c5671af09"
+    },
+    {
+      "source": "vm/test-prime-g2-dma-clock-gates.py",
+      "destination": "vm/test-prime-g2-dma-clock-gates.py",
+      "source_sha256": "aba27e31fbacf5e7328f9218bf1542bb50d1905f26a3cf78120f52d3c56fb8a3",
+      "destination_sha256": "aba27e31fbacf5e7328f9218bf1542bb50d1905f26a3cf78120f52d3c56fb8a3"
+    },
+    {
+      "source": "vm/test-prime-g2-fcb-mode.py",
+      "destination": "vm/test-prime-g2-fcb-mode.py",
+      "source_sha256": "320321498fde984284d26c3ec66eae3f98b8bc240b875fddc36c1dbcd1734404",
+      "destination_sha256": "320321498fde984284d26c3ec66eae3f98b8bc240b875fddc36c1dbcd1734404"
+    },
+    {
+      "source": "vm/test-prime-g2-gpt-oscillator.py",
+      "destination": "vm/test-prime-g2-gpt-oscillator.py",
+      "source_sha256": "cfb1bfc7235856d4ff50752cfa9783f599240602c263b37e5768cd8e24984bcb",
+      "destination_sha256": "cfb1bfc7235856d4ff50752cfa9783f599240602c263b37e5768cd8e24984bcb"
+    },
+    {
+      "source": "vm/test-prime-g2-gpt-state.py",
+      "destination": "vm/test-prime-g2-gpt-state.py",
+      "source_sha256": "e4798dc4f00979995ae604eb5a822567a438cc6b771c6f891b8c21e49280a4e8",
+      "destination_sha256": "e4798dc4f00979995ae604eb5a822567a438cc6b771c6f891b8c21e49280a4e8"
+    },
+    {
+      "source": "vm/test-prime-g2-live-nand-timing.py",
+      "destination": "vm/test-prime-g2-live-nand-timing.py",
+      "source_sha256": "0175a4eec1bd0415e7c60d836117bde88fc4c787a6ef079021842b9ba06a2a98",
+      "destination_sha256": "0175a4eec1bd0415e7c60d836117bde88fc4c787a6ef079021842b9ba06a2a98"
+    },
+    {
+      "source": "vm/test-prime-g2-mmdc.py",
+      "destination": "vm/test-prime-g2-mmdc.py",
+      "source_sha256": "c209831ed70b4cda401e0a9d3d90cad5910836bfaeaaa0911ea55f7ba7894d9a",
+      "destination_sha256": "c209831ed70b4cda401e0a9d3d90cad5910836bfaeaaa0911ea55f7ba7894d9a"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-block-reset.py",
+      "destination": "vm/test-prime-g2-nand-block-reset.py",
+      "source_sha256": "e5b9931a38e7632a7f5f2e440a7a951e4baaa2a61fd7836ed6cfb5dd4c7f1f1e",
+      "destination_sha256": "e5b9931a38e7632a7f5f2e440a7a951e4baaa2a61fd7836ed6cfb5dd4c7f1f1e"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-clocks.py",
+      "destination": "vm/test-prime-g2-nand-clocks.py",
+      "source_sha256": "2e8367ca89aa3800278f847decb8836b68d296fea7f1b5c68818ac53ce158ef6",
+      "destination_sha256": "2e8367ca89aa3800278f847decb8836b68d296fea7f1b5c68818ac53ce158ef6"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-compare.py",
+      "destination": "vm/test-prime-g2-nand-compare.py",
+      "source_sha256": "7bec52a697bd71ad454d9406ddfa1cc40a18ded1a06a1872fa059aaa6bf784aa",
+      "destination_sha256": "7bec52a697bd71ad454d9406ddfa1cc40a18ded1a06a1872fa059aaa6bf784aa"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-discovery.py",
+      "destination": "vm/test-prime-g2-nand-discovery.py",
+      "source_sha256": "9d80bac1abfa78b016e7b90c5539c388ac9d105a0b160d32844ef9120ddb432c",
+      "destination_sha256": "9d80bac1abfa78b016e7b90c5539c388ac9d105a0b160d32844ef9120ddb432c"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-migration.py",
+      "destination": "vm/test-prime-g2-nand-migration.py",
+      "source_sha256": "24401f027a976fa065351616df63bfaa372cfdd2826c152923fb4f5bd9c1fb9a",
+      "destination_sha256": "24401f027a976fa065351616df63bfaa372cfdd2826c152923fb4f5bd9c1fb9a"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-ready.py",
+      "destination": "vm/test-prime-g2-nand-ready.py",
+      "source_sha256": "875e991f6b7e0d827b4e080fcfe623655a05700eede8b753f4b814e3a66794f1",
+      "destination_sha256": "875e991f6b7e0d827b4e080fcfe623655a05700eede8b753f4b814e3a66794f1"
+    },
+    {
+      "source": "vm/test-prime-g2-nand-rom-boot.py",
+      "destination": "vm/test-prime-g2-nand-rom-boot.py",
+      "source_sha256": "4eb178d16d29dae2feac595acbe052c072c0ef72441f724ff89c07a06a9f8f68",
+      "destination_sha256": "4eb178d16d29dae2feac595acbe052c072c0ef72441f724ff89c07a06a9f8f68"
+    },
+    {
+      "source": "vm/test-prime-g2-peripherals.py",
+      "destination": "vm/test-prime-g2-peripherals.py",
+      "source_sha256": "8acc57fdbedcb9bdc1fb07142909ea1259b5ba5c80fac262cda709ed2eada9b4",
+      "destination_sha256": "8acc57fdbedcb9bdc1fb07142909ea1259b5ba5c80fac262cda709ed2eada9b4"
+    },
+    {
+      "source": "vm/test-prime-g2-physical-rom-boot.py",
+      "destination": "vm/test-prime-g2-physical-rom-boot.py",
+      "source_sha256": "395f05b58a2bd2f0295384548d386388eee5caa54c0b608ab643794389bdda1f",
+      "destination_sha256": "395f05b58a2bd2f0295384548d386388eee5caa54c0b608ab643794389bdda1f"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-clocks.py",
+      "destination": "vm/test-prime-g2-pwm-clocks.py",
+      "source_sha256": "b5df3ba3f2c01221e35f2718e73aec17844c7e73674635ebc2b35ed0217dc40d",
+      "destination_sha256": "b5df3ba3f2c01221e35f2718e73aec17844c7e73674635ebc2b35ed0217dc40d"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-counter.py",
+      "destination": "vm/test-prime-g2-pwm-counter.py",
+      "source_sha256": "d7e3ca251c80b85cfb296b3ba2d469a56396593a43b5a0d87b815b2f57848040",
+      "destination_sha256": "d7e3ca251c80b85cfb296b3ba2d469a56396593a43b5a0d87b815b2f57848040"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-cpu-irq.py",
+      "destination": "vm/test-prime-g2-pwm-cpu-irq.py",
+      "source_sha256": "581cd2f93455e10196d3093fb64814c16559d425725147a3658803ae30a66f6e",
+      "destination_sha256": "581cd2f93455e10196d3093fb64814c16559d425725147a3658803ae30a66f6e"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-fifo-state.py",
+      "destination": "vm/test-prime-g2-pwm-fifo-state.py",
+      "source_sha256": "793a31481f99905d2531e125340768e37d8df570080f61ffb52838ecef988d3f",
+      "destination_sha256": "793a31481f99905d2531e125340768e37d8df570080f61ffb52838ecef988d3f"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-fifo.py",
+      "destination": "vm/test-prime-g2-pwm-fifo.py",
+      "source_sha256": "c19501d86605ea556473b90f8fa3b98e3ac8bb72e24a3d25dae3347246e4fe0d",
+      "destination_sha256": "c19501d86605ea556473b90f8fa3b98e3ac8bb72e24a3d25dae3347246e4fe0d"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-irq.py",
+      "destination": "vm/test-prime-g2-pwm-irq.py",
+      "source_sha256": "1d4a1c6301d4a139b3744949a576fd954320412982e3cdc1e2167148a7b91c7c",
+      "destination_sha256": "1d4a1c6301d4a139b3744949a576fd954320412982e3cdc1e2167148a7b91c7c"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-swap.py",
+      "destination": "vm/test-prime-g2-pwm-swap.py",
+      "source_sha256": "227b6c8e6dd430de6f295e1ebb337b1c29094ee78511e9513f3e095b5233aa5e",
+      "destination_sha256": "227b6c8e6dd430de6f295e1ebb337b1c29094ee78511e9513f3e095b5233aa5e"
+    },
+    {
+      "source": "vm/test-prime-g2-pwm-watermark.py",
+      "destination": "vm/test-prime-g2-pwm-watermark.py",
+      "source_sha256": "8e5dd28ad00818695e11b20cfd806ec08fad33454b39a3dd1643919849694edd",
+      "destination_sha256": "8e5dd28ad00818695e11b20cfd806ec08fad33454b39a3dd1643919849694edd"
+    },
+    {
+      "source": "vm/test-prime-g2-ready-migration.py",
+      "destination": "vm/test-prime-g2-ready-migration.py",
+      "source_sha256": "8e414bc7fa81c720a45f1956eeb42b104c3f1bb07b1440cee2a6e308083a279c",
+      "destination_sha256": "8e414bc7fa81c720a45f1956eeb42b104c3f1bb07b1440cee2a6e308083a279c"
+    },
+    {
+      "source": "vm/test-prime-g2-retained-dma.py",
+      "destination": "vm/test-prime-g2-retained-dma.py",
+      "source_sha256": "67b731d717db88ebaacc84da591c908aca57a9279c597aecd0e44b69a21c4914",
+      "destination_sha256": "d7d19da69d7ece66fb802a77cfe47b0ec96b6e1571d0826347481c05cf71add8"
+    },
+    {
+      "source": "vm/test-prime-g2-rom-dcd-staging.py",
+      "destination": "vm/test-prime-g2-rom-dcd-staging.py",
+      "source_sha256": "a7215363ad45bc71071934c253f7c0b4009a7f087c07f9f2582f0e35aadff801",
+      "destination_sha256": "a7215363ad45bc71071934c253f7c0b4009a7f087c07f9f2582f0e35aadff801"
+    },
+    {
+      "source": "vm/test-prime-g2-rom-recovery.py",
+      "destination": "vm/test-prime-g2-rom-recovery.py",
+      "source_sha256": "186c83d1f89339deb3e95cb03756a7ac16c964a6bbe1ad685c6cf1bf1735963c",
+      "destination_sha256": "186c83d1f89339deb3e95cb03756a7ac16c964a6bbe1ad685c6cf1bf1735963c"
+    },
+    {
+      "source": "vm/test-prime-g2-usbmisc.py",
+      "destination": "vm/test-prime-g2-usbmisc.py",
+      "source_sha256": "82eba17e0296b5f92f44b3dfe81a5afc2522bbba113f083e175ab60c53e29a66",
+      "destination_sha256": "82eba17e0296b5f92f44b3dfe81a5afc2522bbba113f083e175ab60c53e29a66"
+    },
+    {
+      "source": "vm/test-prime-main-timer.py",
+      "destination": "vm/test-prime-main-timer.py",
+      "source_sha256": "e66eba0aac7f07614d5370ecbfb24bce0f2672d7050f4214c32d0fad6013e0d5",
+      "destination_sha256": "e66eba0aac7f07614d5370ecbfb24bce0f2672d7050f4214c32d0fad6013e0d5"
+    },
+    {
+      "source": "vm/test-prime-settings-candidate.py",
+      "destination": "vm/test-prime-settings-candidate.py",
+      "source_sha256": "7e4aaf0283006d4215abcf0f59a0e2c96ec2a6303d898e33b3412461cf3fc2be",
+      "destination_sha256": "7e4aaf0283006d4215abcf0f59a0e2c96ec2a6303d898e33b3412461cf3fc2be"
+    },
+    {
+      "source": "vm/test-prime-shift-events.py",
+      "destination": "vm/test-prime-shift-events.py",
+      "source_sha256": "82cd43aaed645a03392236b3e8b1026f301fc485306aee29bb4ca9cae5316878",
+      "destination_sha256": "82cd43aaed645a03392236b3e8b1026f301fc485306aee29bb4ca9cae5316878"
+    },
+    {
+      "source": "vm/test-prime-shift-ui.py",
+      "destination": "vm/test-prime-shift-ui.py",
+      "source_sha256": "c697ec819b1f4c72acf5266e80d98dd4f94e8f0ceb43e42d76d3c81afd92c961",
+      "destination_sha256": "4bc25aedd25d66afa3b8bb3253c32d7d33090f89569f1b22a293fbe32671c130"
+    },
+    {
+      "source": "vm/test-prime-template-palette.py",
+      "destination": "vm/test-prime-template-palette.py",
+      "source_sha256": "fe86df3e8cfbbc3e11beef583406414682b8642a6737b3f150f7696d6390c123",
+      "destination_sha256": "bcf2f16e610adfd7245d81aed539242aa778071554504eead631be722a81a630"
+    },
+    {
+      "source": "vm/test-upstream-unit.sh",
+      "destination": "vm/test-upstream-unit.sh",
+      "source_sha256": "17e1a14442b972329a8a03b42931cc9792d952372495ddd1a8ddea80ff233e50",
+      "destination_sha256": "5bfcaaa77ede922cf2e1d42d6e4d88133380909c0ab9113f300796f954da7672"
+    },
+    {
+      "source": "vm/trace-events/prime-stock-gic.events",
+      "destination": "vm/trace-events/prime-stock-gic.events",
+      "source_sha256": "47fb6a55356436ca8fb39a5f610895acaa88039825b36dfd0c51358110edef4c",
+      "destination_sha256": "47fb6a55356436ca8fb39a5f610895acaa88039825b36dfd0c51358110edef4c"
+    },
+    {
+      "source": "vm/trace-events/prime-stock-snvs.events",
+      "destination": "vm/trace-events/prime-stock-snvs.events",
+      "source_sha256": "d3d59ed47e6f80479058454e81e9b357481f3a3a3c24b8d15e8ccda5573670b8",
+      "destination_sha256": "d3d59ed47e6f80479058454e81e9b357481f3a3a3c24b8d15e8ccda5573670b8"
+    },
+    {
+      "source": "vm/trace-prime-g2-i2c-events",
+      "destination": "vm/trace-prime-g2-i2c-events",
+      "source_sha256": "37ff57921b3aa6fca088b66ea94b9450a3d0bcea0e5cb98d33ed59f3a8309b38",
+      "destination_sha256": "37ff57921b3aa6fca088b66ea94b9450a3d0bcea0e5cb98d33ed59f3a8309b38"
+    },
+    {
+      "source": "vm/u-boot/lefony_ab.c",
+      "destination": "vm/u-boot/lefony_ab.c",
+      "source_sha256": "ace55f3f3938c69105f2966f67dbac0e7b8f7f3f604edfc841b3bb9f58468546",
+      "destination_sha256": "ace55f3f3938c69105f2966f67dbac0e7b8f7f3f604edfc841b3bb9f58468546"
+    },
+    {
+      "source": "vm/uboot-handoff.py",
+      "destination": "vm/uboot-handoff.py",
+      "source_sha256": "eb3315225d07c332a4f7ca2bc0fa1f89c2081945cd39e74af660cab6cd23a930",
+      "destination_sha256": "eb3315225d07c332a4f7ca2bc0fa1f89c2081945cd39e74af660cab6cd23a930"
+    },
+    {
+      "source": "hardware/prime_g2/captures/20260831T154107Z/framebuffer.txt",
+      "destination": "hardware/prime_g2/captures/20260831T154107Z/framebuffer.txt",
+      "source_sha256": "a556e07f215398b22ea45515aa8c72cce084378e4e8ce85b967ead0313b683ec",
+      "destination_sha256": "a556e07f215398b22ea45515aa8c72cce084378e4e8ce85b967ead0313b683ec"
+    }
+  ],
+  "excluded": [
+    ".DS_Store",
+    ".gitattributes",
+    ".gitignore",
+    "README.md",
+    "assets/.DS_Store",
+    "assets/boot-logo.bmp",
+    "assets/boot-logo.png",
+    "assets/boot-logo.raw",
+    "assets/home-screen.png",
+    "assets/kernel-logo-preview.png",
+    "assets/login-screen.png",
+    "assets/mahalo-logo.png",
+    "assets/session-screen.png",
+    "assets/terminal-screen.png",
+    "docs/ARCHITECTURE.md",
+    "docs/BRANDING.md",
+    "docs/GUI.md",
+    "docs/LEFONY-SETTINGS-CANDIDATE.md",
+    "docs/NAND-BACKUP.md",
+    "docs/NAND-BOOT.md",
+    "docs/SDP.md",
+    "docs/SESSION.md",
+    "docs/UPSILON-PORT.md",
+    "gui/S15splash",
+    "gui/apps/mahalo-term.c",
+    "gui/apps/mahalo-type.c",
+    "gui/apps/mahalo-update.c",
+    "gui/apps/terminal.desktop",
+    "gui/apps/update.desktop",
+    "gui/early-splash",
+    "gui/evdiag.c",
+    "gui/evdump.c",
+    "gui/inittab.mahalo",
+    "gui/inject-enter.c",
+    "gui/libmahalo.c",
+    "gui/libmahalo.h",
+    "gui/mahalo-ctl",
+    "gui/mahalo-launcher.c",
+    "gui/mahalo-login.c",
+    "gui/mahalo-session.c",
+    "gui/mahalo-splash.c",
+    "gui/mtd-flash.c",
+    "gui/profiles/guest.conf",
+    "gui/profiles/mahalo.conf",
+    "gui/run-session",
+    "gui/session",
+    "gui/ubi-attach.c",
+    "gui/usb-serial-gadget",
+    "gui/xinitrc.guest",
+    "gui/xinitrc.mahalo",
+    "hardware/prime_g2/captures/20260831T153754Z/boot-dtb-hash.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/framebuffer.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/i2c-spi-devices.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/input.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/interrupts.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/kernel-log.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/manifest.json",
+    "hardware/prime_g2/captures/20260831T153754Z/memory-map.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/modules.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/mounts.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/platform-devices.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/power-thermal-rtc.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/registers-ccm.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/registers-lcdif.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/registers-pwm7.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/registers-src.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/storage.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/system.txt",
+    "hardware/prime_g2/captures/20260831T153754Z/usb.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/i2c-spi-devices.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/input.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/interrupts.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/kernel-log.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/memory-map.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/modules.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/mounts.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/platform-devices.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/power-thermal-rtc.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/storage.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/system.txt",
+    "hardware/prime_g2/captures/20260831T154107Z/usb.txt",
+    "hardware/prime_g2/reference/imx6ull-14x14-prime.dtb",
+    "hardware/prime_g2/reference/imx6ull-14x14-prime.dts",
+    "hardware/prime_g2/reference/linux-nand-install-20260908.md",
+    "hardware/prime_g2/reference/linux-to-rom-recovery-20260901.md",
+    "hardware/prime_g2/reference/prinux-original-restore-20260908.md",
+    "ports/upsilon-hpprime/Dockerfile",
+    "ports/upsilon-hpprime/ion/src/simulator/external/config.hpprime.mak",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/Makefile",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/backlight.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/clipboard.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/console.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/display.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/display.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/events.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/events.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/events_keyboard.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/framebuffer.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/framebuffer.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/input.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/keyboard.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/main.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/main.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/persistence.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/persistence.h",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/power.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/telemetry_init.cpp",
+    "ports/upsilon-hpprime/ion/src/simulator/hpprime/timing.cpp",
+    "pre-display-fix-kernel.mtd",
+    "pre-native-kernel.mtd",
+    "pre-usb-diagnostics-kernel-20260830.mtd",
+    "pre-usb-diagnostics-v2-kernel-20260830.mtd",
+    "pre-visual-progress-kernel-20260830.mtd",
+    "scripts/__pycache__/mahalo_link.cpython-314.pyc",
+    "scripts/__pycache__/patch_kernel_logo.cpython-314.pyc",
+    "scripts/__pycache__/update_mahalo.cpython-314.pyc",
+    "scripts/analyze_hp_prime_python.py",
+    "scripts/backup_nand.uu",
+    "scripts/boot_linux.sh",
+    "scripts/build_upsilon_hpprime.sh",
+    "scripts/build_upsilon_rootfs.sh",
+    "scripts/capture_recovery_input.uu",
+    "scripts/diagnose_linux_usb.uu",
+    "scripts/fix_nand_rootfs.sh",
+    "scripts/flash_kernel_logo.py",
+    "scripts/flash_linux_to_nand.uu",
+    "scripts/flash_nand.sh",
+    "scripts/install_input_polling_kernel.uu",
+    "scripts/install_pristine_linux.uu",
+    "scripts/install_upsilon_hpprime.py",
+    "scripts/install_upsilon_native_nand.uu",
+    "scripts/install_upsilon_native_usb_diagnostics.uu",
+    "scripts/install_upsilon_rootfs.uu",
+    "scripts/mahalo_ctl.py",
+    "scripts/mahalo_link.py",
+    "scripts/mahalo_tui.py",
+    "scripts/make_boot_logo.py",
+    "scripts/nand_inspect.uu",
+    "scripts/nand_kobs_pad.uu",
+    "scripts/nand_rom_boot.uu",
+    "scripts/nand_scrub_boot.uu",
+    "scripts/pack_uimage.py",
+    "scripts/package_prime_settings_candidate.py",
+    "scripts/patch_kernel_logo.py",
+    "scripts/prime_g2_exit_recovery.uu",
+    "scripts/prime_g2_postboot_inspect.uu",
+    "scripts/prime_g2_ram_boot_nand.uu",
+    "scripts/prime_g2_ram_boot_toolbox_milestone.uu",
+    "scripts/prime_g2_readonly_probe.uu",
+    "scripts/prime_g2_reflash_uboot.uu",
+    "scripts/prime_g2_restore_proven_boot.uu",
+    "scripts/restore_kernel.uu",
+    "scripts/restore_nand.uu",
+    "scripts/restore_os.sh",
+    "scripts/run_linux_in_ram.uu",
+    "scripts/run_linux_raymii.uu",
+    "scripts/update_mahalo.py",
+    "scripts/update_mahalo.sh",
+    "tests/test_analyze_hp_prime_python.py",
+    "tests/test_mahalo_tui.py",
+    "tmp/pdfs/ILI9322DS_V1.12.pdf",
+    "tmp/pdfs/IMX6ULLRM.pdf",
+    "tmp/pdfs/PF1550.pdf",
+    "tmp/pdfs/ili9322-timing.png",
+    "upsilon-native-usb-diagnostics-v2.readback",
+    "upsilon-native-usb-diagnostics.readback",
+    "upsilon-native-visual-progress.readback",
+    "upsilon-native.readback",
+    "vm/build-kernel.sh",
+    "vm/build-vm.sh",
+    "vm/guest/S98mahalo-vm-input",
+    "vm/guest/mahalo-vm-input.c",
+    "vm/kernel/0001-prime-g2-vm-skip-cpuidle.patch",
+    "vm/kernel/Dockerfile",
+    "vm/run-vm.sh",
+    "vm/test-prime-g2-linux-gpt.py"
+  ],
+  "status": "moved-to-lefony-source-tree",
+  "validation": "MIGRATION-VALIDATION.md",
+  "notes": "No Git history imported. Release signing identity copied only to ignored local build directory. Originals hash-checked before removal; old Git history and excluded files retained."
+}

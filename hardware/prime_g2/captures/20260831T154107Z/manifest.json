@@ -1,0 +1,56 @@
+{
+  "capture_policy": "read-only; no I2C scan; no MMIO writes; no NAND modification",
+  "captured_at_utc": "20260831T154107Z",
+  "files": [
+    {
+      "bytes": 75,
+      "file": "boot-dtb-hash.txt",
+      "sha256": "f700fccdcac81e62e3cfa67f32b85207ccfe141574c0ab24cc3d3d9ff7603b4c"
+    },
+    {
+      "bytes": 549,
+      "file": "framebuffer.txt",
+      "sha256": "a556e07f215398b22ea45515aa8c72cce084378e4e8ce85b967ead0313b683ec"
+    },
+    {
+      "bytes": 427,
+      "file": "registers-ccm.txt",
+      "sha256": "3b7ae4e6beda90cedc219225f1f4b2ff1168ca910fce7fe80026a19e6e95390e"
+    },
+    {
+      "bytes": 427,
+      "file": "registers-gpio.txt",
+      "sha256": "8cc2e94bec08f81d4786292ae650ca80ed336bd0767dc3d03ce389d35e8c5d35"
+    },
+    {
+      "bytes": 2228,
+      "file": "registers-iomuxc_display.txt",
+      "sha256": "ca234a5edfec4439c4ef7884fc073d804b62f4486391bf2cfa332349ec1d4960"
+    },
+    {
+      "bytes": 270,
+      "file": "registers-kpp.txt",
+      "sha256": "3f8816625bae804726235899a32b1159046c6082da7d4ad189165493ee5ca628"
+    },
+    {
+      "bytes": 475,
+      "file": "registers-lcdif.txt",
+      "sha256": "bbd07018e17fddb78453dd553b1247cd071165227ba60670d493785deef93a72"
+    },
+    {
+      "bytes": 207,
+      "file": "registers-pwm7.txt",
+      "sha256": "2227093107c9fdfcd76176a4f36eeb466e54aa7b20a5ca100ff1ac8bab6ded5e"
+    },
+    {
+      "bytes": 213,
+      "file": "registers-src.txt",
+      "sha256": "1a62588dae6b32b46ac7b93f6be2d8f6c29975bad27b03922db5a5aa27fd7bb3"
+    }
+  ],
+  "incomplete_reason": "second read-only baseline interrupted by a stalled debugfs dump before live-tree capture; core topology and LCDIF/PWM/GPIO snapshots completed",
+  "port": "unknown (offline recovery)",
+  "schema": 1,
+  "status": "incomplete",
+  "distribution": "Sanitized public subset: register values, fbset mode and DTB identity hash only; full capture remains private."
+}

@@ -1,0 +1,27 @@
+--- a/apps/apps_container.h
++++ b/apps/apps_container.h
+@@ -10,2 +10,5 @@
+ #include "math_toolbox.h"
++#if defined(PLATFORM_PRIME_G2)
++#include "prime_math_template_palette.h"
++#endif
+ #include "math_variable_box_controller.h"
+@@ -82,2 +85,6 @@
+   MathToolbox m_mathToolbox;
++#if defined(PLATFORM_PRIME_G2)
++  PrimeMathTemplatePalette m_primeTemplatePalette;
++  bool m_primeTemplateRequested = false;
++#endif
+   MathVariableBoxController m_variableBoxController;
+--- a/apps/apps_container.cpp
++++ b/apps/apps_container.cpp
+@@ -140,2 +140,5 @@
+ MathToolbox * AppsContainer::mathToolbox() {
++#if defined(PLATFORM_PRIME_G2)
++  if (m_primeTemplateRequested) return &m_primeTemplatePalette;
++#endif
+   return &m_mathToolbox;
+@@ -166,2 +169,3 @@
+   MathToolbox::requestPrimeCategory(I18n::Message::Default);
++  m_primeTemplateRequested = event == Ion::Events::PrimeMathTemplates;
+ #if !LIST_ARE_DEFINED

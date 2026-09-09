@@ -1,0 +1,541 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -322,8 +322,6 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+     /*
+      * IOMUXC
+      */
+-    create_unimplemented_device("iomuxc", FSL_IMX6UL_IOMUXC_ADDR,
+-                                FSL_IMX6UL_IOMUXC_SIZE);
+     create_unimplemented_device("iomuxc_gpr", FSL_IMX6UL_IOMUXC_GPR_ADDR,
+                                 FSL_IMX6UL_IOMUXC_GPR_SIZE);
+ 
+@@ -665,10 +663,12 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+      * LCD
+      */
+     sysbus_realize(SYS_BUS_DEVICE(&s->lcdif), &error_abort);
++    s->lcdif.prime_ccm = &s->ccm;
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 0, FSL_IMX6UL_LCDIF_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->lcdif), 0,
+                        qdev_get_gpio_in(gic, FSL_IMX6UL_LCDIF_IRQ));
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 1, FSL_IMX6UL_PWM7_ADDR);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 2, FSL_IMX6UL_IOMUXC_ADDR);
+     qdev_connect_gpio_out(DEVICE(&s->gpio[1]), 21,
+         qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 0));
+     qdev_connect_gpio_out(DEVICE(&s->gpio[2]), 4,
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -49,6 +49,17 @@ REG32(AS_NEXT_BUF, 0x230)
+ #define PRIME_PANEL_WIDTH           320
+ #define PRIME_PANEL_HEIGHT          240
+ #define PRIME_SERIAL_CYCLES         3
++#define PRIME_IOMUX_SIZE            0x700
++/* Enforce the controller's electrical edge margins. The guest deliberately
++ * runs much slower (100 kHz), but QEMU virtual time advances in TCG quanta. */
++#define PRIME_MIN_SPI_HALF_NS       50
++#define PRIME_MIN_SPI_HOLD_NS       50
++#define PRIME_RESET_PHASE_NS        (10 * 1000 * 1000LL)
++#define PRIME_PANEL_RECOVERY_NS     (120 * 1000 * 1000LL)
++#define PRIME_CTRL1_FIFO_CLEAR      (1u << 21)
++#define PRIME_CTRL1_RECOVER         (1u << 24)
++#define PRIME_CTRL1_UNDERFLOW_IRQ   (1u << 10)
++#define PRIME_CTRL1_UNDERFLOW_EN    (1u << 14)
+ 
+ enum PrimePanelInput {
+     PRIME_PANEL_SUPPLY,
+@@ -66,6 +75,12 @@ enum PrimePanelBlankReason {
+     PRIME_PANEL_RESET_INCOMPLETE,
+     PRIME_PANEL_NOT_CONFIGURED,
+     PRIME_PANEL_BAD_LCDIF_MODE,
++    PRIME_PANEL_BAD_IOMUX,
++    PRIME_PANEL_BAD_SIGNAL,
++    PRIME_PANEL_BAD_POWER_TIMING,
++    PRIME_PANEL_BAD_TIMING,
++    PRIME_PANEL_BAD_POLARITY,
++    PRIME_PANEL_FIFO_UNDERFLOW,
+ };
+ 
+ #define FRAME_PERIOD_NS             (16 * 1000 * 1000ULL)
+@@ -128,8 +143,10 @@ static void imx6ul_lcdif_update_irq(IMX6ULLCDIFState *s)
+ {
+     uint32_t ctrl1 = s->regs[IMX6UL_LCDIF_REG_CTRL1];
+-    bool level = FIELD_EX32(ctrl1, CTRL1, CUR_FRAME_DONE_IRQ_EN) &&
+-                 FIELD_EX32(ctrl1, CTRL1, CUR_FRAME_DONE_IRQ);
++    bool level = (FIELD_EX32(ctrl1, CTRL1, CUR_FRAME_DONE_IRQ_EN) &&
++                  FIELD_EX32(ctrl1, CTRL1, CUR_FRAME_DONE_IRQ)) ||
++                 ((ctrl1 & PRIME_CTRL1_UNDERFLOW_EN) &&
++                  (ctrl1 & PRIME_CTRL1_UNDERFLOW_IRQ));
+ 
+     qemu_set_irq(s->irq, level);
+ }
+ 
+@@ -206,6 +223,126 @@ static bool prime_panel_backlight_ready(IMX6ULLCDIFState *s)
+            s->prime_pwm_regs[4] != 0;
+ }
+ 
++static bool prime_iomux_register(IMX6ULLCDIFState *s, hwaddr offset,
++                                 uint32_t expected)
++{
++    return offset < PRIME_IOMUX_SIZE &&
++           s->prime_iomux_regs[offset >> 2] == expected;
++}
++
++static bool prime_panel_iomux_ready(IMX6ULLCDIFState *s)
++{
++    hwaddr mux;
++    hwaddr pad;
++
++    if (s->prime_fault_iomux) {
++        return false;
++    }
++    for (mux = 0x118, pad = 0x3a4; mux <= 0x134; mux += 4, pad += 4) {
++        if (!prime_iomux_register(s, mux, 0) ||
++            !prime_iomux_register(s, pad, 0x79)) {
++            return false;
++        }
++    }
++    return prime_iomux_register(s, 0x104, 0) &&
++           prime_iomux_register(s, 0x390, 0x79) &&
++           prime_iomux_register(s, 0x108, 0) &&
++           prime_iomux_register(s, 0x394, 0x79) &&
++           prime_iomux_register(s, 0x10c, 0) &&
++           prime_iomux_register(s, 0x398, 0x79) &&
++           prime_iomux_register(s, 0x110, 0) &&
++           prime_iomux_register(s, 0x39c, 0x79) &&
++           prime_iomux_register(s, 0x114, 5) &&
++           prime_iomux_register(s, 0x3a0, 0x17059) &&
++           prime_iomux_register(s, 0x1e4, 5) &&
++           prime_iomux_register(s, 0x470, 0x70a1) &&
++           prime_iomux_register(s, 0x1e8, 5) &&
++           prime_iomux_register(s, 0x474, 0x70a1) &&
++           prime_iomux_register(s, 0x1ec, 5) &&
++           prime_iomux_register(s, 0x478, 0x70a1) &&
++           prime_iomux_register(s, 0x1dc, 6) &&
++           prime_iomux_register(s, 0x468, 0x110b0) &&
++           prime_iomux_register(s, 0x1d0, 5) &&
++           prime_iomux_register(s, 0x45c, 0x17059);
++}
++
++static uint64_t prime_panel_pixel_clock_hz(IMX6ULLCDIFState *s)
++{
++    uint32_t cscdr2;
++    uint32_t cbcmr;
++    uint32_t pred;
++    uint32_t podf;
++
++    if (!s->prime_ccm) {
++        return 0;
++    }
++    cscdr2 = s->prime_ccm->ccm[CCM_CSCDR2];
++    cbcmr = s->prime_ccm->ccm[CCM_CBCMR];
++    if (((cscdr2 >> 15) & 7) != 0 || ((cscdr2 >> 9) & 7) != 0 ||
++        ((s->prime_ccm->ccm[CCM_CCGR2] >> 28) & 3) == 0 ||
++        ((s->prime_ccm->ccm[CCM_CCGR3] >> 10) & 3) == 0) {
++        return 0;
++    }
++    pred = ((cscdr2 >> 12) & 7) + 1;
++    podf = ((cbcmr >> 23) & 7) + 1;
++    return 528000000ULL / pred / podf;
++}
++
++static bool prime_panel_timing_ready(IMX6ULLCDIFState *s)
++{
++    uint32_t vdctrl0 = s->regs[0x70 >> 4];
++    uint32_t vdctrl1 = s->regs[0x80 >> 4];
++    uint32_t vdctrl2 = s->regs[0x90 >> 4];
++    uint32_t vdctrl3 = s->regs[0xa0 >> 4];
++    uint32_t vdctrl4 = s->regs[0xb0 >> 4];
++    uint32_t htotal = vdctrl2 & 0x3ffff;
++    uint32_t hsync = vdctrl2 >> 18;
++    uint32_t hwait = (vdctrl3 >> 16) & 0xfff;
++    uint32_t vwait = vdctrl3 & 0xffff;
++    uint64_t pixel_clock = prime_panel_pixel_clock_hz(s);
++    uint64_t refresh_millihz;
++
++    if (s->prime_fault_timing || htotal == 0 || vdctrl1 == 0) {
++        return false;
++    }
++    refresh_millihz = pixel_clock * 1000 / htotal / vdctrl1;
++    return pixel_clock >= 16200000 && pixel_clock <= 19800000 &&
++           refresh_millihz >= 55000 && refresh_millihz <= 65000 &&
++           hsync == 1 && hwait >= 65 && hwait <= 79 &&
++           htotal - PRIME_PANEL_WIDTH * 3 - hwait >= 90 &&
++           htotal - PRIME_PANEL_WIDTH * 3 - hwait <= 110 &&
++           (vdctrl0 & 0x3ffff) == 1 && vdctrl1 >= 262 && vdctrl1 <= 266 &&
++           vwait >= 16 && vwait <= 20 &&
++           vdctrl1 - PRIME_PANEL_HEIGHT - vwait >= 4 &&
++           vdctrl1 - PRIME_PANEL_HEIGHT - vwait <= 8 &&
++           (vdctrl4 & 0x3ffff) == PRIME_PANEL_WIDTH * 3;
++}
++
++static bool prime_panel_polarity_ready(IMX6ULLCDIFState *s)
++{
++    uint32_t vdctrl0 = s->regs[0x70 >> 4];
++    uint32_t vdctrl4 = s->regs[0xb0 >> 4];
++    uint32_t required = (1u << 28) | (1u << 24) |
++                        (1u << 21) | (1u << 20);
++
++    return !s->prime_fault_polarity && (vdctrl0 & required) == required &&
++           !(vdctrl0 & ((1u << 27) | (1u << 26) | (1u << 25))) &&
++           (vdctrl4 & (1u << 18)) && !(vdctrl4 & (7u << 29));
++}
++
++static bool prime_panel_power_timing_ready(IMX6ULLCDIFState *s)
++{
++    return !s->prime_fault_power && !s->prime_power_timing_bad &&
++           s->prime_reset_release_ns >= 0 && s->prime_power_on_ns >= 0;
++}
++
++static bool prime_panel_fifo_ready(IMX6ULLCDIFState *s, uint32_t frame_base)
++{
++    uint32_t outstanding = (s->regs[0x20 >> 4] >> 21) & 7;
++
++    return outstanding >= 3 && !(frame_base & 0x3f);
++}
++
+ static int prime_panel_blank_reason(IMX6ULLCDIFState *s, uint32_t ctrl,
+                                     uint32_t transfer_width, uint32_t height)
+ {
+@@ -220,12 +357,31 @@ static int prime_panel_blank_reason(IMX6ULLCDIFState *s, uint32_t ctrl,
+     }
+     if (!prime_panel_registers_ready(s)) {
+         return PRIME_PANEL_NOT_CONFIGURED;
++    }
++    if (!prime_panel_iomux_ready(s)) {
++        return PRIME_PANEL_BAD_IOMUX;
++    }
++    if (s->prime_fault_signal || s->prime_signal_timing_bad) {
++        return PRIME_PANEL_BAD_SIGNAL;
++    }
++    if (!prime_panel_power_timing_ready(s)) {
++        return PRIME_PANEL_BAD_POWER_TIMING;
+     }
+     if (FIELD_EX32(ctrl, CTRL, WORD_LENGTH) != CTRL_WORD_LENGTH_8 ||
+         !(ctrl & (1u << 14)) || transfer_width != PRIME_PANEL_WIDTH * 3 ||
+         height != PRIME_PANEL_HEIGHT) {
+         return PRIME_PANEL_BAD_LCDIF_MODE;
+     }
++    if (!prime_panel_timing_ready(s)) {
++        return PRIME_PANEL_BAD_TIMING;
++    }
++    if (!prime_panel_polarity_ready(s)) {
++        return PRIME_PANEL_BAD_POLARITY;
++    }
++    if (!prime_panel_fifo_ready(s,
++            s->regs[IMX6UL_LCDIF_REG_V4_CUR_BUF])) {
++        return PRIME_PANEL_FIFO_UNDERFLOW;
++    }
+     return PRIME_PANEL_VISIBLE;
+ }
+ 
+@@ -238,6 +394,12 @@ static const char *prime_panel_blank_reason_name(int reason)
+     case PRIME_PANEL_RESET_INCOMPLETE: return "panel reset pulse is incomplete";
+     case PRIME_PANEL_NOT_CONFIGURED: return "ILI9322 register sequence is incomplete";
+     case PRIME_PANEL_BAD_LCDIF_MODE: return "LCDIF is not in Prime 8-bit serial-RGB mode";
++    case PRIME_PANEL_BAD_IOMUX: return "IOMUXC display pad routing is invalid";
++    case PRIME_PANEL_BAD_SIGNAL: return "panel signal timing violates electrical margins";
++    case PRIME_PANEL_BAD_POWER_TIMING: return "ILI9322 power/reset timing is invalid";
++    case PRIME_PANEL_BAD_TIMING: return "pixel clock or sync porch timing is outside tolerance";
++    case PRIME_PANEL_BAD_POLARITY: return "pixel clock or sync polarity is invalid";
++    case PRIME_PANEL_FIFO_UNDERFLOW: return "LCDIF FIFO cannot sustain scanout";
+     default: return "unknown";
+     }
+ }
+@@ -254,43 +416,114 @@ static void prime_panel_set_input(void *opaque, int line, int level)
+ {
+     IMX6ULLCDIFState *s = opaque;
+     bool high = !!level;
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+ 
+     switch (line) {
+     case PRIME_PANEL_SUPPLY:
++        if (high && !s->prime_panel_supply &&
++            !prime_panel_backlight_ready(s)) {
++            s->prime_power_timing_bad = true;
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "prime-g2-panel: backlight supply enabled before PWM7\n");
++        }
+         s->prime_panel_supply = high;
+         break;
+     case PRIME_PANEL_RESET:
+-        if (!high) {
++        if (high && !s->prime_panel_reset &&
++            !s->prime_panel_reset_seen_low) {
++            s->prime_reset_high_ns = now;
++        } else if (!high && s->prime_panel_reset) {
++            if (s->prime_reset_high_ns < 0 ||
++                now - s->prime_reset_high_ns < PRIME_RESET_PHASE_NS) {
++                s->prime_power_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: reset-high phase too short (%" PRId64 " ns)\n",
++                              now - s->prime_reset_high_ns);
++            }
+             s->prime_panel_reset_seen_low = true;
+             s->prime_panel_reset_released = false;
++            s->prime_reset_low_ns = now;
+             memset(s->prime_panel_regs, 0, sizeof(s->prime_panel_regs));
+         } else if (!s->prime_panel_reset && s->prime_panel_reset_seen_low) {
++            if (s->prime_reset_low_ns < 0 ||
++                now - s->prime_reset_low_ns < PRIME_RESET_PHASE_NS) {
++                s->prime_power_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: reset-low phase too short (%" PRId64 " ns)\n",
++                              now - s->prime_reset_low_ns);
++            }
+             s->prime_panel_reset_released = true;
++            s->prime_reset_release_ns = now;
+         }
+         s->prime_panel_reset = high;
+         break;
+     case PRIME_PANEL_SPI_CLOCK:
++        if (s->prime_panel_reset_released && !s->prime_spi_cs &&
++            high != s->prime_spi_clock) {
++            if (s->prime_spi_edge_ns >= 0 &&
++                now - s->prime_spi_edge_ns < PRIME_MIN_SPI_HALF_NS) {
++                s->prime_signal_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: SPI half-cycle too short (%" PRId64 " ns)\n",
++                              now - s->prime_spi_edge_ns);
++            }
++            s->prime_spi_edge_ns = now;
++        }
+         if (!s->prime_spi_cs && !s->prime_spi_clock && high) {
+             s->prime_spi_shift = (s->prime_spi_shift << 1) |
+                                  s->prime_spi_mosi;
+             s->prime_spi_bits++;
++            s->prime_spi_rise_ns = now;
+         }
+         s->prime_spi_clock = high;
+         break;
+     case PRIME_PANEL_SPI_CS:
+         if (s->prime_spi_cs && !high) {
++            if (s->prime_panel_reset_released && !s->prime_spi_clock) {
++                s->prime_signal_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: SPI clock was not idle-high at CS assertion\n");
++            }
+             s->prime_spi_bits = 0;
+             s->prime_spi_shift = 0;
++            s->prime_spi_cs_ns = now;
++            s->prime_spi_edge_ns = -1;
+         } else if (!s->prime_spi_cs && high && s->prime_spi_bits == 16) {
+             uint8_t address = s->prime_spi_shift >> 8;
+             uint8_t value = s->prime_spi_shift;
+ 
++            if (s->prime_spi_rise_ns < 0 ||
++                now - s->prime_spi_rise_ns < PRIME_MIN_SPI_HOLD_NS ||
++                s->prime_reset_release_ns < 0 ||
++                now - s->prime_reset_release_ns < PRIME_PANEL_RECOVERY_NS) {
++                s->prime_power_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: post-reset recovery too short (%" PRId64 " ns)\n",
++                              now - s->prime_reset_release_ns);
++            }
++            if (address == 0x05 && value == 0xef) {
++                s->prime_power_on_ns = now;
++            } else if (address == 0x30 && value == 0x0d &&
++                       (s->prime_power_on_ns < 0 ||
++                        now - s->prime_power_on_ns <
++                        PRIME_PANEL_RECOVERY_NS)) {
++                s->prime_power_timing_bad = true;
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: power-on recovery too short (%" PRId64 " ns)\n",
++                              now - s->prime_power_on_ns);
++            }
+             if (!s->prime_fault_spi) {
+                 s->prime_panel_regs[address] = value;
+             }
+             qemu_log_mask(LOG_UNIMP,
+                           "prime-g2-panel: ILI9322 reg 0x%02x = 0x%02x\n",
+                           address, value);
++        } else if (s->prime_panel_reset_released &&
++                   !s->prime_spi_cs && high) {
++            s->prime_signal_timing_bad = true;
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "prime-g2-panel: SPI transaction had %u bits\n",
++                          s->prime_spi_bits);
+         }
+         s->prime_spi_cs = high;
+         break;
+@@ -351,8 +560,30 @@ static bool imx6ul_lcdif_update_display(void *opaque)
+         if (reason != PRIME_PANEL_VISIBLE) {
+             prime_panel_draw_black(s);
+             s->invalidate = false;
++            return true;
++        }
++        if (s->prime_fifo_fault_pending) {
++            s->regs[IMX6UL_LCDIF_REG_CTRL1] |= PRIME_CTRL1_UNDERFLOW_IRQ;
++            imx6ul_lcdif_update_irq(s);
++            if (s->regs[IMX6UL_LCDIF_REG_CTRL1] & PRIME_CTRL1_RECOVER) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "prime-g2-panel: LCDIF FIFO underflow recovered\n");
++                s->prime_fifo_fault_pending = false;
++                s->prime_fifo_recovery_frame = true;
++                prime_panel_draw_black(s);
++                prime_panel_invalidate(s);
++                return true;
++            }
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "prime-g2-panel: LCDIF FIFO underflow without recovery\n");
++            prime_panel_draw_black(s);
+             return true;
+         }
++        if (s->prime_fifo_recovery_frame) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "prime-g2-panel: LCDIF FIFO scanout restored\n");
++            s->prime_fifo_recovery_frame = false;
++        }
+         width = transfer_width / PRIME_SERIAL_CYCLES;
+     }
+ 
+@@ -402,6 +633,33 @@ static bool imx6ul_lcdif_update_display(void *opaque)
+     s->invalidate = false;
+     return true;
+ }
++
++static uint64_t prime_iomux_read(void *opaque, hwaddr offset, unsigned size)
++{
++    IMX6ULLCDIFState *s = opaque;
++
++    return s->prime_iomux_regs[offset >> 2];
++}
++
++static void prime_iomux_write(void *opaque, hwaddr offset, uint64_t value,
++                              unsigned size)
++{
++    IMX6ULLCDIFState *s = opaque;
++
++    s->prime_iomux_regs[offset >> 2] = value;
++    prime_panel_invalidate(s);
++}
++
++static const MemoryRegionOps prime_iomux_ops = {
++    .read = prime_iomux_read,
++    .write = prime_iomux_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
+ 
+ static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
+ {
+@@ -527,6 +785,10 @@ static void imx6ul_lcdif_write(void *opaque, hwaddr offset,
+         (value & CTRL_SFTRST)) {
+         s->regs[idx] |= CTRL_CLKGATE;
+     }
++    if (reg == A_CTRL1 && (value & PRIME_CTRL1_FIFO_CLEAR)) {
++        s->regs[idx] &= ~(PRIME_CTRL1_FIFO_CLEAR |
++                          PRIME_CTRL1_UNDERFLOW_IRQ);
++    }
+ 
+     switch (reg) {
+     case A_CTRL:
+@@ -607,6 +869,18 @@ static void imx6ul_lcdif_reset(DeviceState *dev)
+     s->prime_spi_shift = 0;
+     memset(s->prime_panel_regs, 0, sizeof(s->prime_panel_regs));
+     memset(s->prime_pwm_regs, 0, sizeof(s->prime_pwm_regs));
++    memset(s->prime_iomux_regs, 0, sizeof(s->prime_iomux_regs));
++    s->prime_power_timing_bad = false;
++    s->prime_signal_timing_bad = false;
++    s->prime_fifo_fault_pending = s->prime_fault_fifo;
++    s->prime_fifo_recovery_frame = false;
++    s->prime_reset_high_ns = -1;
++    s->prime_reset_low_ns = -1;
++    s->prime_reset_release_ns = -1;
++    s->prime_power_on_ns = -1;
++    s->prime_spi_edge_ns = -1;
++    s->prime_spi_rise_ns = -1;
++    s->prime_spi_cs_ns = -1;
+     s->prime_blank_reason = -1;
+     timer_del(s->frame_timer);
+     imx6ul_lcdif_update_irq(s);
+@@ -657,6 +931,10 @@ static void imx6ul_lcdif_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->prime_pwm_iomem, OBJECT(dev), &prime_pwm_ops, s,
+                           "prime-g2-pwm7", 0x20);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->prime_pwm_iomem);
++    memory_region_init_io(&s->prime_iomux_iomem, OBJECT(dev),
++                          &prime_iomux_ops, s, "prime-g2-iomuxc",
++                          PRIME_IOMUX_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->prime_iomux_iomem);
+     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
+     qdev_init_gpio_in_named(dev, prime_panel_set_input, "prime-g2-panel",
+                             PRIME_PANEL_INPUT_COUNT);
+@@ -682,6 +960,18 @@ static const Property imx6ul_lcdif_properties[] = {
+                      prime_g2_panel, false),
+     DEFINE_PROP_BOOL("prime-g2-fault-spi", IMX6ULLCDIFState,
+                      prime_fault_spi, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-iomux", IMX6ULLCDIFState,
++                     prime_fault_iomux, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-signal", IMX6ULLCDIFState,
++                     prime_fault_signal, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-timing", IMX6ULLCDIFState,
++                     prime_fault_timing, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-polarity", IMX6ULLCDIFState,
++                     prime_fault_polarity, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-power", IMX6ULLCDIFState,
++                     prime_fault_power, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-fifo", IMX6ULLCDIFState,
++                     prime_fault_fifo, false),
+ };
+ 
+ static void imx6ul_lcdif_class_init(ObjectClass *klass, const void *data)
+diff --git a/include/hw/display/imx6ul_lcdif.h b/include/hw/display/imx6ul_lcdif.h
+--- a/include/hw/display/imx6ul_lcdif.h
++++ b/include/hw/display/imx6ul_lcdif.h
+@@ -10,6 +10,7 @@
+ #define IMX6UL_LCDIF_H
+ 
+ #include "hw/core/sysbus.h"
++#include "hw/misc/imx6ul_ccm.h"
+ #include "qom/object.h"
+ #include "qemu/timer.h"
+ #include "ui/console.h"
+@@ -23,6 +24,7 @@ struct IMX6ULLCDIFState {
+ 
+     MemoryRegion iomem;
+     MemoryRegion prime_pwm_iomem;
++    MemoryRegion prime_iomux_iomem;
+     MemoryRegionSection fbsection;
+     qemu_irq irq;
+     QemuConsole *con;
+@@ -34,6 +36,12 @@ struct IMX6ULLCDIFState {
+     bool invalidate;
+     bool prime_g2_panel;
+     bool prime_fault_spi;
++    bool prime_fault_iomux;
++    bool prime_fault_signal;
++    bool prime_fault_timing;
++    bool prime_fault_polarity;
++    bool prime_fault_power;
++    bool prime_fault_fifo;
+     bool prime_panel_supply;
+     bool prime_panel_reset;
+     bool prime_panel_reset_seen_low;
+@@ -41,10 +48,23 @@ struct IMX6ULLCDIFState {
+     bool prime_spi_clock;
+     bool prime_spi_cs;
+     bool prime_spi_mosi;
++    bool prime_power_timing_bad;
++    bool prime_signal_timing_bad;
++    bool prime_fifo_fault_pending;
++    bool prime_fifo_recovery_frame;
+     uint8_t prime_spi_bits;
+     uint16_t prime_spi_shift;
++    int64_t prime_reset_high_ns;
++    int64_t prime_reset_low_ns;
++    int64_t prime_reset_release_ns;
++    int64_t prime_power_on_ns;
++    int64_t prime_spi_edge_ns;
++    int64_t prime_spi_rise_ns;
++    int64_t prime_spi_cs_ns;
+     uint8_t prime_panel_regs[256];
+     uint32_t prime_pwm_regs[8];
++    uint32_t prime_iomux_regs[0x700 / 4];
++    IMX6ULCCMState *prime_ccm;
+     int prime_blank_reason;
+     uint32_t regs[IMX6UL_LCDIF_REGS_NUM];
+ };

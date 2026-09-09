@@ -1,0 +1,152 @@
+diff --git a/include/hw/misc/imx6ul_ccm.h b/include/hw/misc/imx6ul_ccm.h
+--- a/include/hw/misc/imx6ul_ccm.h
++++ b/include/hw/misc/imx6ul_ccm.h
+@@ -218,1 +218,2 @@
+     Clock *gpmi_clock, *bch_clock;
++    Clock *pwm_ipg_clock, *pwm_per_clock;
+diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+--- a/hw/misc/imx6ul_ccm.c
++++ b/hw/misc/imx6ul_ccm.c
+@@ -317,1 +317,3 @@
++static uint64_t imx6ul_ccm_get_ipg_clk(IMX6ULCCMState *dev);
++static uint64_t imx6ul_ccm_get_per_clk(IMX6ULCCMState *dev);
+ static void imx6ul_update_nand_clocks(IMX6ULCCMState *s)
+@@ -321,1 +323,6 @@
+     clock_update_hz(s->bch_clock, imx6ul_nand_root_hz(s, true));
++    /* PWM7 CCGR6 gate in RUN: 00/10 stopped, 01/11 enabled. */
++    bool pwm_on = (s->ccm[CCM_CCGR6] >> 30) & 1;
++    clock_update_hz(s->pwm_ipg_clock, pwm_on ? imx6ul_ccm_get_ipg_clk(s) : 0);
++    clock_update_hz(s->pwm_per_clock, pwm_on ? imx6ul_ccm_get_per_clk(s) : 0);
+@@ -947,1 +954,3 @@
+     s->bch_clock = qdev_init_clock_out(dev, "bch");
++    s->pwm_ipg_clock = qdev_init_clock_out(dev, "pwm7-ipg");
++    s->pwm_per_clock = qdev_init_clock_out(dev, "pwm7-per");
+diff --git a/include/hw/display/imx6ul_lcdif.h b/include/hw/display/imx6ul_lcdif.h
+--- a/include/hw/display/imx6ul_lcdif.h
++++ b/include/hw/display/imx6ul_lcdif.h
+@@ -69,1 +69,4 @@
+     int64_t prime_pwm_enable_ns;
++    Clock *prime_pwm_ipg_clock, *prime_pwm_per_clock;
++    uint32_t prime_pwm_hz;
++    uint64_t prime_pwm_fraction;
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -12,1 +12,2 @@
+ #include "hw/core/qdev-properties.h"
++#include "hw/core/qdev-clock.h"
+@@ -906,5 +907,6 @@
+-    default:
+-        /* Existing IPG/IPG-high approximation. Live CCM roots and gates
+-         * still need wiring; do not confuse these with the 32 kHz input. */
+-        return 66000000;
++    case 1:
++        return clock_get_hz(s->prime_pwm_ipg_clock);
++    case 2:
++        return clock_get_hz(s->prime_pwm_per_clock);
+     }
++    g_assert_not_reached();
+@@ -913,22 +915,47 @@
+-static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
++static void prime_pwm_sync(IMX6ULLCDIFState *s)
+ {
+-    IMX6ULLCDIFState *s = opaque;
+-
+-    if (offset == 0x14 && (s->prime_pwm_regs[0] & 1) &&
++    if ((s->prime_pwm_regs[0] & 1) &&
+         s->prime_pwm_enable_ns >= 0) {
+         uint32_t prescaler = extract32(s->prime_pwm_regs[0], 4, 12) + 1;
+-        /* 0xffff has the same period as 0xfffe: the counter is 16-bit. */
+         uint32_t period = MIN(s->prime_pwm_regs[4] & 0xffff, 0xfffe) + 2;
+-        uint64_t elapsed = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) -
+-                           s->prime_pwm_enable_ns;
+-        uint64_t ticks = muldiv64(elapsed, prime_pwm_source_hz(s),
+-                                  NANOSECONDS_PER_SECOND) / prescaler;
+-
+-        return (s->prime_pwm_regs[5] + ticks) % period;
++        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        uint64_t elapsed = MAX(now - s->prime_pwm_enable_ns, 0);
++        uint64_t whole = muldiv64(elapsed, s->prime_pwm_hz, NANOSECONDS_PER_SECOND);
++        uint64_t part = ((elapsed % NANOSECONDS_PER_SECOND) * s->prime_pwm_hz)
++                        % NANOSECONDS_PER_SECOND;
++        uint64_t denominator = (uint64_t)NANOSECONDS_PER_SECOND * prescaler;
++        uint64_t fraction = s->prime_pwm_fraction + part +
++                            (whole % prescaler) * NANOSECONDS_PER_SECOND;
++        uint64_t ticks = whole / prescaler + fraction / denominator;
++        s->prime_pwm_fraction = fraction % denominator;
++        s->prime_pwm_regs[5] = (s->prime_pwm_regs[5] + ticks) % period;
++        s->prime_pwm_enable_ns = now;
+     }
++}
+ 
++static void prime_pwm_clock_changed(void *opaque, ClockEvent event)
++{
++    IMX6ULLCDIFState *s = opaque;
++    /* Account with the old rate before adopting newly published roots. */
++    prime_pwm_sync(s);
++    s->prime_pwm_hz = prime_pwm_source_hz(s);
++}
++
++static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
++{
++    IMX6ULLCDIFState *s = opaque;
++    if (offset == 0x14) {
++        prime_pwm_sync(s);
++    }
+     return s->prime_pwm_regs[offset >> 2];
+ }
+@@ -946,3 +973,4 @@
+-    if (offset == 0 && (s->prime_pwm_regs[0] & 1)) {
+-        s->prime_pwm_regs[5] = prime_pwm_read(s, 0x14, 4);
+-    }
++    prime_pwm_sync(s);
++    uint32_t old_prescaler = extract32(s->prime_pwm_regs[0], 4, 12) + 1;
+@@ -952,1 +980,5 @@
+             s->prime_pwm_regs[5] = 0;
++            s->prime_pwm_fraction = 0;
++        } else {
++            uint32_t divisor = extract32(s->prime_pwm_regs[0], 4, 12) + 1;
++            s->prime_pwm_fraction = muldiv64(s->prime_pwm_fraction, divisor, old_prescaler);
+@@ -956,1 +988,2 @@
+             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) : -1;
++        s->prime_pwm_hz = prime_pwm_source_hz(s);
+@@ -1146,1 +1179,3 @@
+     s->prime_pwm_enable_ns = -1;
++    s->prime_pwm_fraction = 0;
++    s->prime_pwm_hz = 0;
+@@ -1208,1 +1243,1 @@
+-    .version_id = 3,
++    .version_id = 4,
+@@ -1241,1 +1276,3 @@
+         VMSTATE_INT64_V(prime_pwm_enable_ns, IMX6ULLCDIFState, 3),
++        VMSTATE_UINT32_V(prime_pwm_hz, IMX6ULLCDIFState, 4),
++        VMSTATE_UINT64_V(prime_pwm_fraction, IMX6ULLCDIFState, 4),
+@@ -1168,1 +1201,5 @@
+     IMX6ULLCDIFState *s = opaque;
++    if (version_id < 4) {
++        s->prime_pwm_fraction = 0;
++        s->prime_pwm_hz = prime_pwm_source_hz(s);
++    }
+@@ -1304,1 +1344,9 @@
++static void imx6ul_lcdif_init(Object *obj)
++{
++    IMX6ULLCDIFState *s = IMX6UL_LCDIF(obj);
++    s->prime_pwm_enable_ns = -1;
++    s->prime_pwm_ipg_clock = qdev_init_clock_in(DEVICE(obj), "pwm7-ipg",
++        prime_pwm_clock_changed, s, ClockUpdate);
++    s->prime_pwm_per_clock = qdev_init_clock_in(DEVICE(obj), "pwm7-per",
++        prime_pwm_clock_changed, s, ClockUpdate);
++}
+ static void imx6ul_lcdif_class_init(ObjectClass *klass, const void *data)
+@@ -1320,1 +1368,2 @@
+     .class_init = imx6ul_lcdif_class_init,
++    .instance_init = imx6ul_lcdif_init,
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -742,1 +742,5 @@
++    qdev_connect_clock_in(DEVICE(&s->lcdif), "pwm7-ipg",
++        qdev_get_clock_out(DEVICE(&s->ccm), "pwm7-ipg"));
++    qdev_connect_clock_in(DEVICE(&s->lcdif), "pwm7-per",
++        qdev_get_clock_out(DEVICE(&s->ccm), "pwm7-per"));
+     sysbus_realize(SYS_BUS_DEVICE(&s->lcdif), &error_abort);

@@ -1,0 +1,26 @@
+diff --git a/ion/src/shared/events_keyboard.cpp b/ion/src/shared/events_keyboard.cpp
+--- a/ion/src/shared/events_keyboard.cpp
++++ b/ion/src/shared/events_keyboard.cpp
+@@ -1,6 +1,7 @@
+ #include <ion/keyboard.h>
+ #include <ion/events.h>
+ #include <ion/timing.h>
++#include <apps/prime_g2_boot_progress.h>
+ #include <assert.h>
+ 
+ namespace Ion {
+@@ -104,12 +105,15 @@ static inline Event innerGetEvent(int * timeout) {
+       return event;
+     }
+ 
++    PrimeG2BootProgress(11);
+     if (sleepWithTimeout(10, timeout)) {
++      PrimeG2BootProgress(12);
+       // Timeout occurred
+       resetLongRepetition();
+       return Events::None;
+     }
++    PrimeG2BootProgress(12);
+     time += 10;
+ 
+     // At this point, we know that keysSeenTransitioningFromUpToDown has *always* been zero

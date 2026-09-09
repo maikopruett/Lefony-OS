@@ -1,0 +1,19 @@
+diff --git a/hw/gpio/imx_gpio.c b/hw/gpio/imx_gpio.c
+index 903a1ca818..44c04f7422 100644
+--- a/hw/gpio/imx_gpio.c
++++ b/hw/gpio/imx_gpio.c
+@@ -149,7 +149,13 @@ static uint64_t imx_gpio_read(void *opaque, hwaddr offset, unsigned size)
+         break;
+ 
+     case PSR_ADDR:
+-        reg_value = s->psr & ~s->gdir;
++        /*
++         * PSR samples the pad, not just pins configured as inputs.  In the
++         * uncontended digital model an output pad follows its DR latch.
++         * Stock HP Prime firmware relies on this during its GPIO loopback
++         * self-test before enabling the rest of the board.
++         */
++        reg_value = (s->dr & s->gdir) | (s->psr & ~s->gdir);
+         break;
+ 
+     case ICR1_ADDR:

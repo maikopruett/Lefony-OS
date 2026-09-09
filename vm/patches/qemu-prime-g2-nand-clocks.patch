@@ -1,0 +1,95 @@
+diff --git a/include/hw/misc/imx6ul_ccm.h b/include/hw/misc/imx6ul_ccm.h
+--- a/include/hw/misc/imx6ul_ccm.h
++++ b/include/hw/misc/imx6ul_ccm.h
+@@ -13,1 +13,2 @@
+ #include "hw/misc/imx_ccm.h"
++#include "hw/core/clock.h"
+@@ -216,1 +216,2 @@
+     IMXCCMState parent_obj;
++    Clock *gpmi_clock, *bch_clock;
+diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
+--- a/hw/misc/imx6ul_ccm.c
++++ b/hw/misc/imx6ul_ccm.c
+@@ -14,1 +14,2 @@
+ #include "hw/core/registerfields.h"
++#include "hw/core/qdev-clock.h"
+@@ -284,1 +284,49 @@
++/* Prime NAND root clocks in RUN mode. PLL/PFD settling and low-power
++ * transitions still require board-level qualification. Unknown external
++ * bypass inputs are unavailable, never substituted with a fixed rate. */
++static uint64_t imx6ul_nand_root_hz(IMX6ULCCMState *s, bool bch)
++{
++    uint32_t pll = s->analog[CCM_ANALOG_PLL_SYS];
++    unsigned select = (s->ccm[CCM_CSCMR1] >> (bch ? 18 : 19)) & 1;
++    unsigned lane = (s->analog[CCM_ANALOG_PFD_528] >> (select ? 0 : 16)) & 255;
++    unsigned frac = lane & 63;
++    unsigned div = ((s->ccm[CCM_CSCDR1] >> (bch ? 19 : 22)) & 7) + 1;
++    unsigned gate4 = (s->ccm[CCM_CCGR4] >> (bch ? 26 : 28)) & 3;
++    unsigned gate6 = (s->ccm[CCM_CCGR6] >> (bch ? 6 : 8)) & 3;
++    uint64_t parent;
++    /* 00 off, 01 RUN, 11 all modes. 10 is not a supported gate encoding. */
++    if (!(gate4 & 1) || !(gate6 & 1) || !(pll & (1u << 13)) ||
++        (lane & 128) || frac < 12 || frac > 35) {
++        return 0;
++    }
++    if (pll & (1u << 16)) {
++        if ((pll >> 14) & 3) {
++            return 0;
++        }
++        parent = CKIH_FREQ;
++    } else {
++        if (pll & (1u << 12)) {
++            return 0;
++        }
++        parent = (uint64_t)CKIH_FREQ * ((pll & 1) ? 22 : 20);
++    }
++    return parent * 18 / frac / div;
++}
++
++static void imx6ul_update_nand_clocks(IMX6ULCCMState *s)
++{
++    clock_update_hz(s->gpmi_clock, imx6ul_nand_root_hz(s, false));
++    clock_update_hz(s->bch_clock, imx6ul_nand_root_hz(s, true));
++}
++
++static int imx6ul_nand_clocks_post_load(void *opaque, int version_id)
++{
++    imx6ul_update_nand_clocks(opaque);
++    return 0;
++}
++
+ static const VMStateDescription vmstate_imx6ul_ccm = {
+@@ -288,1 +336,2 @@
+     .minimum_version_id = 1,
++    .post_load = imx6ul_nand_clocks_post_load,
+@@ -628,1 +677,2 @@
+     s->analog[TEMPMON_TEMPSENSE2] = 0x00000000;
++    imx6ul_update_nand_clocks(s);
+@@ -657,2 +707,3 @@
+     s->ccm[index] = (s->ccm[index] & ccm_mask[index]) |
+                            ((uint32_t)value & ~ccm_mask[index]);
++    imx6ul_update_nand_clocks(s);
+@@ -846,6 +897,7 @@
+     default:
+         s->analog[index] = (s->analog[index] & analog_mask[index]) |
+                            (value & ~analog_mask[index]);
+         break;
+     }
++    imx6ul_update_nand_clocks(s);
+ }
+@@ -892,1 +944,3 @@
+     IMX6ULCCMState *s = IMX6UL_CCM(obj);
++    s->gpmi_clock = qdev_init_clock_out(dev, "gpmi");
++    s->bch_clock = qdev_init_clock_out(dev, "bch");
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -22,1 +22,2 @@
+ #include "hw/arm/prime_g2_peripherals.h"
++#include "hw/core/qdev-clock.h"
+@@ -429,1 +430,3 @@
+         SysBusDevice *nsbd = SYS_BUS_DEVICE(nand);
++        qdev_connect_clock_in(nand, "gpmi",
++                              qdev_get_clock_out(DEVICE(&s->ccm), "gpmi"));
++        qdev_connect_clock_in(nand, "bch",
++                              qdev_get_clock_out(DEVICE(&s->ccm), "bch"));

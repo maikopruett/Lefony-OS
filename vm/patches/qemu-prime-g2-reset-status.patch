@@ -1,0 +1,84 @@
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -80,4 +80,4 @@
+     .name = TYPE_IMX6_SRC,
+-    .version_id = 2,
+-    .minimum_version_id = 2,
++    .version_id = 3,
++    .minimum_version_id = 3,
+     .post_load = imx6_src_post_load,
+@@ -85,3 +85,4 @@
+         VMSTATE_UINT32_ARRAY(regs, IMX6SRCState, SRC_MAX),
+         VMSTATE_BOOL(watchdog_reset_pending, IMX6SRCState),
++        VMSTATE_UINT32(watchdog_reset_cause, IMX6SRCState),
+         VMSTATE_BOOL(rom_downloader_active, IMX6SRCState),
+@@ -96,3 +97,4 @@
+     uint32_t gpr10 = s->regs[SRC_GPR10];
+     bool watchdog_reset = s->watchdog_reset_pending;
++    uint32_t reset_status = s->regs[SRC_SRSR];
+     bool rom_downloader = watchdog_reset &&
+@@ -109,3 +111,7 @@
+     s->regs[SRC_SIMR] = 0x1F;
+     if (watchdog_reset) {
++        /* SRC_SRSR accumulates unacknowledged causes until power-on reset.
++         * U-Boot acknowledges them by writing the observed value back. */
++        s->regs[SRC_SRSR] = reset_status | s->watchdog_reset_cause;
++        s->watchdog_reset_cause = 0;
+         /* GPR9/10 are in the SRC persistent domain used by U-Boot's
+@@ -201,2 +207,6 @@
+     switch (index) {
++    case SRC_SRSR:
++        /* Reset causes are write-one-to-clear, never software-settable. */
++        s->regs[index] &= ~(uint32_t)value;
++        break;
+     case SRC_SCR:
+@@ -301,6 +311,8 @@
+     IMX6SRCState *s = opaque;
+-    (void)line;
+     if (level) {
+         s->watchdog_reset_pending = true;
++        /* i.MX6 has the WDOG reset indication at bit 4; WDOG3 has its
++         * separate indication at bit 7 (NXP U-Boot reset-cause decoder). */
++        s->watchdog_reset_cause |= line == 2 ? BIT(7) : BIT(4);
+     }
+ }
+diff --git a/include/hw/misc/imx6_src.h b/include/hw/misc/imx6_src.h
+--- a/include/hw/misc/imx6_src.h
++++ b/include/hw/misc/imx6_src.h
+@@ -71,3 +71,4 @@
+     qemu_irq rom_downloader;
+     bool watchdog_reset_pending;
++    uint32_t watchdog_reset_cause;
+     bool rom_downloader_active;
+diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+--- a/hw/arm/mcimx6ul-evk.c
++++ b/hw/arm/mcimx6ul-evk.c
+@@ -61,3 +61,10 @@
+-static void hp_prime_g2_nand_boot(void *opaque)
++static void hp_prime_g2_rom_enter_image(CPUState *cpu, run_on_cpu_data data)
++{
++    cpu_reset(cpu);
++    cpu_set_pc(cpu, data.target_ptr);
++    cpu->halted = false;
++}
++
++static void hp_prime_g2_nand_boot_after_reset(void *opaque)
+ {
+     HPPrimeG2BootState *boot = opaque;
+@@ -88,4 +95,14 @@
+-    cpu_set_pc(CPU(&boot->soc->cpu), entry);
++    run_on_cpu(CPU(&boot->soc->cpu), hp_prime_g2_rom_enter_image,
++               RUN_ON_CPU_TARGET_PTR(entry));
+ }
+ 
++static void hp_prime_g2_nand_boot(void *opaque)
++{
++    /* Legacy machine reset handlers precede SRC/CPU device reset. Read
++     * the newly latched boot override, and install the entry PC, only
++     * after all reset domains have completed. */
++    aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                            hp_prime_g2_nand_boot_after_reset, opaque);
++}
++
+ static void mcimx6ul_evk_common_init(MachineState *machine,

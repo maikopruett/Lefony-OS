@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "source": "Physical HP Prime G2 in ROM recovery; native macOS IOHID SDP READ_REGISTER, 2026-09-07",
+  "administrator_required": false,
+  "src_registers": {
+    "SRC_SBMR1": {"address": "0x020d8004", "value": "0x00000893"},
+    "SRC_SRSR": {"address": "0x020d8008", "value": "0x00000001"},
+    "SRC_SBMR2": {"address": "0x020d801c", "value": "0x02000001"},
+    "SRC_GPR9": {"address": "0x020d8040", "value": "0x00000000"},
+    "SRC_GPR10": {"address": "0x020d8044", "value": "0x00000000"}
+  },
+  "interpretation": "This observation has POR recorded and no retained software boot override. It does not establish the cause of ROM recovery or the behavior of a later physical reset.",
+  "battery_present": "not confirmed"
+}

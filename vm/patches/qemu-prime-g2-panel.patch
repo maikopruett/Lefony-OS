@@ -1,0 +1,423 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+index 1863558..ae69bbc 100644
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -614,9 +614,11 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+             FSL_IMX6UL_PWM8_ADDR,
+         };
+ 
+-        snprintf(name, NAME_SIZE, "pwm%d", i);
+-        create_unimplemented_device(name, FSL_IMX6UL_PWMn_ADDR[i],
+-                                    FSL_IMX6UL_PWMn_SIZE);
++        if (i != 6) {
++            snprintf(name, NAME_SIZE, "pwm%d", i);
++            create_unimplemented_device(name, FSL_IMX6UL_PWMn_ADDR[i],
++                                        FSL_IMX6UL_PWMn_SIZE);
++        }
+     }
+ 
+     /*
+@@ -666,6 +668,17 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 0, FSL_IMX6UL_LCDIF_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->lcdif), 0,
+                        qdev_get_gpio_in(gic, FSL_IMX6UL_LCDIF_IRQ));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->lcdif), 1, FSL_IMX6UL_PWM7_ADDR);
++    qdev_connect_gpio_out(DEVICE(&s->gpio[1]), 21,
++        qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 0));
++    qdev_connect_gpio_out(DEVICE(&s->gpio[2]), 4,
++        qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 1));
++    qdev_connect_gpio_out(DEVICE(&s->gpio[3]), 21,
++        qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 2));
++    qdev_connect_gpio_out(DEVICE(&s->gpio[3]), 22,
++        qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 3));
++    qdev_connect_gpio_out(DEVICE(&s->gpio[3]), 23,
++        qdev_get_gpio_in_named(DEVICE(&s->lcdif), "prime-g2-panel", 4));
+ 
+     /*
+      * CSU
+diff --git a/hw/display/imx6ul_lcdif.c b/hw/display/imx6ul_lcdif.c
+index 7b5be2b..a0af1d7 100644
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -9,11 +9,13 @@
+ #include "qemu/osdep.h"
+ #include "hw/display/imx6ul_lcdif.h"
+ #include "hw/core/irq.h"
++#include "hw/core/qdev-properties.h"
+ #include "hw/core/registerfields.h"
+ #include "hw/display/framebuffer.h"
+ #include "migration/vmstate.h"
+ #include "system/address-spaces.h"
+ #include "qemu/module.h"
++#include "qemu/log.h"
+ #include "qemu/units.h"
+ #include "ui/pixel_ops.h"
+ 
+@@ -39,8 +41,33 @@ REG32(AS_NEXT_BUF, 0x230)
+ #define REG_TOG                     0xc
+ 
+ #define CTRL_WORD_LENGTH_16         0
++#define CTRL_WORD_LENGTH_8          1
+ #define CTRL_WORD_LENGTH_24         3
++#define CTRL_CLKGATE                (1u << 30)
++#define CTRL_SFTRST                 (1u << 31)
+ 
++#define PRIME_PANEL_WIDTH           320
++#define PRIME_PANEL_HEIGHT          240
++#define PRIME_SERIAL_CYCLES         3
++
++enum PrimePanelInput {
++    PRIME_PANEL_SUPPLY,
++    PRIME_PANEL_RESET,
++    PRIME_PANEL_SPI_CLOCK,
++    PRIME_PANEL_SPI_CS,
++    PRIME_PANEL_SPI_MOSI,
++    PRIME_PANEL_INPUT_COUNT,
++};
++
++enum PrimePanelBlankReason {
++    PRIME_PANEL_VISIBLE,
++    PRIME_PANEL_NO_SUPPLY,
++    PRIME_PANEL_NO_BACKLIGHT,
++    PRIME_PANEL_RESET_INCOMPLETE,
++    PRIME_PANEL_NOT_CONFIGURED,
++    PRIME_PANEL_BAD_LCDIF_MODE,
++};
++
+ #define FRAME_PERIOD_NS             (16 * 1000 * 1000ULL)
+ 
+ enum IMX6ULLCDIFReg {
+@@ -152,12 +177,155 @@ static void imx6ul_lcdif_draw_line_xrgb8888(void *opaque, uint8_t *dst,
+     }
+ }
+ 
++static bool prime_panel_registers_ready(IMX6ULLCDIFState *s)
++{
++    static const uint8_t gamma[] = {
++        0xa7, 0x55, 0x71, 0x71, 0x73, 0x55, 0x18, 0x62,
++    };
++    int i;
++
++    if (s->prime_panel_regs[0x01] != 0x14 ||
++        s->prime_panel_regs[0x02] != 0x3a ||
++        s->prime_panel_regs[0x05] != 0xef ||
++        s->prime_panel_regs[0x30] != 0x0d) {
++        return false;
++    }
++    for (i = 0; i < ARRAY_SIZE(gamma); i++) {
++        if (s->prime_panel_regs[0x10 + i] != gamma[i]) {
++            return false;
++        }
++    }
++    return true;
++}
++
++static bool prime_panel_backlight_ready(IMX6ULLCDIFState *s)
++{
++    return (s->prime_pwm_regs[0] & 1) && s->prime_pwm_regs[3] != 0 &&
++           s->prime_pwm_regs[4] != 0;
++}
++
++static int prime_panel_blank_reason(IMX6ULLCDIFState *s, uint32_t ctrl,
++                                    uint32_t transfer_width, uint32_t height)
++{
++    if (!s->prime_panel_supply) {
++        return PRIME_PANEL_NO_SUPPLY;
++    }
++    if (!prime_panel_backlight_ready(s)) {
++        return PRIME_PANEL_NO_BACKLIGHT;
++    }
++    if (!s->prime_panel_reset_released) {
++        return PRIME_PANEL_RESET_INCOMPLETE;
++    }
++    if (!prime_panel_registers_ready(s)) {
++        return PRIME_PANEL_NOT_CONFIGURED;
++    }
++    if (FIELD_EX32(ctrl, CTRL, WORD_LENGTH) != CTRL_WORD_LENGTH_8 ||
++        !(ctrl & (1u << 14)) || transfer_width != PRIME_PANEL_WIDTH * 3 ||
++        height != PRIME_PANEL_HEIGHT) {
++        return PRIME_PANEL_BAD_LCDIF_MODE;
++    }
++    return PRIME_PANEL_VISIBLE;
++}
++
++static const char *prime_panel_blank_reason_name(int reason)
++{
++    switch (reason) {
++    case PRIME_PANEL_VISIBLE: return "visible";
++    case PRIME_PANEL_NO_SUPPLY: return "panel supply GPIO2_IO21 is low";
++    case PRIME_PANEL_NO_BACKLIGHT: return "PWM7 backlight is disabled";
++    case PRIME_PANEL_RESET_INCOMPLETE: return "panel reset pulse is incomplete";
++    case PRIME_PANEL_NOT_CONFIGURED: return "ILI9322 register sequence is incomplete";
++    case PRIME_PANEL_BAD_LCDIF_MODE: return "LCDIF is not in Prime 8-bit serial-RGB mode";
++    default: return "unknown";
++    }
++}
++
++static void prime_panel_invalidate(IMX6ULLCDIFState *s)
++{
++    s->invalidate = true;
++    if (s->con) {
++        qemu_console_hw_invalidate(s->con);
++    }
++}
++
++static void prime_panel_set_input(void *opaque, int line, int level)
++{
++    IMX6ULLCDIFState *s = opaque;
++    bool high = !!level;
++
++    switch (line) {
++    case PRIME_PANEL_SUPPLY:
++        s->prime_panel_supply = high;
++        break;
++    case PRIME_PANEL_RESET:
++        if (!high) {
++            s->prime_panel_reset_seen_low = true;
++            s->prime_panel_reset_released = false;
++            memset(s->prime_panel_regs, 0, sizeof(s->prime_panel_regs));
++        } else if (!s->prime_panel_reset && s->prime_panel_reset_seen_low) {
++            s->prime_panel_reset_released = true;
++        }
++        s->prime_panel_reset = high;
++        break;
++    case PRIME_PANEL_SPI_CLOCK:
++        if (!s->prime_spi_cs && !s->prime_spi_clock && high) {
++            s->prime_spi_shift = (s->prime_spi_shift << 1) |
++                                 s->prime_spi_mosi;
++            s->prime_spi_bits++;
++        }
++        s->prime_spi_clock = high;
++        break;
++    case PRIME_PANEL_SPI_CS:
++        if (s->prime_spi_cs && !high) {
++            s->prime_spi_bits = 0;
++            s->prime_spi_shift = 0;
++        } else if (!s->prime_spi_cs && high && s->prime_spi_bits == 16) {
++            uint8_t address = s->prime_spi_shift >> 8;
++            uint8_t value = s->prime_spi_shift;
++
++            if (!s->prime_fault_spi) {
++                s->prime_panel_regs[address] = value;
++            }
++            qemu_log_mask(LOG_UNIMP,
++                          "prime-g2-panel: ILI9322 reg 0x%02x = 0x%02x\n",
++                          address, value);
++        }
++        s->prime_spi_cs = high;
++        break;
++    case PRIME_PANEL_SPI_MOSI:
++        s->prime_spi_mosi = high;
++        break;
++    default:
++        return;
++    }
++    prime_panel_invalidate(s);
++}
++
++static void prime_panel_draw_black(IMX6ULLCDIFState *s)
++{
++    DisplaySurface *surface = qemu_console_surface(s->con);
++    int y;
++
++    if (surface_width(surface) != PRIME_PANEL_WIDTH ||
++        surface_height(surface) != PRIME_PANEL_HEIGHT) {
++        qemu_console_resize(s->con, PRIME_PANEL_WIDTH, PRIME_PANEL_HEIGHT);
++        surface = qemu_console_surface(s->con);
++    }
++    for (y = 0; y < PRIME_PANEL_HEIGHT; y++) {
++        memset(surface_data(surface) + y * surface_stride(surface), 0,
++               PRIME_PANEL_WIDTH * 4);
++    }
++    qemu_console_update(s->con, 0, 0, PRIME_PANEL_WIDTH, PRIME_PANEL_HEIGHT);
++}
++
+ static bool imx6ul_lcdif_update_display(void *opaque)
+ {
+     IMX6ULLCDIFState *s = opaque;
+     DisplaySurface *surface = qemu_console_surface(s->con);
+     uint32_t transfer_count = s->regs[IMX6UL_LCDIF_REG_V4_TRANSFER_COUNT];
+-    uint32_t width = FIELD_EX32(transfer_count, V4_TRANSFER_COUNT, H_COUNT);
++    uint32_t transfer_width = FIELD_EX32(transfer_count,
++                                         V4_TRANSFER_COUNT, H_COUNT);
++    uint32_t width = transfer_width;
+     uint32_t height = FIELD_EX32(transfer_count, V4_TRANSFER_COUNT, V_COUNT);
+     uint32_t ctrl = s->regs[IMX6UL_LCDIF_REG_CTRL];
+     uint32_t frame_base = s->regs[IMX6UL_LCDIF_REG_V4_CUR_BUF];
+@@ -170,6 +338,22 @@ static bool imx6ul_lcdif_update_display(void *opaque)
+         return true;
+     }
+ 
++    if (s->prime_g2_panel) {
++        int reason = prime_panel_blank_reason(s, ctrl, transfer_width, height);
++
++        if (reason != s->prime_blank_reason) {
++            qemu_log_mask(LOG_GUEST_ERROR, "prime-g2-panel: %s\n",
++                          prime_panel_blank_reason_name(reason));
++            s->prime_blank_reason = reason;
++        }
++        if (reason != PRIME_PANEL_VISIBLE) {
++            prime_panel_draw_black(s);
++            s->invalidate = false;
++            return true;
++        }
++        width = transfer_width / PRIME_SERIAL_CYCLES;
++    }
++
+     switch (FIELD_EX32(ctrl, CTRL, WORD_LENGTH)) {
+     case CTRL_WORD_LENGTH_16:
+         s->src_bpp = 2;
+@@ -179,6 +363,13 @@ static bool imx6ul_lcdif_update_display(void *opaque)
+         s->src_bpp = 4;
+         fn = imx6ul_lcdif_draw_line_xrgb8888;
+         break;
++    case CTRL_WORD_LENGTH_8:
++        if (!s->prime_g2_panel) {
++            return true;
++        }
++        s->src_bpp = 4;
++        fn = imx6ul_lcdif_draw_line_xrgb8888;
++        break;
+     default:
+         return true;
+     }
+@@ -210,6 +401,39 @@ static bool imx6ul_lcdif_update_display(void *opaque)
+     return true;
+ }
+ 
++static uint64_t prime_pwm_read(void *opaque, hwaddr offset, unsigned size)
++{
++    IMX6ULLCDIFState *s = opaque;
++
++    return s->prime_pwm_regs[offset >> 2];
++}
++
++static void prime_pwm_write(void *opaque, hwaddr offset, uint64_t value,
++                            unsigned size)
++{
++    IMX6ULLCDIFState *s = opaque;
++
++    qemu_log_mask(LOG_UNIMP, "prime-g2-panel: PWM7[0x%02" HWADDR_PRIx
++                  "] = 0x%08" PRIx64 "\n", offset, value);
++    s->prime_pwm_regs[offset >> 2] = value;
++    if (offset == 0) {
++        /* i.MX PWM software reset is self-clearing. */
++        s->prime_pwm_regs[0] &= ~(1u << 3);
++    }
++    prime_panel_invalidate(s);
++}
++
++static const MemoryRegionOps prime_pwm_ops = {
++    .read = prime_pwm_read,
++    .write = prime_pwm_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
++
+ static void imx6ul_lcdif_invalidate_display(void *opaque)
+ {
+     IMX6ULLCDIFState *s = opaque;
+@@ -297,6 +521,12 @@ static void imx6ul_lcdif_write(void *opaque, hwaddr offset,
+         g_assert_not_reached();
+     }
+ 
++    /* The STMP reset handshake raises CLKGATE when SFTRST is asserted. */
++    if (reg == A_CTRL && (offset & 0xf) == REG_SET &&
++        (value & CTRL_SFTRST)) {
++        s->regs[idx] |= CTRL_CLKGATE;
++    }
++
+     switch (reg) {
+     case A_CTRL:
+         if (!FIELD_EX32(oldv, CTRL, RUN) &&
+@@ -364,6 +594,18 @@ static void imx6ul_lcdif_reset(DeviceState *dev)
+     s->rows = 0;
+     s->src_bpp = 0;
+     s->invalidate = true;
++    s->prime_panel_supply = false;
++    s->prime_panel_reset = false;
++    s->prime_panel_reset_seen_low = false;
++    s->prime_panel_reset_released = false;
++    s->prime_spi_clock = false;
++    s->prime_spi_cs = true;
++    s->prime_spi_mosi = false;
++    s->prime_spi_bits = 0;
++    s->prime_spi_shift = 0;
++    memset(s->prime_panel_regs, 0, sizeof(s->prime_panel_regs));
++    memset(s->prime_pwm_regs, 0, sizeof(s->prime_pwm_regs));
++    s->prime_blank_reason = -1;
+     timer_del(s->frame_timer);
+     imx6ul_lcdif_update_irq(s);
+ }
+@@ -410,7 +646,12 @@ static void imx6ul_lcdif_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->iomem, OBJECT(dev), &imx6ul_lcdif_ops, s,
+                           TYPE_IMX6UL_LCDIF, LCDIF_MMIO_SIZE);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
++    memory_region_init_io(&s->prime_pwm_iomem, OBJECT(dev), &prime_pwm_ops, s,
++                          "prime-g2-pwm7", 0x20);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->prime_pwm_iomem);
+     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
++    qdev_init_gpio_in_named(dev, prime_panel_set_input, "prime-g2-panel",
++                            PRIME_PANEL_INPUT_COUNT);
+     s->con = qemu_graphic_console_create(dev, 0, &imx6ul_lcdif_graphic_ops, s);
+ }
+ 
+@@ -428,6 +669,13 @@ static void imx6ul_lcdif_unrealize(DeviceState *dev)
+     }
+ }
+ 
++static const Property imx6ul_lcdif_properties[] = {
++    DEFINE_PROP_BOOL("prime-g2-panel", IMX6ULLCDIFState,
++                     prime_g2_panel, false),
++    DEFINE_PROP_BOOL("prime-g2-fault-spi", IMX6ULLCDIFState,
++                     prime_fault_spi, false),
++};
++
+ static void imx6ul_lcdif_class_init(ObjectClass *klass, const void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -437,6 +685,7 @@ static void imx6ul_lcdif_class_init(ObjectClass *klass, const void *data)
+     dc->vmsd = &vmstate_imx6ul_lcdif;
+     device_class_set_legacy_reset(dc, imx6ul_lcdif_reset);
+     dc->desc = "i.MX6UL LCDIF";
++    device_class_set_props(dc, imx6ul_lcdif_properties);
+ }
+ 
+ static const TypeInfo imx6ul_lcdif_info = {
+diff --git a/include/hw/display/imx6ul_lcdif.h b/include/hw/display/imx6ul_lcdif.h
+index 42fee2f..c81174e 100644
+--- a/include/hw/display/imx6ul_lcdif.h
++++ b/include/hw/display/imx6ul_lcdif.h
+@@ -22,6 +22,7 @@ struct IMX6ULLCDIFState {
+     SysBusDevice parent_obj;
+ 
+     MemoryRegion iomem;
++    MemoryRegion prime_pwm_iomem;
+     MemoryRegionSection fbsection;
+     qemu_irq irq;
+     QemuConsole *con;
+@@ -31,6 +32,20 @@ struct IMX6ULLCDIFState {
+     uint32_t rows;
+     uint8_t src_bpp;
+     bool invalidate;
++    bool prime_g2_panel;
++    bool prime_fault_spi;
++    bool prime_panel_supply;
++    bool prime_panel_reset;
++    bool prime_panel_reset_seen_low;
++    bool prime_panel_reset_released;
++    bool prime_spi_clock;
++    bool prime_spi_cs;
++    bool prime_spi_mosi;
++    uint8_t prime_spi_bits;
++    uint16_t prime_spi_shift;
++    uint8_t prime_panel_regs[256];
++    uint32_t prime_pwm_regs[8];
++    int prime_blank_reason;
+     uint32_t regs[IMX6UL_LCDIF_REGS_NUM];
+ };
+ 

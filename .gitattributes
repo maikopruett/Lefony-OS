@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Patch context and measured text fixtures must retain their original bytes.
+*.patch -whitespace
+hardware/prime_g2/captures/** -whitespace

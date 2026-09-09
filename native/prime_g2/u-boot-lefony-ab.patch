@@ -1,0 +1,59 @@
+diff --git a/cmd/Makefile b/cmd/Makefile
+--- a/cmd/Makefile
++++ b/cmd/Makefile
+@@ -90,6 +90,7 @@ obj-$(CONFIG_CMD_MMC) += mmc.o
+ obj-$(CONFIG_CMD_MMC_SPI) += mmc_spi.o
+ obj-$(CONFIG_MP) += mp.o
+ obj-$(CONFIG_CMD_MTDPARTS) += mtdparts.o
++obj-y += lefony_ab.o
+ obj-$(CONFIG_CMD_NAND) += nand.o
+ obj-$(CONFIG_CMD_NET) += net.o
+ obj-$(CONFIG_CMD_ONENAND) += onenand.o
+diff --git a/include/configs/mx6ull_prime.h b/include/configs/mx6ull_prime.h
+--- a/include/configs/mx6ull_prime.h
++++ b/include/configs/mx6ull_prime.h
+@@ -77,10 +77,13 @@
+ 	"bootargs=console=ttymxc0,115200 ubi.mtd=4 "  \
+ 		"root=ubi0:rootfs rootfstype=ubifs "		     \
+ 		BOOTARGS_CMA_SIZE \
+-		"mtdparts=gpmi-nand:4m(boot),8m(kernel),1m(dtb),1m(misc),-(rootfs)\0"\
+-	"bootcmd=nand read ${loadaddr} 0x400000 0x800000;"\
+-		"nand read ${fdt_addr} 0xc00000 0x100000;"\
+-		"bootz ${loadaddr} - ${fdt_addr}\0"
++		"mtdparts=gpmi-nand:4m(boot),8m(slot_a),1m(dtb),1m(misc)," \
++		"482m(retired_rootfs),8m(slot_b),7936k(rescue),256k(nand_bbt)\0"\
++	"bootcmd=if lefony_ab boot; then " \
++		"nand read ${fdt_addr} 0xc00000 0x100000;" \
++		"bootz ${loadaddr} - ${fdt_addr}; " \
++		"else echo Lefony A/B unavailable, entering ROM recovery; " \
++		"bmode usb; fi\0"
+ 
+ #else
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+diff --git a/configs/mx6ull_prime_defconfig b/configs/mx6ull_prime_defconfig
+--- a/configs/mx6ull_prime_defconfig
++++ b/configs/mx6ull_prime_defconfig
+@@ -35,3 +35,5 @@ CONFIG_USB_ETHER_ASIX=n
+ CONFIG_USB_STORAGE=n
+ CONFIG_DM_ETH=n
+ CONFIG_NAND_BOOT=y
++CONFIG_CMD_HASH=y
++CONFIG_SHA256=y
+diff --git a/tools/Makefile b/tools/Makefile
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -60,5 +60,6 @@ hostprogs-$(CONFIG_CMD_BOOTEFI_SELFTEST) += file2include
+ 
+ FIT_SIG_OBJS-$(CONFIG_FIT_SIGNATURE) := common/image-sig.o
++FIT_SIG_OBJS-y += common/image-sig.o
+ 
+ # The following files are synced with upstream DTC.
+ # Use synced versions from scripts/dtc/libfdt/.
+@@ -75,6 +76,7 @@ LIBFDT_OBJS := $(addprefix libfdt/, $(patsubst %.c, %.o, $(LIBFDT_SRCS_SYNCED)
+ RSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/rsa/, \
+ 					rsa-sign.o rsa-verify.o rsa-checksum.o \
+ 					rsa-mod-exp.o)
++RSA_OBJS-y += lib/rsa/rsa-checksum.o
+ 
+ ROCKCHIP_OBS = lib/rc4.o rkcommon.o rkimage.o rksd.o rkspi.o
+ 

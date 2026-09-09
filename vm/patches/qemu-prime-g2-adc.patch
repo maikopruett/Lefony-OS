@@ -1,0 +1,30 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -695,17 +695,17 @@
+ 
+     /*
+      * ADCs
+      */
+-    for (i = 0; i < FSL_IMX6UL_NUM_ADCS; i++) {
+-        static const hwaddr FSL_IMX6UL_ADCn_ADDR[FSL_IMX6UL_NUM_ADCS] = {
+-            FSL_IMX6UL_ADC1_ADDR,
+-            FSL_IMX6UL_ADC2_ADDR,
+-        };
+-
+-        snprintf(name, NAME_SIZE, "adc%d", i);
+-        create_unimplemented_device(name, FSL_IMX6UL_ADCn_ADDR[i],
+-                                    FSL_IMX6UL_ADCn_SIZE);
++    {
++        DeviceState *adc = qdev_new(TYPE_PRIME_G2_ADC);
++        SysBusDevice *asbd = SYS_BUS_DEVICE(adc);
++        sysbus_realize_and_unref(asbd, &error_abort);
++        sysbus_mmio_map(asbd, 0, FSL_IMX6UL_ADC1_ADDR);
++        sysbus_connect_irq(asbd, 0,
++                           qdev_get_gpio_in(gic, FSL_IMX6UL_ADC1_IRQ));
+     }
++    create_unimplemented_device("adc1", FSL_IMX6UL_ADC2_ADDR,
++                                FSL_IMX6UL_ADCn_SIZE);
+ 
+     /*
+      * LCD
