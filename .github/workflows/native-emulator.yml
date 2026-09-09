@@ -32,6 +32,10 @@ jobs:
   firmware:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    env:
+      LEFONY_UPDATE_PUBLIC_KEY: ${{ github.workspace }}/ports/lefony-prime-g2/release-signing.pub
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,8 +45,70 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
-      - name: Compile physical and emulator targets sequentially
-        run: make firmware firmware-vm
+      - name: Assign update version
+        id: version
+        run: |
+          version="1.0.0+$(date -u +%s)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "LEFONY_RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Compile physical target and boot capsule
+        run: |
+          make firmware
+          ./scripts/build_prime_g2_nand_capsule.sh dist/lefony-os-prime-g2-native.bin dist/lefony-os-prime-g2.zImage
+      - name: Collect corresponding source before preparing the emulator target
+        run: |
+          mkdir -p build/release-source/lefony build/release-source/upsilon
+          git archive HEAD | tar -x -C build/release-source/lefony
+          tar --exclude=.git --exclude=output -C build/lefony-prime-g2 -cf - . | tar -x -C build/release-source/upsilon
+          tar -czf dist/lefony-os-source.tar.gz -C build/release-source .
+      - name: Compile emulator target
+        run: make firmware-vm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lefony-build
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            dist/lefony-os-prime-g2-native.bin
+            dist/lefony-os-prime-g2-vm-native.elf
+            dist/lefony-os-prime-g2.zImage
+            dist/lefony-os-source.tar.gz
+
+  publish:
+    if: github.repository == 'maikopruett/Lefony-OS' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [host-tests, firmware]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: lefony-build
+          path: dist
+      - name: Sign and package verified build outputs
+        env:
+          SIGNING_KEY: ${{ secrets.LEFONY_UPDATE_PRIVATE_KEY }}
+          VERSION: ${{ needs.firmware.outputs.version }}
+        run: |
+          test -n "$SIGNING_KEY" || { echo 'Configure LEFONY_UPDATE_PRIVATE_KEY before publishing.' >&2; exit 1; }
+          umask 077
+          key="$RUNNER_TEMP/lefony-release-private.pem"
+          trap 'rm -f "$key"' EXIT
+          printf '%s\n' "$SIGNING_KEY" > "$key"
+          python scripts/package_lefony_release.py --version "$VERSION" --commit "$GITHUB_SHA" --private-key "$key"
+      - name: Publish complete development package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.firmware.outputs.version }}
+        run: |
+          tag="build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" dist/release/* --target "$GITHUB_SHA" --title "Lefony OS $VERSION (development)" --notes-file dist/release-notes.md --prerelease --latest=false --draft
+          gh release edit "$tag" --draft=false
 
   emulator:
     if: github.event_name == 'workflow_dispatch' && inputs.emulator

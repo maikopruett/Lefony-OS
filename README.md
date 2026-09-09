@@ -59,6 +59,12 @@ clearer hardware documentation.
 
 ## Build the firmware
 
+Successful main-branch builds are packaged automatically in
+[GitHub Releases](https://github.com/maikopruett/Lefony-OS/releases), with signed
+updates, emulator firmware, corresponding source and checksums. These are
+development builds; see [release packaging](docs/RELEASES.md) for qualification
+limits and the website's automatic latest-package discovery.
+
 Install `arm-none-eabi-gcc`/`g++`, or use a running Docker engine for the
 container build path. The scripts fetch the exact upstream revision recorded
 in [UPSTREAM](ports/lefony-prime-g2/UPSTREAM).

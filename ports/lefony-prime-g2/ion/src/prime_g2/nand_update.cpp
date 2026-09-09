@@ -4,6 +4,7 @@
 
 #include "registers.h"
 #include "update_trust_root.h"
+#include "release_version.h"
 
 #include <string.h>
 
@@ -13,7 +14,7 @@ using PrimeG2::NANDUpdate::Manifest;
 using PrimeG2::NANDUpdate::State;
 
 constexpr uint32_t ModelHPG2 = 0x32475048;
-constexpr uint32_t CurrentVersion[4] = {1, 0, 0, 0};
+constexpr uint32_t CurrentVersion[4] = LEFONY_UPDATE_VERSION;
 constexpr uint32_t PageBytes=2048, PagesPerBlock=64, SlotBlocks=64;
 constexpr uint32_t SlotAFirstBlock=32, SlotBFirstBlock=3968;
 constexpr uint32_t MetadataBlocks[2]={104,105};

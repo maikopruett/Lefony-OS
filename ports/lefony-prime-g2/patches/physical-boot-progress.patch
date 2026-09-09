@@ -1,4 +1,3 @@
-diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
 --- a/apps/apps_container.cpp
 +++ b/apps/apps_container.cpp
 @@ -1,5 +1,6 @@
@@ -8,7 +7,7 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
  #include "global_preferences.h"
  #include "exam_mode_configuration.h"
  #include <ion.h>
-@@ -25,7 +26,9 @@ static AppsContainerStorage * g_appsContainerStorage = nullptr;
+@@ -25,7 +26,9 @@
  
  AppsContainer * AppsContainer::sharedAppsContainer() {
    if (!g_appsContainerStorage) {
@@ -18,7 +17,8 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
    }
    return g_appsContainerStorage;
  }
-@@ -48,5 +51,7 @@ AppsContainer::AppsContainer() :
+@@ -48,7 +51,9 @@
+   m_usbConnectedSnapshot(),
    m_startAppSnapshot()
  {
 +  PrimeG2BootProgress(18);
@@ -26,7 +26,8 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
 +  PrimeG2BootProgress(19);
  // #if __EMSCRIPTEN__
    /* AppsContainer::poincareCircuitBreaker uses Ion::Keyboard::scan(), which
-@@ -66,10 +71,13 @@ AppsContainer::AppsContainer() :
+    * calls emscripten_sleep. If we set the poincare circuit breaker, we would
+@@ -66,12 +71,15 @@
  // #else
    Poincare::Expression::SetCircuitBreaker(AppsContainer::poincareCircuitBreaker);
  // #endif
@@ -40,14 +41,17 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
    addTimer(&m_clockTimer);
 +  PrimeG2BootProgress(22);
  }
-@@ -337,5 +346,6 @@ bool AppsContainer::switchTo(App::Snapshot * snapshot) {
+ 
+ bool AppsContainer::poincareCircuitBreaker() {
+@@ -337,16 +345,21 @@
  }
  
  void AppsContainer::run() {
 +  PrimeG2BootProgress(24);
    KDRect screenRect = KDRect(0, 0, Ion::Display::Width, Ion::Display::Height);
    window()->setFrame(screenRect, false);
-@@ -344,8 +353,12 @@ void AppsContainer::run() {
+   /* We push a white screen here, because fetching the exam mode takes some time
+    * and it is visible when reflashing a N0100 (there is some noise on the
     * screen before the logo appears). */
    Ion::Display::pushRectUniform(screenRect, KDColorWhite);
 +  PrimeG2BootProgressReset();
@@ -60,7 +64,16 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
 +  PrimeG2BootProgress(3);
  
    /* ExceptionCheckpoint stores the value of the stack pointer when setjump is
-@@ -369,5 +380,7 @@ void AppsContainer::run() {
+    * called. During a longjump, the stack pointer is set to this stored stack
+@@ -358,6 +371,7 @@
+     /* Normal execution. The exception checkpoint must be created before
+      * switching to the first app, because the first app might create nodes on
+      * the pool. */
++    PrimeG2BootProgress(4);
+     bool switched;
+     if (m_startAppSnapshot != nullptr) {
+       switched = switchTo(m_startAppSnapshot);
+@@ -367,6 +381,8 @@
  
      assert(switched);
      (void) switched; // Silence compilation warning about unused variable.
@@ -68,35 +81,42 @@ diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
 +    PrimeG2UpdateBootReady();
    } else {
      // Exception
-diff --git a/apps/apps_window.cpp b/apps/apps_window.cpp
+     if (s_activeApp != nullptr) {
 --- a/apps/apps_window.cpp
 +++ b/apps/apps_window.cpp
-@@ -1,3 +1,4 @@
+@@ -1,4 +1,5 @@
  #include "apps_window.h"
 +#include "prime_g2_boot_progress.h"
  #include <escher/metric.h>
  extern "C" {
-@@ -11,3 +12,4 @@ AppsWindow::AppsWindow() :
+ #include <assert.h>
+@@ -10,6 +11,7 @@
+   m_titleBarView(),
    m_hideTitleBarView(false)
  {
 +  PrimeG2BootProgress(8);
  }
-diff --git a/apps/backlight_dimming_timer.cpp b/apps/backlight_dimming_timer.cpp
+ 
+ void AppsWindow::setTitle(I18n::Message title) {
 --- a/apps/backlight_dimming_timer.cpp
 +++ b/apps/backlight_dimming_timer.cpp
-@@ -1,2 +1,3 @@
+@@ -1,4 +1,5 @@
  #include "backlight_dimming_timer.h"
 +#include "prime_g2_boot_progress.h"
  #include "global_preferences.h"
-@@ -9,3 +10,4 @@ BacklightDimmingTimer::BacklightDimmingTimer() :
+ #include <ion/backlight.h>
+ #include <ion/events.h>
+@@ -7,6 +8,7 @@
+ BacklightDimmingTimer::BacklightDimmingTimer() :
    Timer(GlobalPreferences::sharedGlobalPreferences()->idleBeforeDimmingSeconds()*1000/Timer::TickDuration)
  {
 +  PrimeG2BootProgress(16);
  }
-diff --git a/apps/battery_timer.cpp b/apps/battery_timer.cpp
+ 
+ bool BacklightDimmingTimer::fire(){
 --- a/apps/battery_timer.cpp
 +++ b/apps/battery_timer.cpp
-@@ -1,7 +1,9 @@
+@@ -1,9 +1,11 @@
  #include "battery_timer.h"
  #include "apps_container.h"
 +#include "prime_g2_boot_progress.h"
@@ -106,10 +126,11 @@ diff --git a/apps/battery_timer.cpp b/apps/battery_timer.cpp
  {
 +  PrimeG2BootProgress(14);
  }
-diff --git a/apps/clock_timer.cpp b/apps/clock_timer.cpp
+ 
+ bool BatteryTimer::fire() {
 --- a/apps/clock_timer.cpp
 +++ b/apps/clock_timer.cpp
-@@ -1,8 +1,10 @@
+@@ -1,10 +1,12 @@
  #include "clock_timer.h"
  #include "apps_container.h"
 +#include "prime_g2_boot_progress.h"
@@ -120,88 +141,111 @@ diff --git a/apps/clock_timer.cpp b/apps/clock_timer.cpp
  {
 +  PrimeG2BootProgress(19);
  }
-diff --git a/apps/empty_battery_window.cpp b/apps/empty_battery_window.cpp
+ 
+ bool ClockTimer::fire() {
 --- a/apps/empty_battery_window.cpp
 +++ b/apps/empty_battery_window.cpp
-@@ -1,2 +1,3 @@
+@@ -1,4 +1,5 @@
  #include "empty_battery_window.h"
 +#include "prime_g2_boot_progress.h"
  #include <apps/i18n.h>
-@@ -8,3 +9,4 @@ EmptyBatteryWindow::EmptyBatteryWindow() :
+ extern "C" {
+ #include <assert.h>
+@@ -7,6 +8,7 @@
+ EmptyBatteryWindow::EmptyBatteryWindow() :
    Window()
  {
 +  PrimeG2BootProgress(9);
  }
-diff --git a/apps/exam_pop_up_controller.cpp b/apps/exam_pop_up_controller.cpp
+ 
+ void EmptyBatteryWindow::drawRect(KDContext * ctx, KDRect rect) const {
 --- a/apps/exam_pop_up_controller.cpp
 +++ b/apps/exam_pop_up_controller.cpp
-@@ -1,3 +1,4 @@
+@@ -1,5 +1,6 @@
  #include "exam_pop_up_controller.h"
  #include "apps_container.h"
 +#include "prime_g2_boot_progress.h"
  #include "exam_mode_configuration.h"
-@@ -30,3 +31,4 @@ ExamPopUpController::ExamPopUpController(ExamPopUpControllerDelegate * delegate) :
+ #include <assert.h>
+ #include <poincare/preferences.h>
+@@ -30,6 +31,7 @@
+   m_targetExamMode(GlobalPreferences::ExamMode::Unknown),
    m_delegate(delegate)
  {
 +  PrimeG2BootProgress(12);
  }
-diff --git a/apps/main.cpp b/apps/main.cpp
+ 
+ void ExamPopUpController::setTargetExamMode(GlobalPreferences::ExamMode mode) {
 --- a/apps/main.cpp
 +++ b/apps/main.cpp
-@@ -1,3 +1,4 @@
+@@ -1,5 +1,6 @@
  #include "apps_container.h"
  #include "global_preferences.h"
 +#include "prime_g2_boot_progress.h"
  #include <poincare/init.h>
-@@ -20,4 +21,5 @@ void ion_main(int argc, const char * const argv[]) {
+ #include <string.h>
+ 
+@@ -20,6 +21,7 @@
  #else
  
  void ion_main(int argc, const char * const argv[]) {
 +  PrimeG2BootProgress(5);
    /* Lock OTP on older devices to prevent garbage being written where the PCB
-diff --git a/apps/math_toolbox.cpp b/apps/math_toolbox.cpp
+    * version is read. */
+ #if 0 // We don't want OTP locked on omega :p
 --- a/apps/math_toolbox.cpp
 +++ b/apps/math_toolbox.cpp
-@@ -1,3 +1,4 @@
+@@ -1,5 +1,6 @@
  #include "math_toolbox.h"
  #include "global_preferences.h"
 +#include "prime_g2_boot_progress.h"
  #include "./shared/toolbox_helpers.h"
-@@ -920,3 +921,4 @@ MathToolbox::MathToolbox() :
+ #include <assert.h>
+ #include <string.h>
+@@ -919,6 +920,7 @@
+     m_leafCells[i].setMessageFont(KDFont::LargeFont);
      m_nodeCells[i].setMessageFont(KDFont::LargeFont);
    }
 +  PrimeG2BootProgress(10);
  }
-diff --git a/apps/math_variable_box_controller.cpp b/apps/math_variable_box_controller.cpp
+ 
+ bool MathToolbox::selectLeaf(int selectedRow, bool quitToolbox) {
 --- a/apps/math_variable_box_controller.cpp
 +++ b/apps/math_variable_box_controller.cpp
-@@ -1,2 +1,3 @@
+@@ -1,4 +1,5 @@
  #include "math_variable_box_controller.h"
 +#include "prime_g2_boot_progress.h"
  #include "shared/global_context.h"
-@@ -27,4 +28,5 @@ MathVariableBoxController::MathVariableBoxController() :
+ #include "shared/continuous_function.h"
+ #include <escher/metric.h>
+@@ -27,6 +28,7 @@
    for (int i = 0; i < k_maxNumberOfDisplayedRows; i++) {
      m_leafCells[i].setParentResponder(&m_selectableTableView);
    }
 +  PrimeG2BootProgress(11);
  }
-diff --git a/apps/on_boarding/prompt_controller.cpp b/apps/on_boarding/prompt_controller.cpp
+ 
+ void MathVariableBoxController::viewWillAppear() {
 --- a/apps/on_boarding/prompt_controller.cpp
 +++ b/apps/on_boarding/prompt_controller.cpp
-@@ -1,3 +1,4 @@
+@@ -1,5 +1,6 @@
  #include "prompt_controller.h"
  #include "../apps_container.h"
 +#include "../prime_g2_boot_progress.h"
  #include <assert.h>
-@@ -48,3 +49,4 @@ PromptController::PromptController(I18n::Message * messages, KDColor * fgcolors, KDColor * bgcolors, uint8_t numberOfMessages) :
+ 
+ namespace OnBoarding {
+@@ -46,6 +47,7 @@
+   ViewController(nullptr),
    m_messageViewWithSkip(messages, fgcolors, bgcolors, numberOfMessages)
  {
 +  PrimeG2BootProgress(13);
  }
-diff --git a/apps/suspend_timer.cpp b/apps/suspend_timer.cpp
+ 
+ bool PromptController::handleEvent(Ion::Events::Event event) {
 --- a/apps/suspend_timer.cpp
 +++ b/apps/suspend_timer.cpp
-@@ -1,7 +1,9 @@
+@@ -1,9 +1,11 @@
  #include "suspend_timer.h"
  #include "apps_container.h"
 +#include "prime_g2_boot_progress.h"
@@ -211,10 +255,11 @@ diff --git a/apps/suspend_timer.cpp b/apps/suspend_timer.cpp
  {
 +  PrimeG2BootProgress(15);
  }
-diff --git a/escher/src/container.cpp b/escher/src/container.cpp
+ 
+ bool SuspendTimer::fire() {
 --- a/escher/src/container.cpp
 +++ b/escher/src/container.cpp
-@@ -1,7 +1,9 @@
+@@ -1,9 +1,11 @@
  #include <escher/container.h>
 +#include <apps/prime_g2_boot_progress.h>
  #include <assert.h>
@@ -224,60 +269,32 @@ diff --git a/escher/src/container.cpp b/escher/src/container.cpp
  {
 +  PrimeG2BootProgress(7);
  }
-diff --git a/escher/src/window.cpp b/escher/src/window.cpp
---- a/escher/src/window.cpp
-+++ b/escher/src/window.cpp
-@@ -1,2 +1,3 @@
- #include <escher/window.h>
-+#include <apps/prime_g2_boot_progress.h>
- #include <ion.h>
-@@ -11,3 +12,4 @@ void Window::redraw(bool force) {
-   Ion::Display::waitForVBlank();
-   View::redraw(bounds());
-+  PrimeG2BootProgress(28);
- }
-diff --git a/escher/src/timer.cpp b/escher/src/timer.cpp
---- a/escher/src/timer.cpp
-+++ b/escher/src/timer.cpp
-@@ -2,6 +2,7 @@
  
- Timer::Timer(uint32_t period) :
-   m_period(period),
--  m_numberOfTicksBeforeFire(period)
-+  m_numberOfTicksBeforeFire(period),
-+  m_next(nullptr)
- {
- }
-diff --git a/apps/apps_container.cpp b/apps/apps_container.cpp
---- a/apps/apps_container.cpp
-+++ b/apps/apps_container.cpp
-@@ -372,5 +374,6 @@ void AppsContainer::run() {
-   if (ExceptionRun(ecp)) {
-     /* Normal execution. The exception checkpoint must be created before
-      * switching to the first app, because the first app might create nodes on
-      * the pool. */
-+    PrimeG2BootProgress(4);
-     bool switched;
-diff --git a/escher/src/container.cpp b/escher/src/container.cpp
---- a/escher/src/container.cpp
-+++ b/escher/src/container.cpp
-@@ -18,4 +18,5 @@ Container::~Container() {
+ // Initialize private static member
+@@ -16,6 +18,7 @@
  }
  
  bool Container::switchTo(App::Snapshot * snapshot) {
 +  PrimeG2BootProgress(5);
    if (s_activeApp && snapshot == s_activeApp->snapshot()) {
-@@ -33,5 +34,6 @@ bool Container::switchTo(App::Snapshot * snapshot) {
+     return true;
+   }
+@@ -31,6 +34,7 @@
    }
    if (snapshot) {
      s_activeApp = snapshot->unpack(this);
 +    PrimeG2BootProgress(6);
    }
    if (s_activeApp) {
-diff --git a/escher/src/window.cpp b/escher/src/window.cpp
+     s_activeApp->didBecomeActive(window());
 --- a/escher/src/window.cpp
 +++ b/escher/src/window.cpp
-@@ -7,10 +7,14 @@
+@@ -1,15 +1,21 @@
+ #include <escher/window.h>
++#include <apps/prime_g2_boot_progress.h>
+ #include <ion.h>
+ extern "C" {
+ #include <assert.h>
  }
  
  void Window::redraw(bool force) {
@@ -289,11 +306,23 @@ diff --git a/escher/src/window.cpp b/escher/src/window.cpp
    Ion::Display::waitForVBlank();
 +  PrimeG2BootProgress(9);
    View::redraw(bounds());
--  PrimeG2BootProgress(28);
 +  PrimeG2BootProgress(20);
 +  PrimeG2FirstFrameReady();
  }
-diff --git a/apps/home/controller.cpp b/apps/home/controller.cpp
+ 
+ void Window::setContentView(View * contentView) {
+--- a/escher/src/timer.cpp
++++ b/escher/src/timer.cpp
+@@ -2,7 +2,8 @@
+ 
+ Timer::Timer(uint32_t period) :
+   m_period(period),
+-  m_numberOfTicksBeforeFire(period)
++  m_numberOfTicksBeforeFire(period),
++  m_next(nullptr)
+ {
+ }
+ 
 --- a/apps/home/controller.cpp
 +++ b/apps/home/controller.cpp
 @@ -1,5 +1,6 @@
@@ -303,7 +332,7 @@ diff --git a/apps/home/controller.cpp b/apps/home/controller.cpp
  #include <apps/home/apps_layout.h>
  #include "../apps_container.h"
  #include "../global_preferences.h"
-@@ -32,5 +33,7 @@ SelectableTableView * Controller::ContentView::selectableTableView() {
+@@ -32,7 +33,9 @@
  }
  
  void Controller::ContentView::drawRect(KDContext * ctx, KDRect rect) const {
@@ -311,7 +340,8 @@ diff --git a/apps/home/controller.cpp b/apps/home/controller.cpp
    m_selectableTableView.drawRect(ctx, rect);
 +  PrimeG2BootProgress(11);
  }
-diff --git a/apps/home/selectable_table_view_with_background.cpp b/apps/home/selectable_table_view_with_background.cpp
+ 
+ void Controller::ContentView::reloadBottomRow(SimpleTableViewDataSource * dataSource, int numberOfIcons, int numberOfColumns) {
 --- a/apps/home/selectable_table_view_with_background.cpp
 +++ b/apps/home/selectable_table_view_with_background.cpp
 @@ -1,4 +1,5 @@
@@ -320,7 +350,7 @@ diff --git a/apps/home/selectable_table_view_with_background.cpp b/apps/home/sel
  
  SelectableTableViewWithBackground::SelectableTableViewWithBackground(Responder * parentResponder, TableViewDataSource * dataSource, BackgroundView * backgroundView, SelectableTableViewDataSource * selectionDataSource, SelectableTableViewDelegate * delegate) :
    SelectableTableView(parentResponder, dataSource, selectionDataSource, delegate),
-@@ -8,5 +9,7 @@ SelectableTableViewWithBackground::SelectableTableViewWithBackground(Responder
+@@ -8,7 +9,9 @@
  }
  
  void SelectableTableViewWithBackground::BackgroundInnerView::drawRect(KDContext * ctx, KDRect rect) const {
@@ -328,7 +358,8 @@ diff --git a/apps/home/selectable_table_view_with_background.cpp b/apps/home/sel
      m_backgroundView->drawRect(ctx, rect);
 +    PrimeG2BootProgress(13);
  }
-diff --git a/apps/home/app_cell.cpp b/apps/home/app_cell.cpp
+ 
+ void SelectableTableViewWithBackground::BackgroundInnerView::setBackgroundView(const uint8_t * data) {
 --- a/apps/home/app_cell.cpp
 +++ b/apps/home/app_cell.cpp
 @@ -1,4 +1,5 @@
@@ -337,7 +368,7 @@ diff --git a/apps/home/app_cell.cpp b/apps/home/app_cell.cpp
  #include <assert.h>
  #include <apps/i18n.h>
  #include <escher/palette.h>
-@@ -15,6 +16,8 @@ AppCell::AppCell() :
+@@ -15,8 +16,10 @@
  
  
  void AppCell::drawRect(KDContext * ctx, KDRect rect) const {
@@ -346,7 +377,8 @@ diff --git a/apps/home/app_cell.cpp b/apps/home/app_cell.cpp
    m_backgroundView->drawRect(ctx, KDRect(0, bounds().height()-nameSize.height() - 2*k_nameHeightMargin, bounds().width(), nameSize.height()+2*k_nameHeightMargin));
 +  PrimeG2BootProgress(15);
    }
-diff --git a/escher/src/icon_view.cpp b/escher/src/icon_view.cpp
+ 
+ int AppCell::numberOfSubviews() const {
 --- a/escher/src/icon_view.cpp
 +++ b/escher/src/icon_view.cpp
 @@ -1,4 +1,5 @@
@@ -355,14 +387,15 @@ diff --git a/escher/src/icon_view.cpp b/escher/src/icon_view.cpp
  extern "C" {
  #include <assert.h>
  #include <stdint.h>
-@@ -16,5 +17,6 @@ constexpr static int iconBufferSize = 3080;
+@@ -16,6 +17,7 @@
  // Icon file is 55 x 56 = 3080
  
  void IconView::drawRect(KDContext * ctx, KDRect rect) const {
 +  PrimeG2BootProgress(16);
    const uint8_t* data;
    size_t size;
-@@ -36,6 +38,7 @@ void IconView::drawRect(KDContext * ctx, KDRect rect) const {
+ 
+@@ -36,6 +38,7 @@
  
    KDColor pixelBuffer[iconBufferSize];
    assert(Ion::stackSafe()); // That's a VERY big buffer we're allocating on the stack
@@ -370,7 +403,7 @@ diff --git a/escher/src/icon_view.cpp b/escher/src/icon_view.cpp
  
    Ion::decompress(
      data,
-@@ -43,6 +46,7 @@ void IconView::drawRect(KDContext * ctx, KDRect rect) const {
+@@ -43,6 +46,7 @@
      size,
      iconBufferSize * sizeof(KDColor)
    );
@@ -378,9 +411,11 @@ diff --git a/escher/src/icon_view.cpp b/escher/src/icon_view.cpp
  
    // If we are on a big-endian CPU, we need to swap the bytes
    #if _BIG_ENDIAN
-@@ -69,4 +73,5 @@ void IconView::drawRect(KDContext * ctx, KDRect rect) const {
+@@ -69,6 +73,7 @@
    ctx->fillRectWithPixels(KDRect(3, 53, m_frame.width()-6, 1),pixelBuffer+3+(53*55), nullptr);
    ctx->fillRectWithPixels(KDRect(4, 54, m_frame.width()-8, 1),pixelBuffer+4+(54*55), nullptr);
    ctx->fillRectWithPixels(KDRect(6, 55, m_frame.width()-12, 1),pixelBuffer+6+(55*55), nullptr);
 +  PrimeG2BootProgress(19);
  }
+ 
+ void IconView::setImage(const uint8_t *data, size_t dataLength) {

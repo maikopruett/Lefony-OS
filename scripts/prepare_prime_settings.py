@@ -6,6 +6,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -41,6 +42,13 @@ def prepare(source: Path, stamp: str | None = None):
         text = text.replace('if (e.isKeyboardEvent()){',
             'if (e.isKeyboardEvent() || e == Ion::Events::Touch){')
         dimming.write_text(text)
+    release_version = os.environ.get("LEFONY_RELEASE_VERSION")
+    if release_version:
+        from prime_g2_update_capsule import parse_version
+        components = parse_version(release_version)
+        (source / "ion/src/prime_g2/release_version.h").write_text(
+            "#pragma once\n#define LEFONY_UPDATE_VERSION {" +
+            ", ".join(str(n) for n in components) + "}\n")
     version = (PORT / "LEFONY_VERSION").read_text().strip()
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.-]+)?", version):
         raise ValueError("Invalid Lefony version")
