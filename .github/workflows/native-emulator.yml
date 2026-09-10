@@ -90,6 +90,10 @@ jobs:
         with:
           name: lefony-build
           path: dist
+      - name: Fetch and verify pinned public recovery environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/browser_recovery_assets.py --output build/browser-recovery
       - name: Sign and package verified build outputs
         env:
           SIGNING_KEY: ${{ secrets.LEFONY_UPDATE_PRIVATE_KEY }}
@@ -100,7 +104,7 @@ jobs:
           key="$RUNNER_TEMP/lefony-release-private.pem"
           trap 'rm -f "$key"' EXIT
           printf '%s\n' "$SIGNING_KEY" > "$key"
-          python scripts/package_lefony_release.py --version "$VERSION" --commit "$GITHUB_SHA" --private-key "$key"
+          python scripts/package_lefony_release.py --version "$VERSION" --commit "$GITHUB_SHA" --private-key "$key" --recovery-dir build/browser-recovery
       - name: Publish complete development package
         env:
           GH_TOKEN: ${{ github.token }}

@@ -13,6 +13,7 @@ import shutil
 import zipfile
 
 from prime_g2_update_capsule import build, inspect, parse_version
+from browser_recovery_assets import verified_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = {
@@ -33,10 +34,13 @@ def describe(path):
             'sha256': hashlib.sha256(data).hexdigest()}
 
 
-def package(root, output, version, commit, private_key):
+def package(root, output, version, commit, private_key, recovery_directory=None):
     parts = parse_version(version)
     if not re.fullmatch(r'[a-f0-9]{40}', commit):
         raise ValueError('Release needs a full source commit')
+    recovery = verified_assets(recovery_directory) if recovery_directory is not None else None
+    if recovery and set(Path(a['path']).name for a in recovery[0].values()) & set(FILES.values()):
+        raise ValueError('Recovery artifact collides with firmware package')
     output.mkdir(parents=True, exist_ok=False)
     public_key = root / 'ports/lefony-prime-g2/release-signing.pub'
     payload = root / 'dist/lefony-os-prime-g2.zImage'
@@ -59,6 +63,19 @@ def package(root, output, version, commit, private_key):
         'message': 'The latest development package is available. Guided installation will open when a qualified recovery bundle is published.',
         'assets': {name: describe(output / filename) for name, filename in FILES.items() if name != 'package'},
     }
+    if recovery:
+        descriptors, files = recovery
+        for name, data in files.items():
+            (output / Path(descriptors[name]['path']).name).write_bytes(data)
+        manifest['assets'].update(descriptors)
+        manifest['browserRecovery'] = {'protocol': 1, 'target': 'single-slot-mtd1', 'development': True}
+        notes[2:] = [
+            'Includes the pinned public recovery environment for browser installation testing.',
+            'Recovery replaces the existing OS slot without a backup and preserves the bootloader.',
+            'The installed bootloader must match the included baseline. This does not provision or repartition a stock calculator.',
+            'Recovery components and their upstream references/notices are separate downloads in this release.',
+        ]
+        manifest['message'] = 'Development browser recovery installation is available for testing.'
     # The ZIP contains firmware, signed capsule, emulator ELF and attribution.
     # Full corresponding source is a separate release asset to avoid duplication.
     with zipfile.ZipFile(output / FILES['package'], 'w', zipfile.ZIP_DEFLATED) as archive:
@@ -84,5 +101,6 @@ if __name__ == '__main__':
     parser.add_argument('--commit', required=True)
     parser.add_argument('--private-key', type=Path, required=True)
     parser.add_argument('--output', type=Path, default=ROOT / 'dist/release')
+    parser.add_argument('--recovery-dir', type=Path, help='Directory containing the exact pinned public recovery files')
     args = parser.parse_args()
-    package(ROOT, args.output, args.version, args.commit, args.private_key)
+    package(ROOT, args.output, args.version, args.commit, args.private_key, args.recovery_dir)

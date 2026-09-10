@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "repository": "maikopruett/Lefony-OS",
+  "tag": "recovery-build-34377898071-1",
+  "assets": {
+    "recoveryUboot": {
+      "path": "artifacts/recovery-uboot.imx",
+      "bytes": 388096,
+      "sha256": "c1a4c09f611b7097322584bdc72336c53691173d829b52347cc96d028cfe5473"
+    },
+    "recoveryKernel": {
+      "path": "artifacts/recovery-zImage",
+      "bytes": 7267616,
+      "sha256": "0e042fcc4c1f447b60756c95675f62b61592323b739894a17075a20a9b465dfe"
+    },
+    "recoveryDtb": {
+      "path": "artifacts/recovery.dtb",
+      "bytes": 30828,
+      "sha256": "0f2b1fee425756299b08816e443a0a9a7e49544a8541f514846a20a9cf06afa0"
+    },
+    "recoveryInitramfs": {
+      "path": "artifacts/recovery-initramfs.u-boot",
+      "bytes": 12348071,
+      "sha256": "aa946d96e13c812cb9ca0e6a7c7c4405adbd154525023b2eaf9dc24aec0509d9"
+    },
+    "baselineUboot": {
+      "path": "artifacts/baseline.imx",
+      "bytes": 389120,
+      "sha256": "2bbea80c11b6cd7ec4e27f216637cc7d32356cc2a0c23255909308a9efdaef3c"
+    },
+    "baselineHistory": {
+      "path": "artifacts/baseline-history.json",
+      "bytes": 890,
+      "sha256": "cef031da00b4c05e4c4bc4bf28d7642c0629d46bfb8e6d048dee5ea15975e2b1"
+    },
+    "recoveryUpstream": {
+      "path": "artifacts/RECOVERY-UPSTREAM.txt",
+      "bytes": 1046,
+      "sha256": "0a0c06021849b7f9711029c8c5d8871a3583fc1402621f24d0824442a57fce14"
+    },
+    "recoveryNotices": {
+      "path": "artifacts/RECOVERY-NOTICES.md",
+      "bytes": 1587,
+      "sha256": "f6d85b6129688f7d2d246b99a9d44204f1ccb152b8e15e6a5781d815fb82ebdc"
+    }
+  }
+}

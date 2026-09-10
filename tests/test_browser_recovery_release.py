@@ -11,6 +11,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from package_lefony_release import package
+import browser_recovery_assets
 from lefony_uboot_history import inspect_bytes
 from prepare_browser_recovery_release import (
     INSTALL_ASSETS, CHECKS, CONTRACT, assemble, audit,
@@ -162,3 +163,90 @@ def test_corrupt_candidates_refused(recovery, kind):
     candidate.write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         audit(candidate, key)
+
+
+@pytest.fixture
+def pinned_recovery(recovery, tmp_path, monkeypatch):
+    candidate, _, _, _ = recovery
+    original = json.loads(candidate.read_text())
+    directory = candidate.parent / 'artifacts'
+    upstream = directory / 'RECOVERY-UPSTREAM.txt'
+    upstream.write_text('Synthetic public source reference')
+    original['assets']['recoveryUpstream'] = {
+        'path': 'artifacts/' + upstream.name, 'bytes': upstream.stat().st_size,
+        'sha256': hashlib.sha256(upstream.read_bytes()).hexdigest(),
+    }
+    pin = {'schema': 1, 'repository': 'maikopruett/Lefony-OS', 'tag': 'synthetic-recovery',
+           'assets': {k: original['assets'][k] for k in browser_recovery_assets.ASSETS}}
+    path = tmp_path / 'pin.json'
+    path.write_text(json.dumps(pin))
+    monkeypatch.setattr(browser_recovery_assets, 'PIN_PATH', path)
+    return directory, pin
+
+
+def test_automatic_package_includes_recovery_without_reusing_old_firmware(pinned_recovery, tmp_path):
+    directory, pin = pinned_recovery
+    output = tmp_path / 'dist/new-release'
+    manifest = package(tmp_path, output, '1.0.0+456', 'b' * 40,
+                       ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem', directory)
+    assert manifest['version'] == '1.0.0+456'
+    assert manifest['commit'] == 'b' * 40
+    assert manifest['status'] == 'package'
+    assert manifest['qualification'] == 'build-tested'
+    assert manifest['browserRecovery'] == {**CONTRACT, 'development': True}
+    from prime_g2_update_capsule import inspect
+    assert inspect(output / 'lefony-os-prime-g2.lfu', output / 'release-signing.pub').version == (1, 0, 0, 456)
+    for name, asset in pin['assets'].items():
+        assert manifest['assets'][name] == asset
+        assert (output / Path(asset['path']).name).read_bytes() == (directory / Path(asset['path']).name).read_bytes()
+    embedded = (tmp_path / 'dist/release-notes.md').read_text().split('<!-- lefony-release-v1\n')[1].split('\n-->')[0]
+    assert json.loads(embedded) == manifest == json.loads((output / 'lefony-release.json').read_text())
+    assert 'not included' not in '\n'.join(manifest['notes'])
+    for line in (output / 'SHA256SUMS').read_text().splitlines():
+        expected, filename = line.split('  ')
+        assert hashlib.sha256((output / filename).read_bytes()).hexdigest() == expected
+    assert not (output / 'recoverySource.test').exists()
+
+
+@pytest.mark.parametrize('damage', ['missing', 'hash', 'size', 'symlink'])
+def test_automatic_package_refuses_incomplete_recovery(pinned_recovery, tmp_path, damage):
+    directory, pin = pinned_recovery
+    path = directory / Path(pin['assets']['recoveryInitramfs']['path']).name
+    if damage == 'missing':
+        path.unlink()
+    elif damage == 'hash':
+        path.write_bytes(b'x' * path.stat().st_size)
+    elif damage == 'size':
+        path.write_bytes(path.read_bytes() + b'x')
+    else:
+        moved = tmp_path / 'elsewhere'
+        path.rename(moved)
+        path.symlink_to(moved)
+    output = tmp_path / 'dist/rejected'
+    with pytest.raises((ValueError, FileNotFoundError)):
+        package(tmp_path, output, '1.0.0+456', 'b' * 40,
+                ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem', directory)
+    assert not output.exists()
+
+
+def test_download_uses_only_pinned_public_assets_and_validates_result(pinned_recovery, tmp_path, monkeypatch):
+    directory, pin = pinned_recovery
+    destination = tmp_path / 'download'
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        assert kwargs == {'check': True, 'timeout': 300}
+        target = Path(command[command.index('--dir') + 1])
+        for asset in pin['assets'].values():
+            name = Path(asset['path']).name
+            shutil.copyfile(directory / name, target / name)
+
+    monkeypatch.setattr(browser_recovery_assets.subprocess, 'run', fake_run)
+    browser_recovery_assets.download(destination)
+    assert calls[0][:5] == ['gh', 'release', 'download', 'synthetic-recovery', '--repo']
+    assert set(destination.iterdir()) == {destination / Path(a['path']).name for a in pin['assets'].values()}
+    assert 'lefony-os-prime-g2.lfu' not in calls[0]
+    (directory / Path(pin['assets']['baselineUboot']['path']).name).write_bytes(b'corrupt')
+    with pytest.raises(ValueError, match='size mismatch'):
+        browser_recovery_assets.download(tmp_path / 'bad-download')

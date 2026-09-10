@@ -2,7 +2,8 @@
 
 Every successful `main` push runs host tests, compiles the physical and emulator
 targets, builds a boot capsule, signs LFU1 with the existing Lefony release key,
-and publishes a GitHub prerelease. Pull requests can build but cannot publish
+verifies and includes the pinned public browser recovery environment, and
+publishes a GitHub prerelease. Pull requests can build but cannot publish
 or access the signing secret. Manual workflow runs on `main` also publish.
 
 The workflow is `.github/workflows/native-emulator.yml`. Configure the Actions
@@ -27,6 +28,8 @@ Do not replace assets or move a published tag: publish a new build instead.
   prepared upstream tree used for the physical build, including submodule source
   and upstream license notices. Generated outputs and Git metadata are excluded.
 - Individual firmware, LFU1, emulator and public key downloads.
+- Recovery U-Boot, Linux kernel, device tree, initramfs, bootloader baseline and
+  history, with the existing public upstream references and license notices.
 - `lefony-release.json` and `SHA256SUMS`: exact lengths and SHA-256 hashes.
 
 The release body embeds the same manifest inside a `lefony-release-v1` HTML
@@ -36,19 +39,46 @@ release. It then pins downloads to that tag. No GitHub account, access token,
 website rebuild or hand-edited download URL is needed. Prereleases intentionally
 do not become GitHub's stable `/releases/latest` target.
 
-These are **development packages**, not physically qualified installer bundles.
-Automated compilation and host tests do not establish hardware acceptance.
-No private/vendor recovery assets, device backups or production private key are
-included. The website offers the package download while keeping physical install
-disabled until the complete recovery bundle and hardware qualification exist.
-The website's `docs/RELEASES.md` documents that future `ready` manifest contract.
+These remain **development packages** with explicit browser recovery opt-in.
+Automated compilation and host tests do not establish hardware acceptance or
+change the release to `physical-verified`. The website checks the new signed
+firmware and all recovery assets before offering installation. The installed
+bootloader must match the included baseline; this does not provision or
+repartition an arbitrary stock calculator.
+
+`ports/lefony-prime-g2/browser-recovery.json` pins the eight public environment,
+baseline and attribution files from `recovery-build-34377898071-1` by exact size
+and SHA-256. The workflow downloads only those names into ignored `build/`, then
+checks every file and the recovery RAM layout before packaging. Firmware and
+the signing key are never copied from the older release. The package uses the
+new build's capsule, version and existing release identity.
+
+Missing or changed pinned files fail the publish job before a draft is created;
+the workflow must not fall back to publishing a firmware-only package. The
+package manifest and release body both carry
+`browserRecovery: {"protocol": 1, "target": "single-slot-mtd1", "development": true}`.
+Recovery files remain separate release assets, outside the firmware ZIP. No
+calculator backups, local captures or private signing keys are distributed.
+Changing the recovery pin requires an explicit review of the replacement
+components and their upstream references/notices.
+
+The local packager still supports firmware-only output when `--recovery-dir`
+is omitted. CI always supplies it. To fetch and verify the public environment
+without building, signing, publishing or accessing a calculator:
+
+```sh
+.venv/bin/python scripts/browser_recovery_assets.py --output build/browser-recovery
+```
+
+This needs GitHub CLI (`gh`). The output directory must not already exist.
 
 ## Preparing a browser recovery release
 
 `scripts/prepare_browser_recovery_release.py` audits local recovery inputs and
 assembles a separate distribution from an existing signed development release.
 It does not rebuild or re-sign the firmware, access a calculator, or publish.
-The automatic development workflow remains unchanged.
+This separate acceptance workflow is optional; automatic development releases
+use the pinned public environment described above.
 
 First prepare a private `candidate.json` beside an `artifacts/` directory. Use
 `schema: 1`, `status: "recovery-candidate"`, the signed firmware's `version`, and
