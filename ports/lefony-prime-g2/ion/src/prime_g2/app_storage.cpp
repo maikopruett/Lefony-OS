@@ -33,7 +33,7 @@ Volume::Volume(Backend backend)
       m_readCache{}, m_writeCache{}, m_fileCache{}, m_lookahead{}, m_scratch{}, m_protected{},
       m_used{}, m_identity{}, m_header{}, m_path{}, m_package(nullptr), m_data(nullptr),
       m_packageBytes(0), m_dataBytes(0), m_cursor(0), m_hash{}, m_state(State::Unprovisioned),
-      m_mounted(false), m_open(false), m_legacyValid(false), m_finishedMigration(false) {
+      m_icon(false), m_mounted(false), m_open(false), m_legacyValid(false), m_finishedMigration(false) {
   m_config.context = this;
   m_config.read = readBlock;
   m_config.prog = programBlock;
@@ -109,13 +109,15 @@ bool Volume::validName(const char *id) const {
       return false;
   return i > 0 && i <= 48;
 }
-bool Volume::path(const char *id, char out[64]) const {
+bool Volume::path(const char *id, char out[64], bool icon) const {
   if (!validName(id))
     return false;
   size_t n = strlen(id);
-  memcpy(out, "apps/", 5);
-  memcpy(out + 5, id, n);
-  memcpy(out + 5 + n, ".app", 5);
+  const char *prefix = icon ? "icons/" : "apps/";
+  size_t start = strlen(prefix);
+  memcpy(out, prefix, start);
+  memcpy(out + start, id, n);
+  memcpy(out + start + n, ".app", 5);
   return true;
 }
 bool Volume::openFile(const char *name, int flags) {
@@ -356,19 +358,19 @@ bool Volume::readHeader(const char *file, uint8_t header[64]) {
                 static_cast<lfs_soff_t>(64 + get(header + 16) + get(header + 20));
   return closeFile() && ok;
 }
-bool Volume::entry(const char *id, Entry *out) {
+bool Volume::entry(const char *id, Entry *out, bool icon) {
   char file[64];
   uint8_t header[64];
-  if (!out || !path(id, file) || !readHeader(file, header))
+  if (!out || !path(id, file, icon) || !readHeader(file, header))
     return false;
   *out = {get(header + 12), get(header + 16), get(header + 20)};
   return true;
 }
 bool Volume::read(const char *id, uint8_t *package, size_t capacity, uint8_t *data,
-                  size_t dataCapacity) {
+                  size_t dataCapacity, bool icon) {
   char file[64];
   uint8_t header[64];
-  if (!path(id, file) || !readHeader(file, header) || !package || capacity < get(header + 16) ||
+  if (!path(id, file, icon) || !readHeader(file, header) || !package || capacity < get(header + 16) ||
       (get(header + 20) && (!data || dataCapacity < get(header + 20))) ||
       !openFile(file, LFS_O_RDONLY))
     return false;
@@ -439,14 +441,20 @@ bool Volume::space(Space *out) {
   return true;
 }
 bool Volume::begin(const char *id, const uint8_t *package, uint32_t packageBytes,
-                   const uint8_t *data, uint32_t dataBytes) {
-  if (!m_mounted || (m_state != State::Ready && m_state != State::Complete) || !path(id, m_path) ||
+                   const uint8_t *data, uint32_t dataBytes, bool icon) {
+  if (!m_mounted || (m_state != State::Ready && m_state != State::Complete) || !path(id, m_path, icon) ||
       packageBytes > MaximumPackage || dataBytes > MaximumData ||
       (packageBytes && (!package || packageBytes < 468)) || (dataBytes && !data) ||
       (!packageBytes && dataBytes))
     return false;
+  if (icon) {
+    if (dataBytes || packageBytes != 6576) return false;
+    int rc = lfs_mkdir(&m_fs, "icons");
+    if (rc != 0 && rc != LFS_ERR_EXIST) return false;
+  }
+  m_icon = icon;
   Entry old = {};
-  entry(id, &old);
+  entry(id, &old, icon);
   if (old.generation == 0xffffffffu || (!packageBytes && !old.packageBytes))
     return false;
   Space usage;
@@ -523,6 +531,15 @@ void Volume::step() {
       m_state = State::Committing;
     }
   } else if (m_state == State::Committing) {
+    // The optional icon has no executable state. Removing it first is safe
+    // across power loss: the still-installed app falls back to the default icon.
+    if (!m_packageBytes && !m_icon) {
+      char iconPath[64];
+      memcpy(iconPath, "icons/", 6);
+      memcpy(iconPath + 6, m_path + 5, strlen(m_path + 5) + 1);
+      int rc = lfs_remove(&m_fs, iconPath);
+      if (rc != 0 && rc != LFS_ERR_NOENT) { fail(); return; }
+    }
     ok = m_packageBytes ? lfs_rename(&m_fs, Pending, m_path) == 0 : lfs_remove(&m_fs, m_path) == 0;
     if (ok)
       m_state = State::Complete;

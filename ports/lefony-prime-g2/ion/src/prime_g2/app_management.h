@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 namespace PrimeG2 { namespace AppManagement {
+constexpr unsigned MaximumIcons=512;
 struct Metadata { uint32_t abi; char id[49],name[81],version[24]; };
 struct CatalogEntry { uint32_t bytes,generation; Metadata metadata; };
 // Validation authenticates before parsing; no app code runs here.
@@ -16,6 +17,7 @@ void abandonSetup();
 void poll();
 bool busy();
 uint32_t revision();
+const uint8_t *icon(unsigned index); // Cached, authenticated LZ4 RGB565 menu image.
 unsigned count(); // Current directory entries, no reserved app slots.
 const CatalogEntry &entry(unsigned slot);
 bool open(unsigned slot);

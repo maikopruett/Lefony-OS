@@ -87,3 +87,10 @@ words are synthetic zeroes; it is not evidence of captured firmware content.
 
 Full boot-media/storage/fault suites additionally use Docker, U-Boot and
 `qemu-img`/`qemu-io`. See [the emulator guide](../vm/README.md).
+
+Installed app menu icons now have a signed store-to-calculator attachment path.
+The icon is bound to the exact signed package and stored atomically outside app
+private data. Existing app versions can receive their icon without reinstalling.
+See [icon format](NATIVE-APP-PACKAGE-FORMAT.md#signed-calculator-icon-attachment).
+Icon support requires matching firmware and website versions; physical icon
+behavior is not yet qualified.

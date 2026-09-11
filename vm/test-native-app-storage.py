@@ -16,9 +16,11 @@ sys.path.insert(0,str(ROOT/'sdk/tools'))
 from cli import package
 from runner import Channel
 from device import Client, FIRST_BLOCK
-from signing import sign
+from signing import sign, HEADER, MAGIC, public_der, openssl
 from lfapp import pack,unpack
 from prime_usb_host import PrimeUSBHost, USBError
+from PIL import Image
+import io
 
 class Transport:
     def __init__(self,host):self.host=host
@@ -40,6 +42,19 @@ def main():
     unsigned=package(ROOT/'sdk/examples/counter').read_bytes()
     signed=sign(unsigned,args.signing_key)
     screenshots=ROOT/'build/sdk-installed-counter';screenshots.mkdir(exist_ok=True)
+    colors=(0xf800,0x07e0,0x001f,0xffe0)
+    pixels=b''.join(struct.pack('<H',colors[(y>=28)*2+(x>=27)]) for y in range(56) for x in range(55))
+    def signed_icon(binding,artwork=pixels):
+        payload=b'LFICON1\0'+binding+struct.pack('<II',55,56)+bytes(16)+artwork
+        der=public_der(args.signing_key,private=True)
+        header=HEADER.pack(MAGIC,1,len(payload),1,0,hashlib.sha256(der).digest(),hashlib.sha256(payload).digest(),bytes(8))
+        return header+openssl('dgst','-sha256','-sign',args.signing_key,data=header)+payload
+    icon=signed_icon(hashlib.sha256(signed).digest())
+    def check_icon(frame):
+        image=Image.open(io.BytesIO(frame)).convert('RGB')
+        counts=dict((rgb,n) for n,rgb in image.getcolors(image.width*image.height))
+        for rgb in ((255,0,0),(0,255,0),(0,0,255),(255,255,0)):
+            assert counts.get(rgb,0)>=700,(rgb,counts.get(rgb,0))
     saved_frame=None
     with tempfile.TemporaryDirectory(prefix='lf-app-usb-',dir='/tmp') as directory:
         directory=Path(directory);overlay=directory/'nand.overlay'
@@ -93,6 +108,11 @@ def main():
                 assert storage[6]==round and storage[7]==131072,storage
                 assert storage[5]>59*1024*1024 and storage[5]==storage[3]-storage[10],storage
                 if round==0:print('PASS: OS reserved app space before USB; read-only inventory reports capacity',flush=True)
+                assert connected['reserved']&8,'Firmware does not advertise icons'
+                def upload_icon(value):
+                    client.write(0x63,argument=len(value))
+                    for offset in range(0,len(value),512):client.write(0x64,value[offset:offset+512],offset)
+                    client.write(0x6c)
                 if round==0:
                     assert client.catalog()==[]
                     client.write(0x63,argument=len(signed));client.cancel_upload()
@@ -108,9 +128,29 @@ def main():
                     assert client.read_package(installed['slot'],len(signed))==signed
                     print('PASS: signed ABI 1 upload, atomic commit and USB byte readback',flush=True)
                     time.sleep(.5);assert capture('menu-after-install')!=before,'Installed tile did not appear live'
+                    corrupt=bytearray(icon);corrupt[-1]^=1
+                    for invalid in (signed_icon(bytes(32)),bytes(corrupt)):
+                        upload_icon(invalid)
+                        try:client.wait()
+                        except RuntimeError:pass
+                        else:raise AssertionError('Invalid icon was accepted')
+                        client.write(0x67)
+                        assert client.read(0x6d,32,0)==bytes(32)
+                    upload_icon(icon);assert client.wait()['state']==6
+                    assert client.read(0x6d,32,0)==hashlib.sha256(icon).digest()
+                    assert client.catalog()[0]['generation']==1
+                    assert client.read_package(0,len(signed))==signed
+                    print('PASS: icon signature and package binding; persisted readback; executable unchanged',flush=True)
                     press(1,0) # EE selects the twelfth tile: the installed Counter.
                     assert 'home_row=3 home_column=2' in channel.command('STATE')
-                    capture('menu-counter-selected')
+                    check_icon(capture('menu-counter-selected'))
+                    replacement=signed_icon(hashlib.sha256(signed).digest(),struct.pack('<H',0xf81f)*(55*56))
+                    upload_icon(replacement);assert client.wait()['state']==6
+                    frame=Image.open(io.BytesIO(capture('menu-icon-replaced'))).convert('RGB')
+                    assert sum(1 for pixel in frame.getdata() if pixel==(255,0,255))>=3000,'Cached menu icon did not refresh without input'
+                    upload_icon(icon);assert client.wait()['state']==6
+                    check_icon(capture('menu-icon-restored'))
+                    print('PASS: replacing a cached icon redraws the visible tile without user input',flush=True)
                     press(7,0);initial=capture('initial');time.sleep(1);press(7,0);saved_frame=capture('saved');assert initial!=saved_frame
                     press(4,6);client.wait();assert client.catalog()[0]['generation']==2
                     assert 'STATE app=0 ' in channel.command('STATE'),'Back did not return directly to the main menu'
@@ -120,7 +160,9 @@ def main():
                     assert client.read_package(entries[0]['slot'],len(signed))==signed
                     press(4,6);press(4,4);press(1,0)
                     assert 'home_row=3 home_column=2' in channel.command('STATE')
-                    capture('menu-after-restart')
+                    check_icon(capture('menu-after-restart'))
+                    assert client.read(0x6d,32,0)==hashlib.sha256(icon).digest()
+                    print('PASS: exact icon colors rendered through the home menu, including cold restart',flush=True)
                     # Goodix touch traverses the normal menu table/controller.
                     assert channel.command('TOUCH FRAME 1 0 265 180')=='OK';time.sleep(.25)
                     assert channel.command('TOUCH FRAME 0')=='OK';time.sleep(.5)

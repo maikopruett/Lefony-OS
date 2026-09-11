@@ -100,3 +100,36 @@ must be mapped, and read destinations cannot point to executable code. Event
 values are Start=0, Key=1, Tick=2, Touch=3, Close=4. Unknown services return -3;
 invalid pointers/arguments return -4. Future incompatible layouts need another
 ABI number, never silent reinterpretation of this contract.
+
+## Signed calculator icon attachment
+
+The store's immutable PNG icon is converted to a 55 × 56 RGB565 image and
+returned by `GET /api/store/releases/<release-id>/calculator-icon`. The artwork
+keeps its square aspect ratio, is area-averaged to 55 × 55, and transparency
+is composited onto white; the final row is white. The source PNG and executable
+package are unchanged. Existing releases can acquire icons without republishing.
+
+An attachment is exactly **6,576 bytes**: the existing 352-byte LFAPP1
+signature envelope (ABI 1), followed by this distinct payload:
+
+| Payload offset | Bytes | Meaning |
+| --- | --- | --- |
+| 0 | 8 | `LFICON1\0` magic; never an executable LFAPP0 payload |
+| 8 | 32 | SHA-256 of the complete signed executable package |
+| 40 | 4 | Width 55, little-endian uint32 |
+| 44 | 4 | Height 56, little-endian uint32 |
+| 48 | 16 | Reserved, all zero |
+| 64 | 6,160 | Row-major RGB565 pixels, little-endian uint16 |
+
+The normal app roots authenticate the envelope. Both browser and firmware check
+exact lengths, dimensions, reserved bytes and binding to the package. Executable
+loaders still require LFAPP0; an icon cannot pass as an application. The firmware
+creates a fixed literal-only LZ4 stream for its existing menu renderer, rather
+than parsing compressed images supplied by an app. Invalid or absent icons use
+the existing puzzle fallback.
+
+Firmware advertising app status capability bit 3 accepts icon commits through
+`0x6c` after the existing `0x63`/`0x64` bounded upload. `0x6d` reads the verified
+attachment digest for a current catalog index. See [storage protocol](NATIVE-APP-STORAGE.md).
+Standalone SDK executable installs remain valid and use the fallback until an
+icon is installed from the store.

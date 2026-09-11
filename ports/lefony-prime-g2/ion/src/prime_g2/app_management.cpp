@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #include "app_management.h"
 #include "app_storage.h"
+#include "app_icon.h"
 #include "native_app.h"
 #include "native_app_signature.h"
 #include "nand_physical.h"
@@ -12,6 +13,7 @@ namespace {
 static_assert(sizeof(CatalogEntry)==168,"app catalog protocol layout");
 static_assert(offsetof(CatalogEntry,metadata)==8 && offsetof(Metadata,id)==4 && offsetof(Metadata,name)==53 && offsetof(Metadata,version)==134,"app catalog text offsets");
 using namespace AppStorage;
+static_assert(MaximumEntries==MaximumIcons,"menu cache bounds");
 alignas(64) uint8_t sRaw[2176];
 bool range(uint32_t block) { return block>=FirstBlock && block<FirstBlock+BlockCount; }
 bool usable(void *,uint32_t block) {
@@ -59,6 +61,9 @@ bool program(void *,uint32_t page,const uint8_t *data) {
 }
 Volume sVolume({nullptr,usable,read,erase,program});
 CatalogEntry sCatalog[MaximumEntries]={};
+uint8_t sAppHashes[MaximumEntries][32], sIconHashes[MaximumEntries][32];
+uint8_t sIcons[MaximumEntries][AppIcon::CompressedBytes], sIconPackage[AppIcon::PackageBytes];
+bool sHasIcon[MaximumEntries]={};
 alignas(64) uint8_t sUpload[MaximumPackage],sLoaded[MaximumPackage];
 uint8_t sData[MaximumData],sUploadData[MaximumData],sBackupDigest[32];
 uint32_t sRevision=0,sCount=0,sUsed=0;
@@ -97,6 +102,20 @@ bool catalogFile(void *,const char *id,const Entry &e) {
   if(sCount>=MaximumEntries) return false;
   Metadata m;
   if(!sVolume.read(id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData)) || !metadata(sLoaded,e.packageBytes,&m) || strcmp(id,m.id)) return false;
+  NativeAppHash::sha256(sLoaded,e.packageBytes,sAppHashes[sCount]);
+  sHasIcon[sCount]=false; memset(sIconHashes[sCount],0,32);
+  Entry icon;
+  if(sVolume.entry(id,&icon,true)) {
+    sUsed+=icon.packageBytes+icon.dataBytes;
+    if(icon.packageBytes==AppIcon::PackageBytes && !icon.dataBytes &&
+        sVolume.read(id,sIconPackage,sizeof(sIconPackage),nullptr,0,true)) {
+      const uint8_t *pixels=AppIcon::pixels(sIconPackage,sizeof(sIconPackage),sAppHashes[sCount]);
+      if(pixels) {
+        AppIcon::compress(pixels,sIcons[sCount]); sHasIcon[sCount]=true;
+        NativeAppHash::sha256(sIconPackage,sizeof(sIconPackage),sIconHashes[sCount]);
+      }
+    }
+  }
   sCatalog[sCount++]={e.packageBytes,e.generation,m};sUsed+=e.packageBytes+e.dataBytes;return true;
 }
 void refresh() {
@@ -137,6 +156,7 @@ void init() {
 }
 uint32_t revision() { return sRevision; }
 unsigned count() { return sCount; }
+const uint8_t *icon(unsigned index) { return index<sCount && sHasIcon[index] ? sIcons[index] : nullptr; }
 bool busy() { return sPending || sState==Backup || sState==Receiving || sState==Working; }
 void acknowledge() { if(sPending) sAcknowledged=true; }
 void abandonSetup() { if(sPending && !sAcknowledged) sPending=0; }
@@ -159,7 +179,7 @@ bool request(uint8_t command,uint32_t arg,const uint8_t *data,size_t size) {
     if(sState!=Receiving || !size || size>512 || arg!=sReceived || size>sLength-sReceived) return false;
     memcpy(sUpload+sReceived,data,size);sReceived+=size;return true;
   }
-  if(command==0x65) return !size && !arg && sState==Receiving && sReceived==sLength && queue(command,0);
+  if(command==0x65 || command==0x6c) return !size && !arg && sState==Receiving && sReceived==sLength && queue(command,0);
   if(command==0x66 || command==0x6a) return !size && idle() && arg<sCount && sCatalog[arg].bytes && queue(command,arg);
   if(command==0x67) {
     if(size || arg || sState==Working) return false;
@@ -171,7 +191,7 @@ bool request(uint8_t command,uint32_t arg,const uint8_t *data,size_t size) {
 bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t *size) {
   if(!data || !size || capacity>512) return false;
   if(command==0x60) {
-    uint32_t status[16]={0x3141464c,2,sPending?Working:sState,sError,sReceived,sLength,2,sCount,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,6};
+    uint32_t status[16]={0x3141464c,2,sPending?Working:sState,sError,sReceived,sLength,2,sCount,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,14};
     *size=capacity<sizeof(status)?capacity:sizeof(status);memcpy(data,status,*size);return !arg;
   }
   if(command==0x62) { if(arg || sBackupOffset!=BackupBytes || sState!=Backup || capacity<32) return false;memcpy(data,sBackupDigest,32);*size=32;return true; }
@@ -198,6 +218,10 @@ bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t 
     uint32_t summary[12]={0x5341464c,2,BlockCount*BlockBytes,info.capacity,sUsed,info.available,sCount,BlockBytes,MaximumPackage,MaximumData,info.allocated,info.overhead};
     memcpy(data,summary,sizeof(summary));*size=sizeof(summary);return true;
   }
+  if(command==0x6d) {
+    if(!idle() || arg>=sCount || capacity<32) return false;
+    memcpy(data,sIconHashes[arg],32); *size=32; return true;
+  }
   if(command==0x68) {
     if(!idle() || arg>=sCount) return false;
     *size=capacity<sizeof(CatalogEntry)?capacity:sizeof(CatalogEntry);memcpy(data,&sCatalog[arg],*size);return true;
@@ -214,6 +238,14 @@ void poll() {
     uint8_t command=sPending;sPending=0;sAcknowledged=false;
     if(command==0x60) { if(sVolume.mount()) { sState=Ready;sError=0;refresh(); } else sState=sVolume.state()==State::Unprovisioned?Unprovisioned:Error; }
     else if(command==0x62) { sState=Working;if(!sVolume.provision(sBackupDigest) || !sVolume.initialize(sUpload,sizeof(sUpload),sUploadData,sizeof(sUploadData),appName)) fail(2);else { sState=Ready;refresh(); } }
+    else if(command==0x6c) {
+      if(!AppIcon::pixels(sUpload,sLength,nullptr)) { fail(3);return; }
+      int target=-1;
+      for(unsigned i=0;i<sCount;i++) if(!memcmp(sUpload+352+8,sAppHashes[i],32)) { target=i;break; }
+      if(target<0) { fail(3);return; }
+      sTarget=target;sState=Working;
+      if(!sVolume.begin(sCatalog[target].metadata.id,sUpload,sLength,nullptr,0,true)) fail(6);
+    }
     else if(command==0x65) {
       Metadata m; if(!metadata(sUpload,sLength,&m) || m.abi!=1) { fail(3);return; }
       int target=-1;

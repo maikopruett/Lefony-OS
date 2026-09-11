@@ -171,6 +171,38 @@ int main() {
       if (recovered.entry("surface-3d", &e))
         check(recovered, "surface-3d", old, oldData);
     }
+  // Icons use the same verified atomic file replacement, without touching
+  // executable bytes, private data, app generations or catalog enumeration.
+  std::vector<uint8_t> icon(6576,0x53), changedIcon(6576,0x84), iconRead(6576);
+  Flash withIcon=baseline;
+  {
+    Volume icons(withIcon.backend()); assert(initialize(icons));
+    assert(!icons.begin("surface-3d",icon.data(),icon.size()-1,nullptr,0,true));
+    assert(icons.begin("surface-3d",icon.data(),icon.size(),nullptr,0,true)); finish(icons);
+    assert(check(icons,"surface-3d",old,oldData).generation==1);
+  }
+  for (bool first : {true,false}) for (bool torn : {false,true}) for(int cut=0;cut<30;cut++) {
+    Flash f=first?baseline:withIcon; f.cut=f.writes+cut; f.torn=torn;
+    try {
+      Volume update(f.backend()); assert(initialize(update));
+      assert(update.begin("surface-3d",changedIcon.data(),changedIcon.size(),nullptr,0,true)); finish(update);
+    } catch(PowerCut &) {}
+    f.cut=-1; Volume recovered(f.backend()); assert(initialize(recovered));
+    assert(check(recovered,"surface-3d",old,oldData).generation==1);
+    Entry e;
+    if(recovered.entry("surface-3d",&e,true)) {
+      assert(recovered.read("surface-3d",iconRead.data(),iconRead.size(),nullptr,0,true));
+      assert(iconRead==changedIcon || (!first && iconRead==icon));
+    } else assert(first);
+  }
+  {
+    Volume icons(withIcon.backend()); assert(initialize(icons));
+    assert(icons.read("surface-3d",iconRead.data(),iconRead.size(),nullptr,0,true)); assert(iconRead==icon);
+    unsigned count=0;
+    assert(icons.list([](void *p,const char *,const Entry &){++*static_cast<unsigned *>(p);return true;},&count)); assert(count==1);
+    assert(icons.begin("surface-3d",nullptr,0,nullptr,0));finish(icons);
+    Entry e; assert(!icons.entry("surface-3d",&e)); assert(!icons.entry("surface-3d",&e,true));
+  }
   // Real profile-1 bank fixtures, not invented migration headers.
   Flash legacy;
   {

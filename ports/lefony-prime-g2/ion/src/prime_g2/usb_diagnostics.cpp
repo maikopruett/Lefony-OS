@@ -539,8 +539,8 @@ bool vendorRequest(const SetupPacket &setup) {
   // new upload, NAND probe/read, or recovery command can interrupt it.
   if (PrimeG2::DevelopmentUpdate::busy() &&
       !(setup.requestType == 0xc0 && setup.request == 0x53)) return false;
-  if (PrimeG2::AppManagement::busy() && !(setup.request >= 0x60 && setup.request <= 0x6b)) return false;
-  if (setup.request >= 0x60 && setup.request <= 0x6b) {
+  if (PrimeG2::AppManagement::busy() && !(setup.request >= 0x60 && setup.request <= 0x6d)) return false;
+  if (setup.request >= 0x60 && setup.request <= 0x6d) {
     PrimeG2::Services::noteUserActivity();
     sLastManagementTime = Ion::Timing::millis(); sManagementSeen = true;
     if (setup.requestType == 0xc0) {
@@ -934,7 +934,7 @@ void handleComplete(uint32_t complete) {
                                                sizeof(sControlBuffer));
     uint16_t remaining = (sControllerMemory.descriptors[0].token >> 16) & 0x7FFF;
     uint16_t received = sPendingOut.length - remaining;
-    if (sPendingOut.request >= 0x60 && sPendingOut.request <= 0x6b) {
+    if (sPendingOut.request >= 0x60 && sPendingOut.request <= 0x6d) {
       if (received != sPendingOut.length || (sControllerMemory.descriptors[0].token & 0xE8u) ||
           !PrimeG2::AppManagement::request(sPendingOut.request,setupValue32(sPendingOut),sControlBuffer,received)) {
         stallControl(); return;

@@ -31,7 +31,7 @@ def prepare(root: Path):
   if (appIndex > NativeApps::builtInCount()) {
     int slot=NativeApps::slotAt(appIndex-NativeApps::builtInCount()-1);
     appCell->setVisible(slot>=0);
-    if (slot>=0) appCell->setInstalledApp(NativeApps::installedName(slot),NativeApps::installedIcon());
+    if (slot>=0) appCell->setInstalledApp(NativeApps::installedName(slot),NativeApps::installedIcon(slot));
     return;
   }''')
     edit('apps/home/controller.cpp','  return container->numberOfApps() - 1;','  (void)container;return NativeApps::menuCount();')

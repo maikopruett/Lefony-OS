@@ -6,7 +6,7 @@ int builtInCount();
 int menuCount();
 int slotAt(int index);
 const char *installedName(unsigned slot);
-const Image *installedIcon();
+const Image *installedIcon(unsigned slot);
 uint32_t catalogRevision();
 bool launchInstalled(int slot);
 }

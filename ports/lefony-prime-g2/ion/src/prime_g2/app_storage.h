@@ -47,10 +47,10 @@ public:
                   NameReader);
   bool provision(const uint8_t backup[32]); // Legacy explicit backup path only.
   bool list(Visitor, void *);
-  bool entry(const char *id, Entry *);
-  bool read(const char *id, uint8_t *package, size_t capacity, uint8_t *data, size_t dataCapacity);
+  bool entry(const char *id, Entry *, bool icon = false);
+  bool read(const char *id, uint8_t *package, size_t capacity, uint8_t *data, size_t dataCapacity, bool icon = false);
   bool begin(const char *id, const uint8_t *package, uint32_t packageBytes, const uint8_t *data,
-             uint32_t dataBytes);
+             uint32_t dataBytes, bool icon = false);
   void step(); // One bounded filesystem operation/chunk; hardware I/O stays in Backend.
   void cancel();
   bool space(Space *);
@@ -64,7 +64,7 @@ private:
   static int syncBlock(const lfs_config *);
   static int usedBlock(void *, lfs_block_t);
   bool validName(const char *) const;
-  bool path(const char *, char out[64]) const;
+  bool path(const char *, char out[64], bool icon = false) const;
   bool readHeader(const char *, uint8_t header[64]);
   bool openFile(const char *, int);
   bool closeFile();
@@ -88,7 +88,7 @@ private:
   uint32_t m_packageBytes, m_dataBytes, m_cursor;
   NativeAppHash::SHA256 m_hash;
   State m_state;
-  bool m_mounted, m_open, m_legacyValid, m_finishedMigration;
+  bool m_icon, m_mounted, m_open, m_legacyValid, m_finishedMigration;
 };
 } // namespace AppStorage
 } // namespace PrimeG2

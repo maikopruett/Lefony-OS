@@ -103,12 +103,14 @@ An old client must reject protocol 2 instead of interpreting its counts as slots
 | `69` | — | Unsupported; no browser reservation command |
 | `6a` | OUT / IN | Select installed package / read back package bytes |
 | `6b` | IN | 48-byte shared filesystem accounting |
+| `6c` | OUT | Commit a signed icon from the upload buffer (capability bit 3) |
+| `6d` | IN | 32-byte verified icon SHA-256 for catalog index; zero if absent |
 
 Status is sixteen LE uint32 values: magic `0x3141464c`, protocol 2, wire state,
 error, received bytes, expected bytes, profile 2, **actual catalog entry count**,
 ABI 1, legacy raw-backup byte count, backup progress, internal engine state,
 engine progress, target index, pending command, capability bits (bit 1: storage
-summary; bit 2: shared filesystem). States remain 0 cold, 1 unprovisioned, 2 ready,
+summary; bit 2: shared filesystem; bit 3: signed menu icons). States remain 0 cold, 1 unprovisioned, 2 ready,
 3 backup, 4 receiving, 5 working, 6 complete, 7 error.
 
 Storage summary is twelve LE uint32 values:
@@ -206,3 +208,55 @@ Local logs are ignored under `build/shared-storage-*` and the website's `.local/
 Physical migration, ECC/erased-page behavior, actual interrupted power, NAND
 endurance and startup time remain unqualified. Root/anchor damage fails closed;
 the payload bad-block tests do not qualify every factory-bad-block placement.
+
+## Optional menu icons
+
+Icons are independent `icons/<authenticated-app-id>.app` files using the same
+LFAFILE2 header, full-content digest, bounded write/readback and atomic rename
+as executable files. Their signed attachment occupies the package field; the
+private-data field is empty. This is an additive namespace on profile 2 and
+requires no reformat or migration. App catalog count and executable generations
+exclude icons; allocated storage includes them, and logical usage includes
+stored attachment bytes. The filesystem's 128 KiB allocation unit still applies.
+
+At catalog refresh the OS authenticates each optional icon and matches its
+embedded package hash against the installed executable. It caches validated
+pixels and attachment digests before serving USB queries or drawing the menu.
+An icon for an older executable version is ignored until replaced. Private-data
+writes preserve the separate icon file. App removal deletes its icon first,
+then the app: an interruption can leave the app with the default icon, but
+cannot lose app data through an icon update. Interrupted icon replacements
+leave either the old complete icon or the new complete icon.
+
+Connecting and refreshing inventory only read icon digests. Installation sends
+the app and then its icon; an already installed matching release offers an
+explicit **Update app icon** action. Each commit is verified and is never
+retried after an ambiguous USB result. Older firmware keeps accepting normal
+app installation; the website offers a firmware update for icon support.
+
+### Icon candidate checks (2026-09-11 UTC)
+
+Source based on `4e99fa053ecd` plus the icon changes. Local physical Prime G2
+BIN SHA-256:
+`3b12f9bbb9b5b4d17b298fb52e5ea10ae443fa60ce138e92282ecf7fe0f19923`.
+Local Prime G2 VM ELF SHA-256:
+`2a03f4d50652280a7f89bd68f838cb1571d53cd7279c4fb32cc9a0d025da9124`.
+
+Both `make firmware` and `make firmware-vm` passed with the existing public
+firmware and app roots. `make test`: 390 passed, two optional private fixtures
+skipped. `make check-public` passed. Storage tests run the actual littlefs engine
+under ASan/UBSan with torn writes during initial icon creation and replacement;
+apps, generations and private data remain unchanged.
+
+`vm/test-native-app-storage.py` with the existing local app signing key and
+public root passed: signed app USB readback; bad icon signature and wrong-package
+rejection; signed icon readback; exact RGB565 colors in the home menu; replacing
+a cached icon redraws without key input; app data and icon survive a cold restart;
+removal clears the catalog. Captured synthetic VM frames were inspected locally.
+This does not qualify physical USB/flash behavior or physical power-loss recovery.
+
+Matching website checks: 250 unit tests passed, one optional SDK fixture skipped;
+four browser installation cases passed (older firmware, unready storage, a new
+app with its icon, and updating an existing app's icon). Build/type checks, lint
+and Worker dry-run passed. No firmware release or live website deployment was
+performed for this candidate.
