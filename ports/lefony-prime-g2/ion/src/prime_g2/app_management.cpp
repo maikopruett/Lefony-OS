@@ -54,6 +54,7 @@ Volume sVolume({nullptr,usable,read,erase,program});
 CatalogEntry sCatalog[Slots]={};
 alignas(64) uint8_t sUpload[MaximumPackage],sLoaded[MaximumPackage],sRaw[2176];
 uint8_t sData[MaximumData],sUploadData[MaximumData],sBackupDigest[32];
+uint32_t sCapacity[Slots]={},sRevision=0;
 NativeAppHash::SHA256 sBackupHash;
 // Wire state is independent of the storage engine's internal states.
 enum : uint32_t { Cold,Unprovisioned,Ready,Backup,Receiving,Working,Complete,Error };
@@ -82,6 +83,7 @@ bool string(const uint8_t *&p,const uint8_t *end,char *out,size_t capacity) {
   p++;out[count]=0;return true;
 }
 void refresh() {
+  sRevision++;
   memset(sCatalog,0,sizeof(sCatalog));
   for(unsigned slot=0;slot<Slots;slot++) {
     auto e=sVolume.entry(slot);
@@ -117,6 +119,13 @@ bool metadata(const uint8_t *package,size_t size,Metadata *out) {
   if(groups!=3) return false;
   *out=m;return true;
 }
+void init() {
+  sState=Working;
+  if(!sVolume.mount() && (sVolume.state()!=State::Unprovisioned || !sVolume.reserve())) { fail(9);return; }
+  for(unsigned slot=0;slot<Slots;slot++) sCapacity[slot]=sVolume.capacity(slot);
+  refresh();sState=Ready;sError=0;
+}
+uint32_t revision() { return sRevision; }
 bool busy() { return sPending || sState==Backup || sState==Receiving || sState==Working; }
 void acknowledge() { if(sPending) sAcknowledged=true; }
 void abandonSetup() { if(sPending && !sAcknowledged) sPending=0; }
@@ -150,7 +159,7 @@ bool request(uint8_t command,uint32_t arg,const uint8_t *data,size_t size) {
 bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t *size) {
   if(!data || !size || capacity>512) return false;
   if(command==0x60) {
-    uint32_t status[16]={0x3141464c,1,sPending?Working:sState,sError,sReceived,sLength,1,Slots,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,0};
+    uint32_t status[16]={0x3141464c,1,sPending?Working:sState,sError,sReceived,sLength,1,Slots,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,2};
     *size=capacity<sizeof(status)?capacity:sizeof(status);memcpy(data,status,*size);return !arg;
   }
   if(command==0x62) { if(arg || sBackupOffset!=BackupBytes || sState!=Backup || capacity<32) return false;memcpy(data,sBackupDigest,32);*size=32;return true; }
@@ -169,6 +178,16 @@ bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t 
     memcpy(data,sRaw+arg%RawBytes,capacity);NativeAppHash::shaUpdate(&sBackupHash,data,capacity);sBackupOffset+=capacity;*size=capacity;
     if(sBackupOffset==BackupBytes) NativeAppHash::shaFinal(&sBackupHash,sBackupDigest);
     return true;
+  }
+  if(command==0x6b) {
+    if(!idle() || arg || capacity<40) return false;
+    uint32_t total=0,used=0,available=0,installed=0;
+    for(unsigned slot=0;slot<Slots;slot++) {
+      const auto e=sVolume.entry(slot);total+=sCapacity[slot];used+=e.packageBytes+e.dataBytes;
+      if(e.packageBytes) installed++;else available+=sCapacity[slot];
+    }
+    uint32_t summary[10]={0x5341464c,1,BlockCount*PagesPerBlock*PageBytes,total,used,available,installed,Slots,MaximumPackage,MaximumData};
+    memcpy(data,summary,sizeof(summary));*size=sizeof(summary);return true;
   }
   if(command==0x68) {
     if(!idle() || arg>=Slots) return false;

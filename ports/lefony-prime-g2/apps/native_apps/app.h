@@ -10,7 +10,6 @@ public:
   public:
     I18n::Message name() override;
     I18n::Message upperName() override;
-    const Image *icon() override;
   };
   class Snapshot : public SharedApp::Snapshot {
   public:
@@ -23,7 +22,6 @@ public:
 private:
   class SurfaceView : public View {
   public:
-    unsigned selected=0;
     void invalidate() { markRectAsDirty(bounds()); }
     void drawRect(KDContext *context,KDRect rect) const override;
   };
@@ -38,8 +36,6 @@ private:
     bool handleTouch(const Ion::Touch::Event &event) override;
     bool acceptsMultitouch() const override { return true; }
   private:
-    bool activate(unsigned slot);
-    int m_touchSlot=-1;
     SurfaceView m_view;
   };
   explicit App(Snapshot *snapshot);

@@ -26,6 +26,10 @@ public:
   // compare its SHA-256 with the device's sequential backup receipt first.
   // This method only provisions a previously unprovisioned volume.
   bool provision(const uint8_t backupSHA256[32]);
+  // OS startup policy: fixed app region only, no backup. Reject damaged
+  // Lefony records and unknown layouts before any erase.
+  bool reserve();
+  uint32_t capacity(unsigned slot) const;
   bool read(unsigned slot,uint8_t *package,size_t capacity,uint8_t *data,size_t dataCapacity);
   // Buffer ownership stays with the caller until Complete/Failed. Package and
   // data are committed together; packageBytes=0,dataBytes=0 is a tombstone.

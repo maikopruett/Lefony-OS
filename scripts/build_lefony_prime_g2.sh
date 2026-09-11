@@ -58,6 +58,7 @@ if [ -d "$PORT/apps" ]; then
 fi
 python3 "$REPO/scripts/prepare_prime_touch.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_display.py" "$SOURCE"
+python3 "$REPO/scripts/prepare_prime_app_menu.py" "$SOURCE"
 
 if [ "$NATIVE_PLATFORM" = prime_g2 ]; then
     KEY_DIR=${LEFONY_UPDATE_KEY_DIR:-"$REPO/build/lefony-update-signing"}

@@ -53,6 +53,37 @@ int main() {
   std::vector<uint8_t> old(7131,0x23),next(9321,0x61),oldData(17,0x91),newData(4099,0x85);
   assert(!v.begin(0,old.data(),old.size(),nullptr,0));
   uint8_t backup[32]; memset(backup,0x15,32);
+  // First install can reserve blank/stock UBI space without a backup. A later
+  // call must not erase apps, even if both volume markers have disappeared.
+  Flash automatic;
+  Page ubi;ubi.fill(0xff);memcpy(ubi.data(),"UBI#",4);
+  automatic.pages[FirstBlock*PagesPerBlock]=ubi;
+  Volume reserved(automatic.backend());assert(!reserved.mount());
+  assert(automatic.writes==0);
+  assert(reserved.reserve());assert(!reserved.reserve());
+  assert(reserved.begin(0,old.data(),old.size(),oldData.data(),oldData.size()));finish(reserved);
+  automatic.pages.erase(FirstBlock*PagesPerBlock);
+  automatic.pages.erase((FirstBlock+1)*PagesPerBlock);
+  int before=automatic.writes;
+  Volume missing(automatic.backend());assert(!missing.mount());assert(!missing.reserve());assert(automatic.writes==before);
+  // Unknown data and torn markers are errors, never an automatic reformat.
+  Flash unknown;Page data;data.fill(0x42);unknown.pages[FirstBlock*PagesPerBlock]=data;
+  Volume u(unknown.backend());assert(!u.mount());assert(!u.reserve());assert(unknown.writes==0);
+  Flash unreadable;unreadable.bad.insert(FirstBlock);
+  Volume unavailable(unreadable.backend());assert(!unavailable.mount());assert(!unavailable.reserve());assert(unreadable.writes==0);
+  for(bool torn:{false,true}) for(int cut=0;cut<4;cut++) {
+    Flash f;f.cut=cut;f.torn=torn;Volume p(f.backend());assert(!p.mount());
+    try { p.reserve(); } catch(PowerCut &) {}
+    f.cut=-1;Volume recovered(f.backend());
+    if(recovered.mount()) assert(recovered.entry(0).bank==-1);
+    else {
+      bool damaged=false;for(const auto &page:f.pages) damaged|=!memcmp(page.second.data(),"LFAVOL1",7);
+      int writes=f.writes;
+      if(damaged) { assert(!recovered.reserve());assert(f.writes==writes); }
+      else assert(recovered.reserve());
+    }
+  }
+  assert(reserved.capacity(0)==MaximumPackage);
   assert(v.provision(backup)); assert(!v.provision(backup));
   assert(v.begin(0,old.data(),old.size(),oldData.data(),oldData.size())); finish(v);
   Flash baseline=flash;
@@ -82,6 +113,7 @@ int main() {
   Flash bad=baseline; bad.bad.insert(FirstBlock+16+BankBlocks); bad.bad.insert(FirstBlock+16+BankBlocks+2);
   Volume b(bad.backend()); assert(b.mount()); assert(b.begin(0,next.data(),next.size(),nullptr,0)); finish(b);
   for(unsigned i=1;i<BankBlocks;i++) bad.bad.insert(FirstBlock+16+i);
+  assert(b.capacity(0)==0);assert(b.capacity(Slots)==0);
   int writes=bad.writes;
   std::vector<uint8_t> maximum(MaximumPackage,42);
   assert(!b.begin(0,maximum.data(),maximum.size(),nullptr,0)); assert(bad.writes==writes);

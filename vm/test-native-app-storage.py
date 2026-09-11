@@ -33,13 +33,14 @@ def marker():
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--signing-key',required=True,type=Path)
-    parser.add_argument('--public-key',required=True,type=Path);args=parser.parse_args()
+    parser.add_argument('--public-key',required=True,type=Path)
+    parser.add_argument('--preprovisioned',action='store_true',help='Also exercise an existing legacy volume');args=parser.parse_args()
     signed=sign(package(ROOT/'sdk/examples/counter').read_bytes(),args.signing_key)
     screenshots=ROOT/'build/sdk-installed-counter';screenshots.mkdir(exist_ok=True)
     saved_frame=None
     with tempfile.TemporaryDirectory(prefix='lf-app-usb-',dir='/tmp') as directory:
         directory=Path(directory);overlay=directory/'nand.overlay'
-        overlay.write_bytes(b'PG2OVL1\n'+b''.join(struct.pack('<B3xI',1,(FIRST_BLOCK+i)*64)+marker() for i in range(2)))
+        overlay.write_bytes(b'PG2OVL1\n'+b''.join(struct.pack('<B3xI',1,(FIRST_BLOCK+i)*64)+marker() for i in range(2) if args.preprovisioned))
         def run(round):
             nonlocal saved_frame
             uart=directory/f'uart{round}';usb=directory/'usb'
@@ -82,29 +83,48 @@ def main():
                 def capture(name):
                     time.sleep(.3);path=screenshots/(name+'.ppm');execute('screendump',{'filename':str(path)});return path.read_bytes()
                 host=PrimeUSBHost(usb);host.connect_and_enumerate();client=Client(Transport(host))
-                connected=client.connect();assert connected['state']==2,connected
+                # Startup must finish before any host mount/provision command.
+                connected=client.status();assert connected['state']==2 and connected['reserved']&2,connected
+                storage=struct.unpack('<10I',client.read(0x6b,40))
+                assert storage[:3]==(0x5341464c,1,64*1024*1024)
+                assert storage[6]==round and storage[7]==8,storage
+                assert storage[5]==(8-round)*2101664,storage
+                if round==0:print('PASS: OS reserved app space before USB; read-only inventory reports capacity',flush=True)
                 if round==0:
                     assert client.catalog()==[]
                     # Missing backup receipt cannot provision an existing volume.
                     try:host.control_out(0x40,0x62,payload=bytes(32))
                     except USBError:pass
                     else:raise AssertionError('Provision without backup was accepted')
+                    press(4,6);press(4,4);press(5,6) # Dismiss USB, Apps, then Settings via its menu shortcut.
+                    before=capture('menu-before-install')
                     installed=client.install(signed,[args.public_key]);assert installed['id']=='counter'
                     assert client.read_package(installed['slot'],len(signed))==signed
                     print('PASS: signed ABI 1 upload, atomic commit and USB byte readback',flush=True)
-                    assert channel.command('APP LAUNCH')=='OK';client.wait();time.sleep(.5)
+                    time.sleep(.5);assert capture('menu-after-install')!=before,'Installed tile did not appear live'
+                    press(1,0) # EE selects the twelfth tile: the installed Counter.
+                    assert 'home_row=3 home_column=2' in channel.command('STATE')
+                    capture('menu-counter-selected')
                     press(7,0);initial=capture('initial');time.sleep(1);press(7,0);saved_frame=capture('saved');assert initial!=saved_frame
                     press(4,6);client.wait();assert client.catalog()[0]['generation']==2
+                    assert 'STATE app=0 ' in channel.command('STATE'),'Back did not return directly to the main menu'
                     print('PASS: normal launcher/key input commits app-private data on exit',flush=True)
                 else:
                     entries=client.catalog();assert len(entries)==1 and entries[0]['id']=='counter'
                     assert client.read_package(entries[0]['slot'],len(signed))==signed
-                    # Opening the launcher queues a storage remount. Wait for
-                    # it before sending the key, or busy storage rejects open().
-                    assert channel.command('APP LAUNCH')=='OK';client.wait();time.sleep(.5);press(7,0)
+                    press(4,6);press(4,4);press(1,0)
+                    assert 'home_row=3 home_column=2' in channel.command('STATE')
+                    capture('menu-after-restart')
+                    # Goodix touch traverses the normal menu table/controller.
+                    assert channel.command('TOUCH FRAME 1 0 265 180')=='OK';time.sleep(.25)
+                    assert channel.command('TOUCH FRAME 0')=='OK';time.sleep(.5)
                     assert capture('restored')==saved_frame,'Saved app data did not survive cold restart'
                     press(4,6);client.wait()
                     client.remove('counter');assert client.catalog()==[]
+                    time.sleep(.5);capture('menu-after-remove')
+                    assert 'STATE app=0 home_row=3 home_column=1' in channel.command('STATE'),'Removed tile remained selected'
+                    press(5,7) # Settings shortcut must never open the hidden runtime.
+                    assert 'STATE app=11 ' in channel.command('STATE')
                     print('PASS: cold restart retains package and app data; removal clears catalog',flush=True)
                 channel.close();qmp.close();monitor.close();stream.close();qt.close()
             finally:

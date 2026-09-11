@@ -38,8 +38,9 @@ hardware-tested behavior and modeled behavior.
 The [native SDK](sdk/README.md) builds and runs C++ app packages in
 the emulator. It includes starter projects, `AGENTS.md`, drawing/input APIs and
 automatic publication tooling, signed ABI 1 packages and USB installation.
-Physical app storage uses an explicit backed-up migration and remains a
-development candidate awaiting hardware qualification.
+Lefony reserves the fixed app region during OS startup, independently of the
+website. The browser reads installed apps and free capacity, and installs packages. This retires the
+stock HP filesystem and remains a development candidate awaiting hardware qualification.
 See [implementation status](docs/NATIVE-APP-SDK-STATUS.md) and the
 [full SDK/store plan](docs/NATIVE-APP-SDK-PLAN.md). The [setup runbook](docs/NATIVE-APP-SETUP.md)
 covers the provisioned website, signing keys, OAuth and validator service.

@@ -88,6 +88,40 @@ bool Volume::provision(const uint8_t backup[32]) {
   }
   return mount();
 }
+bool Volume::reserve() {
+  if(m_state!=State::Unprovisioned) return false;
+  NativeAppHash::SHA256 hash;NativeAppHash::shaInit(&hash);
+  const char domain[]="Lefony app volume profile 1";
+  NativeAppHash::shaUpdate(&hash,reinterpret_cast<const uint8_t *>(domain),sizeof(domain));
+  // Only erased blocks or stock UBI erase-counter pages can be retired by
+  // this path. Scan every usable block so missing/damaged volume markers can
+  // never turn an existing app bank into a fresh, apparently empty volume.
+  for(uint32_t block=FirstBlock;block<FirstBlock+BlockCount;block++) {
+    if(!m_backend.usable(m_backend.context,block)) continue;
+    if(!m_backend.read(m_backend.context,block*PagesPerBlock,m_scratch)) { m_state=State::Failed;return false; }
+    NativeAppHash::shaUpdate(&hash,m_scratch,PageBytes);
+    bool erased=true;
+    for(unsigned i=0;i<PageBytes;i++) erased&=m_scratch[i]==0xff;
+    if(!erased && memcmp(m_scratch,"UBI#",4)) { m_state=State::Failed;return false; }
+  }
+  // The on-media identity field is unchanged. It need not be a backup hash;
+  // legacy receipt-based provisioning remains available to the SDK host tool.
+  uint8_t identity[32];NativeAppHash::shaFinal(&hash,identity);
+  return provision(identity);
+}
+uint32_t Volume::capacity(unsigned slot) const {
+  if(slot>=Slots) return 0;
+  uint32_t capacity=MaximumPackage;
+  // Budget for an atomic update in either bank and the full private-data area.
+  for(unsigned bank=0;bank<2;bank++) {
+    unsigned usable=0;
+    for(uint32_t b=first(slot,bank);b<first(slot,bank)+BankBlocks;b++) usable+=m_backend.usable(m_backend.context,b)?1:0;
+    uint32_t bytes=usable>1?(usable-1)*PagesPerBlock*PageBytes:0;
+    bytes=bytes>MaximumData?bytes-MaximumData:0;
+    if(bytes<capacity) capacity=bytes;
+  }
+  return capacity;
+}
 bool Volume::read(unsigned slot,uint8_t *package,size_t capacity,uint8_t *data,size_t dataCapacity) {
   if(slot>=Slots || (m_state!=State::Ready && m_state!=State::Complete) || m_entries[slot].bank<0 || !m_entries[slot].packageBytes ||
       !package || capacity<m_entries[slot].packageBytes || (m_entries[slot].dataBytes && (!data || dataCapacity<m_entries[slot].dataBytes))) return false;

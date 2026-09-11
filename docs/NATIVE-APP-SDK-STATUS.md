@@ -13,19 +13,20 @@ complete or qualify migration on physical hardware.
 | --- | --- |
 | SDK | Pinned GCC, project generation, AGENTS.md, native C++ examples, deterministic packages, inspect/build/run/test/source commands |
 | ABI 1 | Frozen package/service/event contract, drawing, keypad/touch/timers, bounded private data calls, normal start/close lifecycle |
-| Runtime | ARM user mode, RX code, non-executable data/stack, guard pages, validated pointers, callback timeout/fault recovery; launcher on both targets |
+| Runtime | ARM user mode, RX code, non-executable data/stack, guard pages, validated pointers, callback timeout/fault recovery; individual installed-app tiles in the main menu |
 | Signing | Separate RSA-2048 app identity, LFAPP1 signatures checked by host, guest and website, bounded public key ring and retired-key rejection |
 | Storage | Explicit profile at 432–496 MiB; eight app slots, paired package/data banks, 64 KiB private data, bad-block handling, readback and commit records |
-| USB | Dedicated app protocol, backup-gated provisioning, install/readback/remove, bounded sequential uploads, reconnect status and no retry of ambiguous writes |
+| USB | Dedicated app protocol, OS-startup reservation, read-only inventory/capacity, install/readback/remove, bounded sequential uploads, reconnect status and no retry of ambiguous writes |
 | Website | Catalog, Developers page, required name/description/icon/screenshots, GitHub-only OAuth, thumbs up/down and optional versioned comments |
 | Publication | Source-only uploads, immutable versions/ownership, queued leases/retries, isolated rebuild/test, automatic host signing and publication without manual approval |
 | Distribution | macOS ARM64 desktop candidate with compiler/Python/OpenSSL/QEMU, checksums, notices and three corresponding-source archives; standalone source kit |
 | Operations | Cloudflare D1/R2 provisioned; Linux validator image qualified locally; consumer service/timer and authenticated health command |
 
-The migration intentionally retires part of the stock HP filesystem, only after
-the host saves and rereads the entire selected raw NAND range and the device
-verifies the backup receipt. It does not alter the existing firmware update
-partition, signature policy or bootloader. No connected device was written.
+OS startup reserves the fixed app region before browser connection. The browser
+only reads inventory/capacity or installs/removes apps. It retires the
+stock HP filesystem; the legacy backup/receipt protocol is retained for compatibility with older tools.
+The firmware update partition, signature policy and bootloader stay unchanged.
+No connected device was written.
 The [storage contract](NATIVE-APP-STORAGE.md) documents the exact boundaries and
 why physical recovery qualification is still required.
 

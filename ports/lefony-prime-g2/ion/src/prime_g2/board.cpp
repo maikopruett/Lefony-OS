@@ -2,6 +2,7 @@
 #include "backlight.h"
 #include "display.h"
 #include "persistence.h"
+#include "app_management.h"
 #include "registers.h"
 #include "diagnostics.h"
 #include "usb_diagnostics.h"
@@ -52,6 +53,7 @@ void init() {
   Diagnostics::record(Diagnostics::BacklightReady);
   Display::bootProgress(2);
   Persistence::init();
+  AppManagement::init();
   Display::bootProgress(3);
   Watchdog::init();
   /* Preserve the proven GPT-based peripheral power-up timing above, then

@@ -4,7 +4,7 @@
   "target": "hp-prime-g2",
   "status": "development-candidate",
   "physical_qualified": false,
-  "migration_policy": "explicit-backup-verified-stock-filesystem-retirement",
+  "migration_policy": "os-startup-stock-filesystem-retirement-without-backup",
   "offset": 452984832,
   "size": 67108864,
   "first_block": 3456,

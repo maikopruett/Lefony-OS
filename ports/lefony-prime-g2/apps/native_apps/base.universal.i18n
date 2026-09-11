@@ -1,2 +1,3 @@
 NativeApps = "Native apps"
 NativeAppsCapital = "NATIVE APPS"
+NativeAppUnavailable = "Unable to open this app"

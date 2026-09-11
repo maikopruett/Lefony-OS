@@ -31,22 +31,18 @@ will survive a physical power cycle.
 ## Native SDK preview
 
 The [native SDK](../sdk/README.md) builds C++ packages for an experimental
-user-mode runtime with a Native apps launcher on both targets. Physical
+user-mode runtime with installed apps in the main menu on both targets. Physical
 firmware requires signed ABI 1 apps and provisioned app storage. Drawing, bounded callbacks,
 fault recovery, independent app signatures and source-based publication tooling
 are implemented. A macOS desktop candidate and read-only website deployment
 are available; see the [setup runbook](NATIVE-APP-SETUP.md). ABI 1, signed packages, paired app/data transactions and USB installation are
 implemented. [Storage migration](NATIVE-APP-STORAGE.md) intentionally retires
-part of the stock filesystem after a verified raw backup. Physical migration,
+part of the stock filesystem. OS-startup reservation needs no browser command or backup; the older SDK backup/migration command remains available. Physical migration,
 restore, power-loss behavior and flash endurance still require qualification. See [SDK implementation status](NATIVE-APP-SDK-STATUS.md).
 
-Release `1.0.0+1789022886` predates the native app USB protocol. The website can
-correctly report that version as the latest published firmware while app
-installation rejects it. The subsequent CI build failed because the Native
-apps launcher did not declare its dependency on the generated Settings icon.
-That dependency is now explicit. A successful build and a newer signed release
-must be published before those calculators can install store apps; reinstalling
-`1.0.0+1789022886` does not add app support.
+Release `1.0.0+1789098764` includes native app USB protocol 1. Automatic app
+storage initialization and inventory reporting are additive capabilities in the source after that release;
+unprovisioned calculators need a new firmware build to prepare app storage at startup. Existing app volumes remain compatible.
 
 ## Installer and recovery
 
