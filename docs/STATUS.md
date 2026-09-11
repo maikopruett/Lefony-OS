@@ -40,6 +40,14 @@ implemented. [Storage migration](NATIVE-APP-STORAGE.md) intentionally retires
 part of the stock filesystem after a verified raw backup. Physical migration,
 restore, power-loss behavior and flash endurance still require qualification. See [SDK implementation status](NATIVE-APP-SDK-STATUS.md).
 
+Release `1.0.0+1789022886` predates the native app USB protocol. The website can
+correctly report that version as the latest published firmware while app
+installation rejects it. The subsequent CI build failed because the Native
+apps launcher did not declare its dependency on the generated Settings icon.
+That dependency is now explicit. A successful build and a newer signed release
+must be published before those calculators can install store apps; reinstalling
+`1.0.0+1789022886` does not add app support.
+
 ## Installer and recovery
 
 The installer supports detection, build selection/history, backup and readback,

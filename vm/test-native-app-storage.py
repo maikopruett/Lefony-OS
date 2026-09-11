@@ -92,14 +92,16 @@ def main():
                     installed=client.install(signed,[args.public_key]);assert installed['id']=='counter'
                     assert client.read_package(installed['slot'],len(signed))==signed
                     print('PASS: signed ABI 1 upload, atomic commit and USB byte readback',flush=True)
-                    assert channel.command('APP LAUNCH')=='OK';time.sleep(.5)
+                    assert channel.command('APP LAUNCH')=='OK';client.wait();time.sleep(.5)
                     press(7,0);initial=capture('initial');time.sleep(1);press(7,0);saved_frame=capture('saved');assert initial!=saved_frame
                     press(4,6);client.wait();assert client.catalog()[0]['generation']==2
                     print('PASS: normal launcher/key input commits app-private data on exit',flush=True)
                 else:
                     entries=client.catalog();assert len(entries)==1 and entries[0]['id']=='counter'
                     assert client.read_package(entries[0]['slot'],len(signed))==signed
-                    assert channel.command('APP LAUNCH')=='OK';time.sleep(.5);press(7,0)
+                    # Opening the launcher queues a storage remount. Wait for
+                    # it before sending the key, or busy storage rejects open().
+                    assert channel.command('APP LAUNCH')=='OK';client.wait();time.sleep(.5);press(7,0)
                     assert capture('restored')==saved_frame,'Saved app data did not survive cold restart'
                     press(4,6);client.wait()
                     client.remove('counter');assert client.catalog()==[]
