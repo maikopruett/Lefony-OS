@@ -16,6 +16,7 @@ void abandonSetup();
 void poll();
 bool busy();
 uint32_t revision();
+unsigned count(); // Current directory entries, no reserved app slots.
 const CatalogEntry &entry(unsigned slot);
 bool open(unsigned slot);
 void close();

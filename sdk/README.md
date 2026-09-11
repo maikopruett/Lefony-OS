@@ -113,6 +113,12 @@ The firmware, compiler and custom QEMU form part of the test trust boundary.
 
 Store downloads use the authenticated [LFAPP1 envelope](../docs/NATIVE-APP-PACKAGE-FORMAT.md), verified independently by the host, website and guest. Physical installation requires a signed ABI 1 package and a provisioned [app storage profile](../docs/NATIVE-APP-STORAGE.md). ABI 0 remains emulator-only compatibility.
 
+Current source supports USB protocol 2 and named files in the shared app
+filesystem, as well as legacy protocol 1. OS startup migrates existing apps and
+saved data; the SDK does not reserve app space when connecting to protocol 2.
+Use an SDK build containing this support with profile-2 firmware; older published
+SDKs may reject the new protocol until updated.
+
 See [implementation status](../docs/NATIVE-APP-SDK-STATUS.md) and the
 [full development plan](../docs/NATIVE-APP-SDK-PLAN.md) for the remaining gates.
 

@@ -99,3 +99,33 @@ def test_bad_backup_receipt_prevents_migration(tmp_path,monkeypatch):
     t.read=lambda request,**kwargs:bytes(32) if request==0x62 else read(request,**kwargs)
     with pytest.raises(device.DeviceError,match='verification'):device.Client(t).backup_and_migrate(tmp_path/'backup',retire_stock_filesystem=True)
     assert 0x62 not in t.calls
+
+
+class PoolTransport(Transport):
+    def read(self,request,value=0,index=0,length=0):
+        if request==0x60:
+            return struct.pack('<16I',0x3141464c,2,self.state,0,len(self.upload),self.expected,
+                               2,1 if self.package else 0,1,device.BACKUP_BYTES,0,1,0,0,0,6)
+        return super().read(request,value,index,length)
+
+def test_shared_filesystem_install_and_read_only_connect(signed):
+    package,keys=signed;t=PoolTransport();c=device.Client(t)
+    assert c.connect()['entries']==0 and t.calls==[]
+    assert c.install(package,keys)['id']=='sample'
+    assert len(c.catalog())==1
+    c.remove('sample');assert c.catalog()==[]
+    assert not set(t.calls)&{0x60,0x61,0x62}
+
+def test_shared_catalog_can_enumerate_more_than_eight_apps():
+    t=PoolTransport();read=t.read
+    def inventory(request,**kw):
+        data=bytearray(read(request,**kw))
+        if request==0x60:struct.pack_into('<I',data,28,12)
+        if request==0x68:
+            ident=f"app-{kw.get('value',0)}".encode()
+            struct.pack_into('<III',data,0,1000,1,1)
+            for start,text in [(12,ident),(61,ident),(142,b'1.0.0')]:data[start:start+len(text)]=text
+        return bytes(data)
+    t.read=inventory
+    assert [a['id'] for a in device.Client(t).catalog()]==[f'app-{i}' for i in range(12)]
+    assert not t.calls

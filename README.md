@@ -113,6 +113,14 @@ The emulator's private-stock-fixture research tests are optional and clearly
 separated from the firmware/unit-test workflow. HP ROMs, firmware archives,
 NAND dumps, and vendor PDFs are not distributed here.
 
+## Native app storage
+
+Native apps use a shared [littlefs filesystem](docs/NATIVE-APP-STORAGE.md) in the
+reserved 64 MiB region. Files consume space according to their size, with flash
+allocation and update overhead; there is no eight-app slot limit. OS startup
+migrates existing profile-1 apps and saved data. This source change remains a
+development candidate requiring physical storage qualification.
+
 ## Installer
 
 ```sh

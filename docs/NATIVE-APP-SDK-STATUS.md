@@ -15,7 +15,7 @@ complete or qualify migration on physical hardware.
 | ABI 1 | Frozen package/service/event contract, drawing, keypad/touch/timers, bounded private data calls, normal start/close lifecycle |
 | Runtime | ARM user mode, RX code, non-executable data/stack, guard pages, validated pointers, callback timeout/fault recovery; individual installed-app tiles in the main menu |
 | Signing | Separate RSA-2048 app identity, LFAPP1 signatures checked by host, guest and website, bounded public key ring and retired-key rejection |
-| Storage | Explicit profile at 432–496 MiB; eight app slots, paired package/data banks, 64 KiB private data, bad-block handling, readback and commit records |
+| Storage | Shared littlefs profile 2 at 432–496 MiB; named app files, atomic replacement, verified profile-1 migration, 64 KiB private data and bad-block handling |
 | USB | Dedicated app protocol, OS-startup reservation, read-only inventory/capacity, install/readback/remove, bounded sequential uploads, reconnect status and no retry of ambiguous writes |
 | Website | Catalog, Developers page, required name/description/icon/screenshots, GitHub-only OAuth, thumbs up/down and optional versioned comments |
 | Publication | Source-only uploads, immutable versions/ownership, queued leases/retries, isolated rebuild/test, automatic host signing and publication without manual approval |
@@ -30,7 +30,11 @@ No connected device was written.
 The [storage contract](NATIVE-APP-STORAGE.md) documents the exact boundaries and
 why physical recovery qualification is still required.
 
-## Verification — 2026-09-11 UTC
+The shared-filesystem candidate has separate, current
+[qualification evidence](NATIVE-APP-STORAGE.md#candidate-evidence). The earlier
+SDK/package qualification below is historical and does not qualify profile 2.
+
+## Earlier SDK verification — 2026-09-11 UTC
 
 - Host suite: **387 passed**, two expected private DTB/DTS fixture skips.
   Storage tests execute the actual C++ volume engine under ASan/UBSan and inject

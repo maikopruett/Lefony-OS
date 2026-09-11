@@ -40,9 +40,12 @@ implemented. [Storage migration](NATIVE-APP-STORAGE.md) intentionally retires
 part of the stock filesystem. OS-startup reservation needs no browser command or backup; the older SDK backup/migration command remains available. Physical migration,
 restore, power-loss behavior and flash endurance still require qualification. See [SDK implementation status](NATIVE-APP-SDK-STATUS.md).
 
-Release `1.0.0+1789098764` includes native app USB protocol 1. Automatic app
-storage initialization and inventory reporting are additive capabilities in the source after that release;
-unprovisioned calculators need a new firmware build to prepare app storage at startup. Existing app volumes remain compatible.
+The current source replaces profile-1 fixed app banks with a shared littlefs
+filesystem (storage profile/USB protocol 2). Existing apps migrate at OS startup;
+the region remains 64 MiB, with roughly 60 MiB initially available after metadata
+and update headroom. SDK and website support both protocol versions. This is a
+local development candidate pending physical migration/power-loss qualification;
+see [storage details](NATIVE-APP-STORAGE.md).
 
 ## Installer and recovery
 

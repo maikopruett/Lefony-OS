@@ -77,7 +77,7 @@ bool App::Controller::handleTouch(const Ion::Touch::Event &event) {
   return true;
 }
 bool launchInstalled(int slot) {
-  if(slot<0 || slot>=8 || GlobalPreferences::sharedGlobalPreferences()->isInExamMode() || !PrimeG2::AppManagement::open(slot)) return false;
+  if(slot<0 || static_cast<unsigned>(slot)>=PrimeG2::AppManagement::count() || GlobalPreferences::sharedGlobalPreferences()->isInExamMode() || !PrimeG2::AppManagement::open(slot)) return false;
   sInstalledLaunch=true;
   auto *container=AppsContainer::sharedAppsContainer();
   bool switched=container->switchTo(container->appSnapshotAtIndex(container->numberOfApps()-1));

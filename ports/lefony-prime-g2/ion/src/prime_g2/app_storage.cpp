@@ -1,187 +1,549 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #include "app_storage.h"
-#include "native_app_digest.h"
 #include <string.h>
-namespace PrimeG2 { namespace AppStorage {
+namespace PrimeG2 {
+namespace AppStorage {
 namespace {
-uint32_t get(const uint8_t *p) { return uint32_t(p[0])|(uint32_t(p[1])<<8)|(uint32_t(p[2])<<16)|(uint32_t(p[3])<<24); }
-void put(uint8_t *p,uint32_t v) { for(unsigned i=0;i<4;i++) p[i]=v>>(i*8); }
-uint32_t first(unsigned slot,unsigned bank) { return FirstBlock+16+(slot*2+bank)*BankBlocks; }
-void seal(uint8_t *p) { NativeAppHash::sha256(p,PageBytes-32,p+PageBytes-32); }
-bool sealed(const uint8_t *p) { uint8_t hash[32]; NativeAppHash::sha256(p,PageBytes-32,hash); return !memcmp(hash,p+PageBytes-32,32); }
-uint32_t map(const uint8_t *p,unsigned i) { return get(p+128+i*4); }
+constexpr uint32_t FSFirst = FirstBlock + 2, FSBlocks = BlockCount - 2;
+const char *Pending = "apps/.pending";
+uint32_t get(const uint8_t *p) {
+  return uint32_t(p[0]) | (uint32_t(p[1]) << 8) | (uint32_t(p[2]) << 16) | (uint32_t(p[3]) << 24);
 }
-Volume::Volume(Backend b):m_backend(b),m_state(State::Unprovisioned),m_entries{},m_identity{},m_header{},m_scratch{},m_package(nullptr),m_data(nullptr),m_cursor(0),m_pages(0),m_packageBytes(0),m_dataBytes(0),m_slot(0) {
-  for(auto &entry:m_entries) entry.bank=-1;
+void put(uint8_t *p, uint32_t v) {
+  for (unsigned i = 0; i < 4; i++)
+    p[i] = v >> (8 * i);
 }
-bool Volume::validMarker(const uint8_t *p) const {
-  return !memcmp(p,"LFAVOL1\0",8) && get(p+8)==1 && get(p+12)==FirstBlock && get(p+16)==BlockCount && get(p+20)==PageBytes && get(p+24)==PagesPerBlock && sealed(p);
+void seal(uint8_t *p) { NativeAppHash::sha256(p, PageBytes - 32, p + PageBytes - 32); }
+bool sealed(const uint8_t *p) {
+  uint8_t h[32];
+  NativeAppHash::sha256(p, PageBytes - 32, h);
+  return !memcmp(h, p + PageBytes - 32, 32);
 }
-bool Volume::readHeader(unsigned slot,unsigned bank,uint8_t *h) {
-  const uint32_t start=first(slot,bank);
-  uint32_t block=start;
-  while(block<start+BankBlocks && !m_backend.usable(m_backend.context,block)) block++;
-  if(block==start+BankBlocks || !m_backend.read(m_backend.context,block*PagesPerBlock,h)) return false;
-  if(memcmp(h,"LFASLOT1",8) || get(h+8)!=1 || get(h+12)!=slot || get(h+16)!=bank || !get(h+20) ||
-      memcmp(h+24,m_identity,32) || get(h+56)>MaximumPackage || get(h+60)>MaximumData ||
-      (!get(h+56) && get(h+60)) || !sealed(h)) return false;
-  uint32_t count=get(h+64),pages=(get(h+56)+get(h+60)+PageBytes-1)/PageBytes;
-  if(count<2 || count>BankBlocks || pages>(count-1)*PagesPerBlock || map(h,0)!=block) return false;
-  for(unsigned i=0;i<count;i++) {
-    uint32_t b=map(h,i);
-    if(b<start || b>=start+BankBlocks || (i && b<=map(h,i-1))) return false;
-  }
-  uint8_t commit[PageBytes];
-  return m_backend.read(m_backend.context,block*PagesPerBlock+1,commit) &&
-    !memcmp(commit,"LFACMT1\0",8) && !memcmp(commit+8,h+PageBytes-32,32) && sealed(commit);
+bool headerValid(const uint8_t *p) {
+  return !memcmp(p, "LFAFILE2", 8) && get(p + 8) == 2 && get(p + 12) && get(p + 16) >= 468 &&
+         get(p + 16) <= MaximumPackage && get(p + 20) <= MaximumData && !get(p + 56) &&
+         !get(p + 60);
 }
-uint32_t Volume::payloadPage(const uint8_t *h,uint32_t i) const { return map(h,1+i/PagesPerBlock)*PagesPerBlock+i%PagesPerBlock; }
-bool Volume::checkPayload(const uint8_t *h,uint8_t *package,uint8_t *data) {
-  uint32_t packageBytes=get(h+56),dataBytes=get(h+60),total=packageBytes+dataBytes;
-  NativeAppHash::SHA256 hash; NativeAppHash::shaInit(&hash);
-  uint8_t page[PageBytes],digest[32];
-  for(uint32_t offset=0;offset<total;offset+=PageBytes) {
-    if(!m_backend.read(m_backend.context,payloadPage(h,offset/PageBytes),page)) return false;
-    uint32_t bytes=total-offset; if(bytes>PageBytes) bytes=PageBytes;
-    NativeAppHash::shaUpdate(&hash,page,bytes);
-    uint32_t app=offset<packageBytes?packageBytes-offset:0; if(app>bytes) app=bytes;
-    if(package && app) memcpy(package+offset,page,app);
-    if(data && bytes>app) memcpy(data+(offset+app-packageBytes),page+app,bytes-app);
-  }
-  NativeAppHash::shaFinal(&hash,digest);
-  return !memcmp(digest,h+80,32);
+uint32_t fileBlocks(uint32_t bytes) {
+  return (bytes + 64 + (BlockBytes - 128) - 1) / (BlockBytes - 128);
+}
+} // namespace
+Volume::Volume(Backend backend)
+    : m_backend(backend), m_legacy(backend), m_fs{}, m_config{}, m_file{}, m_fileConfig{},
+      m_readCache{}, m_writeCache{}, m_fileCache{}, m_lookahead{}, m_scratch{}, m_protected{},
+      m_used{}, m_identity{}, m_header{}, m_path{}, m_package(nullptr), m_data(nullptr),
+      m_packageBytes(0), m_dataBytes(0), m_cursor(0), m_hash{}, m_state(State::Unprovisioned),
+      m_mounted(false), m_open(false), m_legacyValid(false), m_finishedMigration(false) {
+  m_config.context = this;
+  m_config.read = readBlock;
+  m_config.prog = programBlock;
+  m_config.erase = eraseBlock;
+  m_config.sync = syncBlock;
+  m_config.read_size = PageBytes;
+  m_config.prog_size = PageBytes;
+  m_config.block_size = BlockBytes;
+  m_config.block_count = FSBlocks;
+  m_config.block_cycles = 100;
+  m_config.cache_size = PageBytes;
+  m_config.lookahead_size = sizeof(m_lookahead);
+  m_config.read_buffer = m_readCache;
+  m_config.prog_buffer = m_writeCache;
+  m_config.lookahead_buffer = m_lookahead;
+  m_config.name_max = 53;
+  m_config.file_max = MaximumPackage + MaximumData + 64;
+  m_config.metadata_max = 8192;
+  m_config.inline_max = 256;
+  m_fileConfig.buffer = m_fileCache;
+}
+Volume::~Volume() {
+  if (m_mounted)
+    lfs_unmount(&m_fs);
+}
+int Volume::readBlock(const lfs_config *c, lfs_block_t block, lfs_off_t offset, void *data,
+                      lfs_size_t size) {
+  auto &v = *static_cast<Volume *>(c->context);
+  if (block >= FSBlocks || offset % PageBytes || size % PageBytes || offset > BlockBytes ||
+      size > BlockBytes - offset)
+    return LFS_ERR_INVAL;
+  for (uint32_t i = 0; i < size; i += PageBytes)
+    if (!v.m_backend.read(v.m_backend.context,
+                          (FSFirst + block) * PagesPerBlock + (offset + i) / PageBytes,
+                          static_cast<uint8_t *>(data) + i))
+      return LFS_ERR_CORRUPT;
+  return 0;
+}
+int Volume::programBlock(const lfs_config *c, lfs_block_t block, lfs_off_t offset, const void *data,
+                         lfs_size_t size) {
+  auto &v = *static_cast<Volume *>(c->context);
+  if (block >= FSBlocks || offset % PageBytes || size % PageBytes || offset > BlockBytes ||
+      size > BlockBytes - offset)
+    return LFS_ERR_INVAL;
+  if (v.m_protected[block + 2] || !v.m_backend.usable(v.m_backend.context, FSFirst + block))
+    return LFS_ERR_CORRUPT;
+  for (uint32_t i = 0; i < size; i += PageBytes)
+    if (!v.m_backend.program(v.m_backend.context,
+                             (FSFirst + block) * PagesPerBlock + (offset + i) / PageBytes,
+                             static_cast<const uint8_t *>(data) + i))
+      return LFS_ERR_CORRUPT;
+  return 0;
+}
+int Volume::eraseBlock(const lfs_config *c, lfs_block_t block) {
+  auto &v = *static_cast<Volume *>(c->context);
+  if (block >= FSBlocks)
+    return LFS_ERR_INVAL;
+  if (v.m_protected[block + 2] || !v.m_backend.usable(v.m_backend.context, FSFirst + block))
+    return LFS_ERR_CORRUPT;
+  return v.m_backend.erase(v.m_backend.context, FSFirst + block) ? 0 : LFS_ERR_CORRUPT;
+}
+int Volume::syncBlock(const lfs_config *) {
+  return 0;
+} // Backend completes physical writes synchronously.
+void Volume::fail() { m_state = State::Failed; }
+bool Volume::validName(const char *id) const {
+  if (!id || id[0] < 'a' || id[0] > 'z')
+    return false;
+  unsigned i = 0;
+  for (; id[i] && i < 49; i++)
+    if (!((id[i] >= 'a' && id[i] <= 'z') ||
+          (i && ((id[i] >= '0' && id[i] <= '9') || id[i] == '-'))))
+      return false;
+  return i > 0 && i <= 48;
+}
+bool Volume::path(const char *id, char out[64]) const {
+  if (!validName(id))
+    return false;
+  size_t n = strlen(id);
+  memcpy(out, "apps/", 5);
+  memcpy(out + 5, id, n);
+  memcpy(out + 5 + n, ".app", 5);
+  return true;
+}
+bool Volume::openFile(const char *name, int flags) {
+  if (m_open || lfs_file_opencfg(&m_fs, &m_file, name, flags, &m_fileConfig) < 0)
+    return false;
+  m_open = true;
+  return true;
+}
+bool Volume::closeFile() {
+  if (!m_open)
+    return true;
+  int result = lfs_file_close(&m_fs, &m_file);
+  m_open = false;
+  return result == 0;
+}
+bool Volume::readSmall(const char *name, uint8_t *data, size_t size) {
+  if (!openFile(name, LFS_O_RDONLY))
+    return false;
+  bool ok = lfs_file_size(&m_fs, &m_file) == static_cast<lfs_soff_t>(size) &&
+            lfs_file_read(&m_fs, &m_file, data, size) == static_cast<lfs_ssize_t>(size);
+  return closeFile() && ok;
+}
+bool Volume::writeSmall(const char *name, const uint8_t *data, size_t size) {
+  if (!openFile(".setup", LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC))
+    return false;
+  bool ok = lfs_file_write(&m_fs, &m_file, data, size) == static_cast<lfs_ssize_t>(size);
+  if (!closeFile() || !ok)
+    return false;
+  return lfs_rename(&m_fs, ".setup", name) == 0;
+}
+bool Volume::marker(const uint8_t *p) const {
+  return !memcmp(p, "LFAVFS2\0", 8) && get(p + 8) == 2 && get(p + 12) == FirstBlock &&
+         get(p + 16) == BlockCount && sealed(p);
 }
 bool Volume::mount() {
-  if(m_state==State::Erasing || m_state==State::Writing || m_state==State::Verifying || m_state==State::Committing) return false;
-  m_state=State::Unprovisioned;
-  bool found=false;
-  for(unsigned i=0;i<2;i++) {
-    if(!m_backend.usable(m_backend.context,FirstBlock+i) || !m_backend.read(m_backend.context,(FirstBlock+i)*PagesPerBlock,m_scratch) || !validMarker(m_scratch)) continue;
-    if(found && memcmp(m_identity,m_scratch+32,32)) { m_state=State::Failed; return false; }
-    memcpy(m_identity,m_scratch+32,32); found=true;
+  if (m_open ||
+      (m_state != State::Ready && m_state != State::Complete && m_state != State::Failed &&
+       m_state != State::Unprovisioned && m_state != State::Migrating))
+    return false;
+  if (m_mounted) {
+    lfs_unmount(&m_fs);
+    m_mounted = false;
   }
-  if(!found) return false;
-  for(unsigned slot=0;slot<Slots;slot++) {
-    m_entries[slot]={0,0,0,-1};
-    for(unsigned bank=0;bank<2;bank++) {
-      if(!readHeader(slot,bank,m_header) || !checkPayload(m_header)) continue;
-      const uint32_t generation=get(m_header+20);
-      if(generation==m_entries[slot].generation) { m_state=State::Failed; return false; }
-      if(generation>m_entries[slot].generation) m_entries[slot]={generation,get(m_header+56),get(m_header+60),static_cast<int>(bank)};
+  memset(m_protected, 0, sizeof(m_protected));
+  m_finishedMigration = false;
+  m_legacyValid = false;
+  m_state = State::Unprovisioned;
+  unsigned anchors = 0;
+  for (unsigned i = 0; i < 2; i++)
+    if (m_backend.usable(m_backend.context, FirstBlock + i) &&
+        m_backend.read(m_backend.context, (FirstBlock + i) * PagesPerBlock, m_scratch) &&
+        marker(m_scratch)) {
+      if (anchors && memcmp(m_identity, m_scratch + 32, 32)) {
+        fail();
+        return false;
+      }
+      memcpy(m_identity, m_scratch + 32, 32);
+      anchors++;
+    }
+  if (!anchors) {
+    m_legacyValid = m_legacy.mount();
+    if (!m_legacyValid) {
+      if (m_legacy.state() != LegacyAppStorage::State::Unprovisioned)
+        fail();
+      return false;
+    }
+    memcpy(m_identity, m_legacy.identity(), 32);
+    if (!m_legacy.protect(m_protected)) {
+      fail();
+      return false;
     }
   }
-  m_state=State::Ready; return true;
-}
-bool Volume::writeChecked(uint32_t page,const uint8_t *data) {
-  uint8_t verify[PageBytes];
-  return m_backend.program(m_backend.context,page,data) && m_backend.read(m_backend.context,page,verify) && !memcmp(data,verify,PageBytes);
+  if (lfs_mount(&m_fs, &m_config) < 0) {
+    if (anchors)
+      fail();
+    else
+      m_state = State::Migrating;
+    return false;
+  }
+  m_mounted = true;
+  uint8_t identity[32];
+  if (!readSmall("volume", identity, 32) || memcmp(identity, m_identity, 32)) {
+    if (anchors)
+      fail();
+    else
+      m_state = State::Migrating;
+    return false;
+  }
+  m_finishedMigration = readSmall("migrated", identity, 32) && !memcmp(identity, m_identity, 32);
+  if (anchors && !m_finishedMigration) {
+    fail();
+    return false;
+  }
+  if (!m_finishedMigration || anchors != 2) {
+    m_state = State::Migrating;
+    return false;
+  }
+  memset(m_protected, 0, sizeof(m_protected));
+  m_state = State::Ready;
+  return true;
 }
 bool Volume::provision(const uint8_t backup[32]) {
-  if(m_state!=State::Unprovisioned || !backup) return false;
-  // Both reserved blocks must be usable. We never create an ad-hoc layout.
-  if(!m_backend.usable(m_backend.context,FirstBlock) || !m_backend.usable(m_backend.context,FirstBlock+1)) return false;
-  memset(m_header,0xff,PageBytes); memcpy(m_header,"LFAVOL1\0",8);
-  put(m_header+8,1); put(m_header+12,FirstBlock); put(m_header+16,BlockCount); put(m_header+20,PageBytes); put(m_header+24,PagesPerBlock);
-  memcpy(m_header+32,backup,32); seal(m_header);
-  for(unsigned i=0;i<2;i++) {
-    if(!m_backend.erase(m_backend.context,FirstBlock+i) || !writeChecked((FirstBlock+i)*PagesPerBlock,m_header)) { m_state=State::Failed; return false; }
+  return m_state == State::Unprovisioned && m_legacy.provision(backup);
+}
+bool Volume::initialize(uint8_t *package, size_t capacity, uint8_t *data, size_t dataCapacity,
+                        NameReader nameReader) {
+  if (!package || capacity < MaximumPackage || !data || dataCapacity < MaximumData || !nameReader)
+    return false;
+  if (mount()) {
+    int rc = lfs_remove(&m_fs, Pending);
+    if (rc != 0 && rc != LFS_ERR_NOENT) {
+      fail();
+      return false;
+    }
+    return true;
   }
-  return mount();
-}
-bool Volume::reserve() {
-  if(m_state!=State::Unprovisioned) return false;
-  NativeAppHash::SHA256 hash;NativeAppHash::shaInit(&hash);
-  const char domain[]="Lefony app volume profile 1";
-  NativeAppHash::shaUpdate(&hash,reinterpret_cast<const uint8_t *>(domain),sizeof(domain));
-  // Only erased blocks or stock UBI erase-counter pages can be retired by
-  // this path. Scan every usable block so missing/damaged volume markers can
-  // never turn an existing app bank into a fresh, apparently empty volume.
-  for(uint32_t block=FirstBlock;block<FirstBlock+BlockCount;block++) {
-    if(!m_backend.usable(m_backend.context,block)) continue;
-    if(!m_backend.read(m_backend.context,block*PagesPerBlock,m_scratch)) { m_state=State::Failed;return false; }
-    NativeAppHash::shaUpdate(&hash,m_scratch,PageBytes);
-    bool erased=true;
-    for(unsigned i=0;i<PageBytes;i++) erased&=m_scratch[i]==0xff;
-    if(!erased && memcmp(m_scratch,"UBI#",4)) { m_state=State::Failed;return false; }
+  if (m_state == State::Unprovisioned) {
+    if (!m_legacy.reserve()) {
+      fail();
+      return false;
+    }
+    mount();
   }
-  // The on-media identity field is unchanged. It need not be a backup hash;
-  // legacy receipt-based provisioning remains available to the SDK host tool.
-  uint8_t identity[32];NativeAppHash::shaFinal(&hash,identity);
-  return provision(identity);
-}
-uint32_t Volume::capacity(unsigned slot) const {
-  if(slot>=Slots) return 0;
-  uint32_t capacity=MaximumPackage;
-  // Budget for an atomic update in either bank and the full private-data area.
-  for(unsigned bank=0;bank<2;bank++) {
-    unsigned usable=0;
-    for(uint32_t b=first(slot,bank);b<first(slot,bank)+BankBlocks;b++) usable+=m_backend.usable(m_backend.context,b)?1:0;
-    uint32_t bytes=usable>1?(usable-1)*PagesPerBlock*PageBytes:0;
-    bytes=bytes>MaximumData?bytes-MaximumData:0;
-    if(bytes<capacity) capacity=bytes;
+  if (m_state != State::Migrating)
+    return false;
+  if (!m_mounted) {
+    if (!m_legacyValid || lfs_format(&m_fs, &m_config) < 0 || lfs_mount(&m_fs, &m_config) < 0) {
+      fail();
+      return false;
+    }
+    m_mounted = true;
   }
-  return capacity;
-}
-bool Volume::read(unsigned slot,uint8_t *package,size_t capacity,uint8_t *data,size_t dataCapacity) {
-  if(slot>=Slots || (m_state!=State::Ready && m_state!=State::Complete) || m_entries[slot].bank<0 || !m_entries[slot].packageBytes ||
-      !package || capacity<m_entries[slot].packageBytes || (m_entries[slot].dataBytes && (!data || dataCapacity<m_entries[slot].dataBytes))) return false;
-  return readHeader(slot,m_entries[slot].bank,m_header) && checkPayload(m_header,package,data);
-}
-bool Volume::begin(unsigned slot,const uint8_t *package,uint32_t packageBytes,const uint8_t *data,uint32_t dataBytes) {
-  if((m_state!=State::Ready && m_state!=State::Complete) || slot>=Slots || packageBytes>MaximumPackage || dataBytes>MaximumData ||
-      (packageBytes && !package) || (dataBytes && !data) || (!packageBytes && dataBytes) || m_entries[slot].generation==0xffffffffu) return false;
-  unsigned bank=m_entries[slot].bank==0?1:0;
-  memset(m_header,0xff,PageBytes); memcpy(m_header,"LFASLOT1",8);
-  put(m_header+8,1); put(m_header+12,slot); put(m_header+16,bank); put(m_header+20,m_entries[slot].generation+1);
-  memcpy(m_header+24,m_identity,32); put(m_header+56,packageBytes); put(m_header+60,dataBytes);
-  unsigned count=0;
-  for(uint32_t b=first(slot,bank);b<first(slot,bank)+BankBlocks;b++) if(m_backend.usable(m_backend.context,b)) put(m_header+128+count++*4,b);
-  m_pages=(packageBytes+dataBytes+PageBytes-1)/PageBytes;
-  if(count<2 || m_pages>(count-1)*PagesPerBlock) return false;
-  count=1+(m_pages+PagesPerBlock-1)/PagesPerBlock; if(count<2) count=2;
-  put(m_header+64,count);
-  NativeAppHash::SHA256 hash; NativeAppHash::shaInit(&hash);
-  if(packageBytes) NativeAppHash::shaUpdate(&hash,package,packageBytes);
-  if(dataBytes) NativeAppHash::shaUpdate(&hash,data,dataBytes);
-  NativeAppHash::shaFinal(&hash,m_header+80); seal(m_header);
-  m_slot=slot; m_package=package; m_data=data; m_packageBytes=packageBytes; m_dataBytes=dataBytes; m_cursor=0; m_state=State::Erasing; return true;
-}
-void Volume::makePage(uint32_t i,uint8_t *out) const {
-  memset(out,0xff,PageBytes);
-  uint32_t offset=i*PageBytes,bytes=m_packageBytes+m_dataBytes-offset;
-  if(bytes>PageBytes) bytes=PageBytes;
-  uint32_t app=offset<m_packageBytes?m_packageBytes-offset:0; if(app>bytes) app=bytes;
-  if(app) memcpy(out,m_package+offset,app);
-  if(bytes>app) memcpy(out+app,m_data+offset+app-m_packageBytes,bytes-app);
-}
-void Volume::step() {
-  bool ok=true;
-  if(m_state==State::Erasing) {
-    ok=m_backend.erase(m_backend.context,map(m_header,m_cursor));
-    if(++m_cursor==get(m_header+64)) { m_cursor=0; m_state=State::Writing; }
-  } else if(m_state==State::Writing) {
-    if(m_cursor==0) ok=m_backend.program(m_backend.context,map(m_header,0)*PagesPerBlock,m_header);
-    else { makePage(m_cursor-1,m_scratch); ok=m_backend.program(m_backend.context,payloadPage(m_header,m_cursor-1),m_scratch); }
-    if(++m_cursor==m_pages+1) { m_cursor=0; m_state=State::Verifying; }
-  } else if(m_state==State::Verifying) {
-    uint8_t expected[PageBytes];
-    if(!m_cursor) memcpy(expected,m_header,PageBytes); else makePage(m_cursor-1,expected);
-    uint32_t page=m_cursor?payloadPage(m_header,m_cursor-1):map(m_header,0)*PagesPerBlock;
-    ok=m_backend.read(m_backend.context,page,m_scratch) && !memcmp(expected,m_scratch,PageBytes);
-    if(++m_cursor==m_pages+1) { m_cursor=0; m_state=State::Committing; }
-  } else if(m_state==State::Committing) {
-    if(!m_cursor) {
-      memset(m_scratch,0xff,PageBytes); memcpy(m_scratch,"LFACMT1\0",8); memcpy(m_scratch+8,m_header+PageBytes-32,32); seal(m_scratch);
-      ok=m_backend.program(m_backend.context,map(m_header,0)*PagesPerBlock+1,m_scratch); m_cursor=1;
-    } else {
-      ok=m_backend.read(m_backend.context,map(m_header,0)*PagesPerBlock+1,m_scratch) && sealed(m_scratch) && !memcmp(m_scratch,"LFACMT1\0",8) && !memcmp(m_scratch+8,m_header+PageBytes-32,32);
-      if(ok) { m_entries[m_slot]={get(m_header+20),m_packageBytes,m_dataBytes,static_cast<int>(get(m_header+16))}; m_state=State::Complete; }
+  // Legacy live extents stay protected until every file and this migration
+  // marker are durable. Power loss can resume from the original v1 records.
+  if (!m_finishedMigration) {
+    uint8_t identity[32];
+    if (!readSmall("volume", identity, 32)) {
+      if (!writeSmall("volume", m_identity, 32)) {
+        fail();
+        return false;
+      }
+    } else if (memcmp(identity, m_identity, 32)) {
+      fail();
+      return false;
+    }
+    int rc = lfs_mkdir(&m_fs, "apps");
+    if (rc != 0 && rc != LFS_ERR_EXIST) {
+      fail();
+      return false;
+    }
+    if (!m_legacyValid) {
+      fail();
+      return false;
+    }
+    char names[LegacyAppStorage::Slots][49] = {};
+    for (unsigned i = 0; i < LegacyAppStorage::Slots; i++) {
+      const auto old = m_legacy.entry(i);
+      if (!old.packageBytes)
+        continue;
+      if (!m_legacy.read(i, package, capacity, data, dataCapacity) ||
+          !nameReader(package, old.packageBytes, names[i]) || !validName(names[i])) {
+        fail();
+        return false;
+      }
+      for (unsigned j = 0; j < i; j++)
+        if (!strcmp(names[i], names[j])) {
+          fail();
+          return false;
+        }
+      char file[64];
+      path(names[i], file);
+      uint8_t header[64], hash[32];
+      NativeAppHash::SHA256 digest;
+      NativeAppHash::shaInit(&digest);
+      NativeAppHash::shaUpdate(&digest, package, old.packageBytes);
+      NativeAppHash::shaUpdate(&digest, data, old.dataBytes);
+      NativeAppHash::shaFinal(&digest, hash);
+      if (readHeader(file, header)) {
+        if (get(header + 16) != old.packageBytes || get(header + 20) != old.dataBytes ||
+            memcmp(hash, header + 24, 32) ||
+            !read(names[i], package, capacity, data, dataCapacity)) {
+          fail();
+          return false;
+        }
+      } else {
+        m_state = State::Ready;
+        if (!begin(names[i], package, old.packageBytes, data, old.dataBytes)) {
+          fail();
+          return false;
+        }
+        put(m_header + 12, old.generation);
+        if (!finish()) {
+          fail();
+          return false;
+        }
+      }
+    }
+    if (!writeSmall("migrated", m_identity, 32)) {
+      fail();
+      return false;
     }
   }
-  if(!ok) m_state=State::Failed;
+  // Retire the v1 anchors only after the filesystem contains all apps/data.
+  // Old firmware then fails closed instead of treating pooled blocks as banks.
+  memset(m_scratch, 255, PageBytes);
+  memcpy(m_scratch, "LFAVFS2\0", 8);
+  put(m_scratch + 8, 2);
+  put(m_scratch + 12, FirstBlock);
+  put(m_scratch + 16, BlockCount);
+  memcpy(m_scratch + 32, m_identity, 32);
+  seal(m_scratch);
+  uint8_t verify[PageBytes];
+  for (unsigned i = 0; i < 2; i++) {
+    uint32_t b = FirstBlock + i;
+    if (!m_backend.usable(m_backend.context, b)) {
+      fail();
+      return false;
+    }
+    if (m_backend.read(m_backend.context, b * PagesPerBlock, verify) &&
+        !memcmp(verify, m_scratch, PageBytes))
+      continue;
+    if (!m_backend.erase(m_backend.context, b) ||
+        !m_backend.program(m_backend.context, b * PagesPerBlock, m_scratch) ||
+        !m_backend.read(m_backend.context, b * PagesPerBlock, verify) ||
+        memcmp(verify, m_scratch, PageBytes)) {
+      fail();
+      return false;
+    }
+  }
+  m_state = State::Ready;
+  return mount();
+}
+bool Volume::readHeader(const char *file, uint8_t header[64]) {
+  if (!m_mounted || !openFile(file, LFS_O_RDONLY))
+    return false;
+  bool ok = lfs_file_read(&m_fs, &m_file, header, 64) == 64 && headerValid(header) &&
+            lfs_file_size(&m_fs, &m_file) ==
+                static_cast<lfs_soff_t>(64 + get(header + 16) + get(header + 20));
+  return closeFile() && ok;
+}
+bool Volume::entry(const char *id, Entry *out) {
+  char file[64];
+  uint8_t header[64];
+  if (!out || !path(id, file) || !readHeader(file, header))
+    return false;
+  *out = {get(header + 12), get(header + 16), get(header + 20)};
+  return true;
+}
+bool Volume::read(const char *id, uint8_t *package, size_t capacity, uint8_t *data,
+                  size_t dataCapacity) {
+  char file[64];
+  uint8_t header[64];
+  if (!path(id, file) || !readHeader(file, header) || !package || capacity < get(header + 16) ||
+      (get(header + 20) && (!data || dataCapacity < get(header + 20))) ||
+      !openFile(file, LFS_O_RDONLY))
+    return false;
+  bool ok = lfs_file_seek(&m_fs, &m_file, 64, LFS_SEEK_SET) == 64 &&
+            lfs_file_read(&m_fs, &m_file, package, get(header + 16)) ==
+                static_cast<lfs_ssize_t>(get(header + 16)) &&
+            lfs_file_read(&m_fs, &m_file, data, get(header + 20)) ==
+                static_cast<lfs_ssize_t>(get(header + 20));
+  if (!closeFile() || !ok)
+    return false;
+  NativeAppHash::SHA256 hash;
+  uint8_t digest[32];
+  NativeAppHash::shaInit(&hash);
+  NativeAppHash::shaUpdate(&hash, package, get(header + 16));
+  if (get(header + 20))
+    NativeAppHash::shaUpdate(&hash, data, get(header + 20));
+  NativeAppHash::shaFinal(&hash, digest);
+  return !memcmp(digest, header + 24, 32);
+}
+bool Volume::list(Visitor visitor, void *context) {
+  if (!m_mounted || m_open || !visitor)
+    return false;
+  lfs_dir_t dir;
+  if (lfs_dir_open(&m_fs, &dir, "apps") < 0)
+    return false;
+  lfs_info info;
+  int rc;
+  bool ok = true;
+  while ((rc = lfs_dir_read(&m_fs, &dir, &info)) > 0) {
+    if (info.type == LFS_TYPE_DIR || !strcmp(info.name, ".pending"))
+      continue;
+    size_t length = strlen(info.name);
+    if (length < 5 || length > 52 || strcmp(info.name + length - 4, ".app")) {
+      ok = false;
+      break;
+    }
+    info.name[length - 4] = 0;
+    Entry e;
+    if (!entry(info.name, &e) || !visitor(context, info.name, e)) {
+      ok = false;
+      break;
+    }
+  }
+  return lfs_dir_close(&m_fs, &dir) == 0 && rc >= 0 && ok;
+}
+int Volume::usedBlock(void *context, lfs_block_t block) {
+  if (block >= FSBlocks)
+    return LFS_ERR_CORRUPT;
+  static_cast<Volume *>(context)->m_used[block + 2] = true;
+  return 0;
+}
+bool Volume::space(Space *out) {
+  if (!m_mounted || !out)
+    return false;
+  memset(m_used, 0, sizeof(m_used));
+  if (lfs_fs_traverse(&m_fs, usedBlock, this) < 0)
+    return false;
+  uint32_t usable = 0, used = 0;
+  for (uint32_t i = 2; i < BlockCount; i++) {
+    bool good = m_backend.usable(m_backend.context, FirstBlock + i);
+    usable += good ? 1 : 0;
+    used += (m_used[i] || m_protected[i]) ? 1 : 0;
+  }
+  uint32_t capacity = usable > ReserveBlocks ? (usable - ReserveBlocks) * BlockBytes : 0,
+           allocated = used * BlockBytes;
+  *out = {capacity, 0, capacity > allocated ? capacity - allocated : 0, allocated,
+          BlockCount * BlockBytes - capacity};
+  return true;
+}
+bool Volume::begin(const char *id, const uint8_t *package, uint32_t packageBytes,
+                   const uint8_t *data, uint32_t dataBytes) {
+  if (!m_mounted || (m_state != State::Ready && m_state != State::Complete) || !path(id, m_path) ||
+      packageBytes > MaximumPackage || dataBytes > MaximumData ||
+      (packageBytes && (!package || packageBytes < 468)) || (dataBytes && !data) ||
+      (!packageBytes && dataBytes))
+    return false;
+  Entry old = {};
+  entry(id, &old);
+  if (old.generation == 0xffffffffu || (!packageBytes && !old.packageBytes))
+    return false;
+  Space usage;
+  if (!space(&usage))
+    return false;
+  if (packageBytes) {
+    uint32_t needed = fileBlocks(packageBytes + dataBytes),
+             previous = old.packageBytes ? fileBlocks(old.packageBytes + old.dataBytes) : 0;
+    if (needed > usage.available / BlockBytes + previous)
+      return false;
+  }
+  m_package = package;
+  m_data = data;
+  m_packageBytes = packageBytes;
+  m_dataBytes = dataBytes;
+  m_cursor = 0;
+  memset(m_header, 0, 64);
+  memcpy(m_header, "LFAFILE2", 8);
+  put(m_header + 8, 2);
+  put(m_header + 12, old.generation + 1);
+  put(m_header + 16, packageBytes);
+  put(m_header + 20, dataBytes);
+  NativeAppHash::SHA256 hash;
+  NativeAppHash::shaInit(&hash);
+  if (packageBytes)
+    NativeAppHash::shaUpdate(&hash, package, packageBytes);
+  if (dataBytes)
+    NativeAppHash::shaUpdate(&hash, data, dataBytes);
+  NativeAppHash::shaFinal(&hash, m_header + 24);
+  m_state = packageBytes ? State::Writing : State::Committing;
+  return true;
+}
+void Volume::step() {
+  bool ok = true;
+  if (m_state == State::Writing) {
+    if (!m_open)
+      ok = openFile(Pending, LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC) &&
+           lfs_file_write(&m_fs, &m_file, m_header, 64) == 64;
+    else if (m_cursor < m_packageBytes + m_dataBytes) {
+      uint32_t bytes = m_packageBytes + m_dataBytes - m_cursor;
+      if (bytes > PageBytes)
+        bytes = PageBytes;
+      uint32_t app = m_cursor < m_packageBytes ? m_packageBytes - m_cursor : 0;
+      if (app > bytes)
+        app = bytes;
+      if (app)
+        memcpy(m_scratch, m_package + m_cursor, app);
+      if (bytes > app)
+        memcpy(m_scratch + app, m_data + m_cursor + app - m_packageBytes, bytes - app);
+      ok = lfs_file_write(&m_fs, &m_file, m_scratch, bytes) == static_cast<lfs_ssize_t>(bytes);
+      m_cursor += bytes;
+    } else {
+      ok = closeFile();
+      m_cursor = 0;
+      NativeAppHash::shaInit(&m_hash);
+      m_state = State::Verifying;
+    }
+  } else if (m_state == State::Verifying) {
+    if (!m_open)
+      ok = openFile(Pending, LFS_O_RDONLY) && lfs_file_read(&m_fs, &m_file, m_scratch, 64) == 64 &&
+           !memcmp(m_scratch, m_header, 64);
+    else if (m_cursor < m_packageBytes + m_dataBytes) {
+      uint32_t bytes = m_packageBytes + m_dataBytes - m_cursor;
+      if (bytes > PageBytes)
+        bytes = PageBytes;
+      ok = lfs_file_read(&m_fs, &m_file, m_scratch, bytes) == static_cast<lfs_ssize_t>(bytes);
+      if (ok)
+        NativeAppHash::shaUpdate(&m_hash, m_scratch, bytes);
+      m_cursor += bytes;
+    } else {
+      uint8_t digest[32];
+      NativeAppHash::shaFinal(&m_hash, digest);
+      ok = closeFile() && !memcmp(digest, m_header + 24, 32);
+      m_state = State::Committing;
+    }
+  } else if (m_state == State::Committing) {
+    ok = m_packageBytes ? lfs_rename(&m_fs, Pending, m_path) == 0 : lfs_remove(&m_fs, m_path) == 0;
+    if (ok)
+      m_state = State::Complete;
+  }
+  if (!ok) {
+    closeFile();
+    fail();
+  }
+}
+bool Volume::finish() {
+  for (unsigned i = 0; i < 10000 && m_state != State::Complete && m_state != State::Failed; i++)
+    step();
+  return m_state == State::Complete;
 }
 void Volume::cancel() {
-  if(m_state==State::Erasing || m_state==State::Writing || m_state==State::Verifying) { m_package=nullptr; m_data=nullptr; m_state=State::Ready; }
-  // Commit outcome cannot be cancelled or guessed. Finish/read status instead.
+  if (m_state == State::Writing || m_state == State::Verifying) {
+    if (closeFile())
+      m_state = State::Ready;
+    else
+      fail();
+  }
 }
-}}
+} // namespace AppStorage
+} // namespace PrimeG2

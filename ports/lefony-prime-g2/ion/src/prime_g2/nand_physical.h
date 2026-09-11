@@ -15,13 +15,20 @@ const uint8_t *pageData();
 bool blockUsable(uint32_t block);
 bool eraseOSBlock(uint32_t block);
 bool programOSPage(uint32_t page, const uint8_t *data);
-// Profile-1 app partition only; caller owns NAND serialization. Raw backup
+// Reserved app partition only; caller owns NAND serialization. Raw backup
 // includes all 2112 bytes. Destination must be DMA/cache-line aligned.
 bool appBlockUsable(uint32_t block);
 bool eraseAppBlock(uint32_t block);
 bool programAppPage(uint32_t page,const uint8_t *data);
 bool readAppPage(uint32_t page);
 bool readRawAppPage(uint32_t page,uint8_t *destination);
+// A filesystem may read unwritten pages whose ECC status is not decodable.
+// Accept only exact erased payload AND spare bytes, never a damaged codeword.
+inline bool erasedRawAppPage(const uint8_t *raw) {
+  if(!raw) return false;
+  for(unsigned i=0;i<2112;i++) if(raw[i]!=0xff) return false;
+  return true;
+}
 struct Report {
   uint32_t magic, version, error, phase;
   uint32_t id[2];

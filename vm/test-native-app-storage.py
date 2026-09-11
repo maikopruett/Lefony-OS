@@ -17,6 +17,7 @@ from cli import package
 from runner import Channel
 from device import Client, FIRST_BLOCK
 from signing import sign
+from lfapp import pack,unpack
 from prime_usb_host import PrimeUSBHost, USBError
 
 class Transport:
@@ -34,8 +35,10 @@ def marker():
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--signing-key',required=True,type=Path)
     parser.add_argument('--public-key',required=True,type=Path)
-    parser.add_argument('--preprovisioned',action='store_true',help='Also exercise an existing legacy volume');args=parser.parse_args()
-    signed=sign(package(ROOT/'sdk/examples/counter').read_bytes(),args.signing_key)
+    parser.add_argument('--preprovisioned',action='store_true',help='Also exercise an existing legacy volume')
+    parser.add_argument('--many-apps',action='store_true',help='Install nine apps and launch the ninth from the normal menu');args=parser.parse_args()
+    unsigned=package(ROOT/'sdk/examples/counter').read_bytes()
+    signed=sign(unsigned,args.signing_key)
     screenshots=ROOT/'build/sdk-installed-counter';screenshots.mkdir(exist_ok=True)
     saved_frame=None
     with tempfile.TemporaryDirectory(prefix='lf-app-usb-',dir='/tmp') as directory:
@@ -85,13 +88,16 @@ def main():
                 host=PrimeUSBHost(usb);host.connect_and_enumerate();client=Client(Transport(host))
                 # Startup must finish before any host mount/provision command.
                 connected=client.status();assert connected['state']==2 and connected['reserved']&2,connected
-                storage=struct.unpack('<10I',client.read(0x6b,40))
-                assert storage[:3]==(0x5341464c,1,64*1024*1024)
-                assert storage[6]==round and storage[7]==8,storage
-                assert storage[5]==(8-round)*2101664,storage
+                storage=struct.unpack('<12I',client.read(0x6b,48))
+                assert storage[:3]==(0x5341464c,2,64*1024*1024)
+                assert storage[6]==round and storage[7]==131072,storage
+                assert storage[5]>59*1024*1024 and storage[5]==storage[3]-storage[10],storage
                 if round==0:print('PASS: OS reserved app space before USB; read-only inventory reports capacity',flush=True)
                 if round==0:
                     assert client.catalog()==[]
+                    client.write(0x63,argument=len(signed));client.cancel_upload()
+                    assert client.connect()['state']==2 and client.catalog()==[]
+                    print('PASS: cancelled upload returns to ready without remounting',flush=True)
                     # Missing backup receipt cannot provision an existing volume.
                     try:host.control_out(0x40,0x62,payload=bytes(32))
                     except USBError:pass
@@ -126,6 +132,24 @@ def main():
                     press(5,7) # Settings shortcut must never open the hidden runtime.
                     assert 'STATE app=11 ' in channel.command('STATE')
                     print('PASS: cold restart retains package and app data; removal clears catalog',flush=True)
+                    if args.many_apps:
+                        metadata,code=unpack(unsigned)
+                        for i in range(9):
+                            item=sign(pack({**metadata,'id':f'extra-{i:02}','name':f'Extra {i+1}'},code),args.signing_key)
+                            assert client.install(item,[args.public_key])['id']==f'extra-{i:02}'
+                            if (i+1)%3==0:print(f'Installed and verified {i+1} apps in shared storage',flush=True)
+                        assert len(client.catalog())==9
+                        metrics=struct.unpack('<12I',client.read(0x6b,48));assert metrics[6]==9 and metrics[5]>58*1024*1024,metrics
+                        press(4,4) # Apps, retaining the Settings cell at row 3, column 1.
+                        for _ in range(3):press(4,5)
+                        assert 'home_row=6 home_column=1' in channel.command('STATE')
+                        capture('ninth-app-selected');press(7,0)
+                        assert 'STATE app=12 ' in channel.command('STATE'),'Ninth app was not launched'
+                        before=capture('ninth-app');press(7,0);assert capture('ninth-app-counted')!=before
+                        press(4,6);client.wait();assert client.catalog()[8]['generation']==2
+                        client.remove('extra-00')
+                        entries=client.catalog();assert len(entries)==8 and entries[-1]['id']=='extra-08' and entries[-1]['generation']==2
+                        print('PASS: nine installed apps share storage; ninth launches and saves data; deletion reindexes catalog',flush=True)
                 channel.close();qmp.close();monitor.close();stream.close();qt.close()
             finally:
                 if host:host.close()

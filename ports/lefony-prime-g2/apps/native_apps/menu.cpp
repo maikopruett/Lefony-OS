@@ -7,12 +7,12 @@ namespace NativeApps {
 int builtInCount() { return AppsContainer::sharedAppsContainer()->numberOfApps()-2; }
 int menuCount() {
   int count=builtInCount();
-  for(unsigned slot=0;slot<8;slot++) count+=PrimeG2::AppManagement::entry(slot).bytes?1:0;
+  for(unsigned slot=0;slot<PrimeG2::AppManagement::count();slot++) count+=PrimeG2::AppManagement::entry(slot).bytes?1:0;
   return count;
 }
 int slotAt(int index) {
   if(index<0) return -1;
-  for(unsigned slot=0;slot<8;slot++) if(PrimeG2::AppManagement::entry(slot).bytes && index--==0) return slot;
+  for(unsigned slot=0;slot<PrimeG2::AppManagement::count();slot++) if(PrimeG2::AppManagement::entry(slot).bytes && index--==0) return slot;
   return -1;
 }
 const char *installedName(unsigned slot) { return PrimeG2::AppManagement::entry(slot).metadata.name; }

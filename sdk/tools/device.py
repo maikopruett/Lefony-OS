@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Native app USB protocol 1. Never sends firmware or recovery write requests."""
+"""Native app USB protocols 1 (legacy banks) and 2 (shared filesystem). Never sends firmware or recovery write requests."""
 from __future__ import annotations
 import hashlib
 import json
@@ -37,9 +37,9 @@ class Client:
 
     def status(self):
         values=struct.unpack('<16I',self.read(0x60,64))
-        if values[0:2]!=(0x3141464c,1) or values[6:10]!=(PROFILE,SLOTS,1,BACKUP_BYTES):
+        if values[0]!=0x3141464c or values[1] not in (1,2) or values[8:10]!=(1,BACKUP_BYTES) or (values[1]==1 and values[6:8]!=(PROFILE,SLOTS)) or (values[1]==2 and (values[6]!=2 or values[7]>BLOCKS)):
             raise DeviceError('Unsupported app installation protocol or storage geometry')
-        return dict(zip(('magic','protocol','state','error','received','length','profile','slots','abi','backup_bytes','backup_received','storage_state','progress','target','pending','reserved'),values))
+        return dict(zip(('magic','protocol','state','error','received','length','profile','entries','abi','backup_bytes','backup_received','storage_state','progress','target','pending','reserved'),values))
 
     def wait(self,timeout=120):
         deadline=self.clock()+timeout
@@ -56,8 +56,10 @@ class Client:
         status=self.status()
         if status['state'] in (3,4,5) or status['pending']:
             raise DeviceError('Calculator has an unfinished operation. Inspect status or explicitly cancel an upload before reconnecting.')
-        self.write(0x60)
-        return self.wait()
+        if status['protocol']==1:
+            self.write(0x60)
+            return self.wait()
+        return status
 
     def cancel_upload(self):
         if self.status()["state"] not in (3,4):
@@ -66,7 +68,7 @@ class Client:
 
     def catalog(self):
         result=[]
-        for slot in range(SLOTS):
+        for slot in range(self.status()['entries']):
             data=self.read(0x68,168,slot)
             size,generation,abi=struct.unpack_from('<III',data)
             if not size:

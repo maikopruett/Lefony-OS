@@ -1,0 +1,6 @@
+Project: littlefs
+Repository: https://github.com/littlefs-project/littlefs
+Tag: v2.11.3
+Revision: 6cb4e86540eca0d9ba62500a298385c9d863c8be
+License: BSD-3-Clause
+Files are unmodified upstream source.

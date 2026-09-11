@@ -12,6 +12,7 @@ namespace {
 static_assert(sizeof(CatalogEntry)==168,"app catalog protocol layout");
 static_assert(offsetof(CatalogEntry,metadata)==8 && offsetof(Metadata,id)==4 && offsetof(Metadata,name)==53 && offsetof(Metadata,version)==134,"app catalog text offsets");
 using namespace AppStorage;
+alignas(64) uint8_t sRaw[2176];
 bool range(uint32_t block) { return block>=FirstBlock && block<FirstBlock+BlockCount; }
 bool usable(void *,uint32_t block) {
   if(!range(block)) return false;
@@ -28,7 +29,13 @@ bool read(void *,uint32_t page,uint8_t *data) {
   for(unsigned i=0;i<PageBytes;i+=4) { uint32_t word=reg32(GPMI+0x14c); memcpy(data+i,&word,4); }
   return !reg32(GPMI+0x148);
 #else
-  if(!NANDPhysical::readAppPage(page)) return false;
+  if(!NANDPhysical::readAppPage(page)) {
+    // BCH qualification rejects erased pages. littlefs must see an exact
+    // erased page, but transport/geometry faults and non-erased damage fail.
+    if(NANDPhysical::pageReport().error!=static_cast<uint32_t>(NANDPhysical::Error::Uncorrectable) ||
+        !NANDPhysical::readRawAppPage(page,sRaw) || !NANDPhysical::erasedRawAppPage(sRaw)) return false;
+    memset(data,0xff,PageBytes);return true;
+  }
   memcpy(data,NANDPhysical::pageData(),PageBytes); return true;
 #endif
 }
@@ -51,10 +58,11 @@ bool program(void *,uint32_t page,const uint8_t *data) {
 #endif
 }
 Volume sVolume({nullptr,usable,read,erase,program});
-CatalogEntry sCatalog[Slots]={};
-alignas(64) uint8_t sUpload[MaximumPackage],sLoaded[MaximumPackage],sRaw[2176];
+CatalogEntry sCatalog[MaximumEntries]={};
+alignas(64) uint8_t sUpload[MaximumPackage],sLoaded[MaximumPackage];
 uint8_t sData[MaximumData],sUploadData[MaximumData],sBackupDigest[32];
-uint32_t sCapacity[Slots]={},sRevision=0;
+uint32_t sRevision=0,sCount=0,sUsed=0;
+Space sSpace={};
 NativeAppHash::SHA256 sBackupHash;
 // Wire state is independent of the storage engine's internal states.
 enum : uint32_t { Cold,Unprovisioned,Ready,Backup,Receiving,Working,Complete,Error };
@@ -82,15 +90,18 @@ bool string(const uint8_t *&p,const uint8_t *end,char *out,size_t capacity) {
   if(p==end || !count || !nonspace) return false;
   p++;out[count]=0;return true;
 }
+bool appName(const uint8_t *package,size_t size,char id[49]) {
+  Metadata m;if(!metadata(package,size,&m)) return false;memcpy(id,m.id,49);return true;
+}
+bool catalogFile(void *,const char *id,const Entry &e) {
+  if(sCount>=MaximumEntries) return false;
+  Metadata m;
+  if(!sVolume.read(id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData)) || !metadata(sLoaded,e.packageBytes,&m) || strcmp(id,m.id)) return false;
+  sCatalog[sCount++]={e.packageBytes,e.generation,m};sUsed+=e.packageBytes+e.dataBytes;return true;
+}
 void refresh() {
-  sRevision++;
-  memset(sCatalog,0,sizeof(sCatalog));
-  for(unsigned slot=0;slot<Slots;slot++) {
-    auto e=sVolume.entry(slot);
-    if(!e.packageBytes) continue;
-    Metadata m;
-    if(sVolume.read(slot,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData)) && metadata(sLoaded,e.packageBytes,&m)) sCatalog[slot]={e.packageBytes,e.generation,m};
-  }
+  sRevision++;sCount=0;sUsed=0;memset(sCatalog,0,sizeof(sCatalog));
+  if(!sVolume.list(catalogFile,nullptr) || !sVolume.space(&sSpace)) fail(4);
   sLoadedBytes=0;
 }
 bool queue(uint8_t command,uint32_t argument) {
@@ -121,11 +132,11 @@ bool metadata(const uint8_t *package,size_t size,Metadata *out) {
 }
 void init() {
   sState=Working;
-  if(!sVolume.mount() && (sVolume.state()!=State::Unprovisioned || !sVolume.reserve())) { fail(9);return; }
-  for(unsigned slot=0;slot<Slots;slot++) sCapacity[slot]=sVolume.capacity(slot);
-  refresh();sState=Ready;sError=0;
+  if(!sVolume.initialize(sUpload,sizeof(sUpload),sUploadData,sizeof(sUploadData),appName)) { fail(9);return; }
+  sState=Ready;sError=0;refresh();
 }
 uint32_t revision() { return sRevision; }
+unsigned count() { return sCount; }
 bool busy() { return sPending || sState==Backup || sState==Receiving || sState==Working; }
 void acknowledge() { if(sPending) sAcknowledged=true; }
 void abandonSetup() { if(sPending && !sAcknowledged) sPending=0; }
@@ -149,17 +160,18 @@ bool request(uint8_t command,uint32_t arg,const uint8_t *data,size_t size) {
     memcpy(sUpload+sReceived,data,size);sReceived+=size;return true;
   }
   if(command==0x65) return !size && !arg && sState==Receiving && sReceived==sLength && queue(command,0);
-  if(command==0x66 || command==0x6a) return !size && idle() && arg<Slots && sCatalog[arg].bytes && queue(command,arg);
+  if(command==0x66 || command==0x6a) return !size && idle() && arg<sCount && sCatalog[arg].bytes && queue(command,arg);
   if(command==0x67) {
     if(size || arg || sState==Working) return false;
-    sState=Cold;sReceived=sLength=sBackupOffset=0;sError=0;return true;
+    sState=(sVolume.state()==State::Ready || sVolume.state()==State::Complete)?Ready:Cold;
+    sReceived=sLength=sBackupOffset=0;sError=0;return true;
   }
   return false;
 }
 bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t *size) {
   if(!data || !size || capacity>512) return false;
   if(command==0x60) {
-    uint32_t status[16]={0x3141464c,1,sPending?Working:sState,sError,sReceived,sLength,1,Slots,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,2};
+    uint32_t status[16]={0x3141464c,2,sPending?Working:sState,sError,sReceived,sLength,2,sCount,1,BackupBytes,sBackupOffset,static_cast<uint32_t>(sVolume.state()),sVolume.progress(),sTarget,sPending,6};
     *size=capacity<sizeof(status)?capacity:sizeof(status);memcpy(data,status,*size);return !arg;
   }
   if(command==0x62) { if(arg || sBackupOffset!=BackupBytes || sState!=Backup || capacity<32) return false;memcpy(data,sBackupDigest,32);*size=32;return true; }
@@ -180,17 +192,14 @@ bool response(uint8_t command,uint32_t arg,uint8_t *data,size_t capacity,size_t 
     return true;
   }
   if(command==0x6b) {
-    if(!idle() || arg || capacity<40) return false;
-    uint32_t total=0,used=0,available=0,installed=0;
-    for(unsigned slot=0;slot<Slots;slot++) {
-      const auto e=sVolume.entry(slot);total+=sCapacity[slot];used+=e.packageBytes+e.dataBytes;
-      if(e.packageBytes) installed++;else available+=sCapacity[slot];
-    }
-    uint32_t summary[10]={0x5341464c,1,BlockCount*PagesPerBlock*PageBytes,total,used,available,installed,Slots,MaximumPackage,MaximumData};
+    if(!idle() || arg || capacity<48) return false;
+    // USB responses only copy cached accounting; NAND traversal belongs in poll().
+    const Space &info=sSpace;
+    uint32_t summary[12]={0x5341464c,2,BlockCount*BlockBytes,info.capacity,sUsed,info.available,sCount,BlockBytes,MaximumPackage,MaximumData,info.allocated,info.overhead};
     memcpy(data,summary,sizeof(summary));*size=sizeof(summary);return true;
   }
   if(command==0x68) {
-    if(!idle() || arg>=Slots) return false;
+    if(!idle() || arg>=sCount) return false;
     *size=capacity<sizeof(CatalogEntry)?capacity:sizeof(CatalogEntry);memcpy(data,&sCatalog[arg],*size);return true;
   }
   if(command==0x6a) {
@@ -203,16 +212,16 @@ void poll() {
   if(DevelopmentUpdate::busy()) return;
   if(sPending && sAcknowledged) {
     uint8_t command=sPending;sPending=0;sAcknowledged=false;
-    if(command==0x60) { if(sVolume.mount()) { refresh();sState=Ready;sError=0; } else sState=sVolume.state()==State::Unprovisioned?Unprovisioned:Error; }
-    else if(command==0x62) { sState=Working;if(!sVolume.provision(sBackupDigest)) fail(2);else { refresh();sState=Ready; } }
+    if(command==0x60) { if(sVolume.mount()) { sState=Ready;sError=0;refresh(); } else sState=sVolume.state()==State::Unprovisioned?Unprovisioned:Error; }
+    else if(command==0x62) { sState=Working;if(!sVolume.provision(sBackupDigest) || !sVolume.initialize(sUpload,sizeof(sUpload),sUploadData,sizeof(sUploadData),appName)) fail(2);else { sState=Ready;refresh(); } }
     else if(command==0x65) {
       Metadata m; if(!metadata(sUpload,sLength,&m) || m.abi!=1) { fail(3);return; }
       int target=-1;
-      for(unsigned i=0;i<Slots;i++) if(sCatalog[i].bytes && !strcmp(sCatalog[i].metadata.id,m.id)) { target=i;break; }
+      for(unsigned i=0;i<sCount;i++) if(sCatalog[i].bytes && !strcmp(sCatalog[i].metadata.id,m.id)) { target=i;break; }
       uint32_t bytes=0;
       if(target>=0) {
-        auto e=sVolume.entry(target);bytes=e.dataBytes;
-        if(!sVolume.read(target,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData))) { fail(4);return; }
+        Entry e;if(!sVolume.entry(m.id,&e)) { fail(4);return; }bytes=e.dataBytes;
+        if(!sVolume.read(m.id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData))) { fail(4);return; }
         const char *old=sCatalog[target].metadata.version,*next=m.version;
         int order=0;
         for(unsigned part=0;part<3;part++) {
@@ -225,30 +234,30 @@ void poll() {
         }
         if(order<0 || (!order && (sLength!=e.packageBytes || memcmp(sUpload,sLoaded,sLength)))) { fail(8);return; }
         if(!order) { sTarget=target;sState=Complete;return; }
-      } else for(unsigned i=0;i<Slots;i++) if(!sVolume.entry(i).packageBytes) { target=i;break; }
-      if(target<0) { fail(5);return; }
+      } else target=sCount;
+      if(target<0 || static_cast<unsigned>(target)>=MaximumEntries) { fail(5);return; }
       sTarget=target;sState=Working;
-      if(!sVolume.begin(target,sUpload,sLength,sUploadData,bytes)) fail(6);
-    } else if(command==0x66) { sTarget=sPendingArgument;sState=Working;if(!sVolume.begin(sTarget,nullptr,0,nullptr,0)) fail(6); }
-    else if(command==0x6a) { auto e=sVolume.entry(sPendingArgument);if(!sVolume.read(sPendingArgument,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData))) fail(4);else { sLoadedBytes=e.packageBytes;sState=Complete; } }
+      if(!sVolume.begin(m.id,sUpload,sLength,sUploadData,bytes)) fail(6);
+    } else if(command==0x66) { sTarget=sPendingArgument;sState=Working;if(!sVolume.begin(sCatalog[sTarget].metadata.id,nullptr,0,nullptr,0)) fail(6); }
+    else if(command==0x6a) { auto e=sCatalog[sPendingArgument];if(!sVolume.read(e.metadata.id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData))) fail(4);else { sLoadedBytes=e.bytes;sState=Complete; } }
   }
   if(sState==Working) {
     sVolume.step();
     if(sVolume.state()==State::Failed) fail(7);
-    else if(sVolume.state()==State::Complete) { refresh();sState=Complete;sError=0; }
+    else if(sVolume.state()==State::Complete) { sState=Complete;sError=0;refresh(); }
   }
 }
-const CatalogEntry &entry(unsigned slot) { return sCatalog[slot<Slots?slot:0]; }
+const CatalogEntry &entry(unsigned slot) { return sCatalog[slot<sCount?slot:0]; }
 bool open(unsigned slot) {
-  if(busy() || slot>=Slots || !sCatalog[slot].bytes || sOpen>=0) return false;
-  auto e=sVolume.entry(slot);
-  if(!sVolume.read(slot,sLoaded,sizeof(sLoaded),sData,sizeof(sData)) || !NativeApp::load(sLoaded,e.packageBytes)) return false;
+  if(busy() || slot>=sCount || !sCatalog[slot].bytes || sOpen>=0) return false;
+  Entry e;if(!sVolume.entry(sCatalog[slot].metadata.id,&e)) return false;
+  if(!sVolume.read(sCatalog[slot].metadata.id,sLoaded,sizeof(sLoaded),sData,sizeof(sData)) || !NativeApp::load(sLoaded,e.packageBytes)) return false;
   sOpen=slot;sLoadedBytes=e.packageBytes;sDataBytes=e.dataBytes;sDirty=false;return true;
 }
 void close() {
   if(sOpen<0) return;
   unsigned slot=sOpen;sOpen=-1;
-  if(sDirty && NativeApp::lastResult()==1) { sTarget=slot;sState=Working;if(!sVolume.begin(slot,sLoaded,sLoadedBytes,sData,sDataBytes)) fail(6); }
+  if(sDirty && NativeApp::lastResult()==1) { sTarget=slot;sState=Working;if(!sVolume.begin(sCatalog[slot].metadata.id,sLoaded,sLoadedBytes,sData,sDataBytes)) fail(6); }
   sDirty=false;
 }
 int readData(uint32_t offset,void *data,uint32_t size) {

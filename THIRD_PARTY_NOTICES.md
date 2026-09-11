@@ -24,6 +24,10 @@
   recorded in `hardware/prime_g2/reference/sources.json`. Only curated register
   facts and protocol/geometry fixtures are included. Private device-tree
   binaries, captured firmware payloads and vendor manuals were excluded.
+- **littlefs:** flash filesystem from <https://github.com/littlefs-project/littlefs>,
+  v2.11.3 at `6cb4e86540eca0d9ba62500a298385c9d863c8be`. Unmodified sources
+  and [BSD-3-Clause license](ports/lefony-prime-g2/ion/src/prime_g2/littlefs/LICENSE.md)
+  are vendored; Lefony supplies a separate NAND/static-runtime adapter.
 - **Toolchain and libraries:** compiler runtime libraries, Python components,
   app assets and other upstream dependencies keep their own notices. Before a
   binary release, collect the full notice set from the exact source/toolchain
