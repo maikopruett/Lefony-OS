@@ -5,6 +5,7 @@
 #include "nand_update.h"
 #include "nand_physical.h"
 #include "development_update.h"
+#include "app_management.h"
 #include "registers.h"
 #include "services.h"
 #include "system.h"
@@ -538,6 +539,21 @@ bool vendorRequest(const SetupPacket &setup) {
   // new upload, NAND probe/read, or recovery command can interrupt it.
   if (PrimeG2::DevelopmentUpdate::busy() &&
       !(setup.requestType == 0xc0 && setup.request == 0x53)) return false;
+  if (PrimeG2::AppManagement::busy() && !(setup.request >= 0x60 && setup.request <= 0x6a)) return false;
+  if (setup.request >= 0x60 && setup.request <= 0x6a) {
+    PrimeG2::Services::noteUserActivity();
+    sLastManagementTime = Ion::Timing::millis(); sManagementSeen = true;
+    if (setup.requestType == 0xc0) {
+      size_t bytes = 0;
+      if (!PrimeG2::AppManagement::response(setup.request,setupValue32(setup),sControlBuffer,
+          setup.length<sizeof(sControlBuffer)?setup.length:sizeof(sControlBuffer),&bytes)) return false;
+      controlIn(sControlBuffer,bytes,setup.length); return true;
+    }
+    if (setup.requestType != 0x40 || setup.length > sizeof(sControlBuffer)) return false;
+    if (setup.length) { controlOut(setup); return true; }
+    if (!PrimeG2::AppManagement::request(setup.request,setupValue32(setup),nullptr,0)) return false;
+    statusIn(); return true;
+  }
   /* A full capsule can take longer than the normal idle-suspend interval on
    * slow hosts and instrumented emulators. USB management traffic is active
    * use of the calculator and must keep the runtime awake. */
@@ -780,6 +796,7 @@ bool vendorRequest(const SetupPacket &setup) {
 }
 
 void handleSetup() {
+  PrimeG2::AppManagement::abandonSetup();
   sInstallAfterStatus = false;
   sRecoveryAfterStatus = false;
   sRebootAfterStatus = false;
@@ -893,6 +910,7 @@ void handleComplete(uint32_t complete) {
         sPendingAddress = -1;
       }
       sControlState = ControlState::Idle;
+      PrimeG2::AppManagement::acknowledge();
       if (sInstallAfterStatus) {
         sInstallAfterStatus = false;
         PrimeG2::DevelopmentUpdate::begin(sRecoveryImage, sRecoveryLength, sRecoveryCRC);
@@ -916,7 +934,12 @@ void handleComplete(uint32_t complete) {
                                                sizeof(sControlBuffer));
     uint16_t remaining = (sControllerMemory.descriptors[0].token >> 16) & 0x7FFF;
     uint16_t received = sPendingOut.length - remaining;
-    if (sPendingOut.request == 0x48) {
+    if (sPendingOut.request >= 0x60 && sPendingOut.request <= 0x6a) {
+      if (received != sPendingOut.length || (sControllerMemory.descriptors[0].token & 0xE8u) ||
+          !PrimeG2::AppManagement::request(sPendingOut.request,setupValue32(sPendingOut),sControlBuffer,received)) {
+        stallControl(); return;
+      }
+    } else if (sPendingOut.request == 0x48) {
       PrimeG2::NANDUpdate::acceptManifest(sControlBuffer, received);
     } else {
       handleRecoveryDataOut(received);
@@ -995,7 +1018,7 @@ void poll() {
 
 uint32_t statusFlags() { return sStatus; }
 bool managementActive() {
-  return externalPowerConnected() || (sManagementSeen && (sStatus & StatusConfigured) &&
+  return PrimeG2::AppManagement::busy() || externalPowerConnected() || (sManagementSeen && (sStatus & StatusConfigured) &&
     Ion::Timing::millis() - sLastManagementTime < 2000);
 }
 bool externalPowerConnected() {

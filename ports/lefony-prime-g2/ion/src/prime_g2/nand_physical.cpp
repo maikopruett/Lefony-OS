@@ -1,4 +1,5 @@
 #include "nand_physical.h"
+#include "app_storage.h"
 #include "registers.h"
 #include "system.h"
 #include <ion/timing.h>
@@ -41,16 +42,18 @@ bool fail(Error error) {
   snapshot();
   return false;
 }
-bool transfer(bool read, uint32_t commandLength = 2) {
+bool transfer(bool read, uint32_t commandLength = 2, uint8_t *destination = nullptr, uint32_t readLength = 8) {
+  if (readLength > 2112) return false;
   memset(&sDescriptor, 0, sizeof(sDescriptor));
-  const uint32_t length = read ? 8 : commandLength;
+  const uint32_t length = read ? readLength : commandLength;
+  uint8_t *readBuffer = destination ? destination : sData;
   // DMA_WRITE means peripheral -> memory in APBH terminology.
   sDescriptor.command = (read ? 1u : 2u) | (1u << 3) | (1u << 6) |
-    (1u << 7) | ((read ? 1u : 3u) << 12) | (length << 16);
-  sDescriptor.buffer = reinterpret_cast<uintptr_t>(read ? sData : sCommand);
+    (1u << 7) | ((read && !destination ? 1u : 3u) << 12) | (length << 16);
+  sDescriptor.buffer = reinterpret_cast<uintptr_t>(read ? readBuffer : sCommand);
   sDescriptor.pio[0] = (read ? (1u << 24) : ((1u << 17) | (1u << 16))) |
     (1u << 23) | length;
-  System::cleanInvalidateDataCacheRange(sData, sizeof(sData));
+  System::cleanInvalidateDataCacheRange(readBuffer, destination ? readLength : sizeof(sData));
   System::cleanDataCacheRange(sCommand, sizeof(sCommand));
   System::cleanDataCacheRange(&sDescriptor, sizeof(sDescriptor));
   reg32(APBH + 0x18) = 1; // acknowledge only channel 0
@@ -63,7 +66,7 @@ bool transfer(bool read, uint32_t commandLength = 2) {
   for (unsigned attempt = 0; attempt < 2000; ++attempt) {
     if (reg32(APBH + 0x20) & 1u) break;
     if ((reg32(APBH + 0x10) & 1u) && !(reg32(Semaphore) & 0xff0000u)) {
-      System::invalidateDataCacheRange(sData, sizeof(sData));
+      System::invalidateDataCacheRange(readBuffer, destination ? readLength : sizeof(sData));
       return true;
     }
     Ion::Timing::usleep(10);
@@ -123,8 +126,9 @@ bool readyStatus() {
   return false;
 }
 }
-bool blockUsable(uint32_t block) {
-  if (block < 32 || block >= 96 || !writableGeometry()) return false;
+static bool appBlock(uint32_t block) { return block >= AppStorage::FirstBlock && block < AppStorage::FirstBlock + AppStorage::BlockCount; }
+static bool usableInRange(uint32_t block, bool app) {
+  if ((app ? !appBlock(block) : (block < 32 || block >= 96)) || !writableGeometry()) return false;
   for (uint32_t page = block * 64; page < block * 64 + 2; ++page) {
     sCommand[0] = 0x00; sCommand[1] = 0; sCommand[2] = 8; // raw OOB column 2048
     sCommand[3] = page; sCommand[4] = page >> 8; sCommand[5] = page >> 16;
@@ -140,8 +144,8 @@ bool blockUsable(uint32_t block) {
   }
   return readyStatus();
 }
-bool eraseOSBlock(uint32_t block) {
-  if (block < 32 || block >= 96 || !writableGeometry()) return false;
+static bool eraseInRange(uint32_t block, bool app) {
+  if ((app ? !appBlock(block) : (block < 32 || block >= 96)) || !writableGeometry()) return false;
   uint32_t page = block * 64;
   sCommand[0] = 0x60; sCommand[1] = page;
   sCommand[2] = page >> 8; sCommand[3] = page >> 16;
@@ -149,8 +153,8 @@ bool eraseOSBlock(uint32_t block) {
   sCommand[0] = 0xd0;
   return transfer(false, 1) && readyStatus();
 }
-bool programOSPage(uint32_t page, const uint8_t *data) {
-  if (page < 2048 || page >= 6144 || !data || !writableGeometry()) return false;
+static bool programInRange(uint32_t page, const uint8_t *data, bool app) {
+  if ((app ? !appBlock(page / 64) : (page < 2048 || page >= 6144)) || !data || !writableGeometry()) return false;
   sCommand[0] = 0x80; sCommand[1] = sCommand[2] = 0;
   sCommand[3] = page; sCommand[4] = page >> 8; sCommand[5] = page >> 16;
   if (!transfer(false, 6)) return false;
@@ -190,14 +194,14 @@ bool programOSPage(uint32_t page, const uint8_t *data) {
   sCommand[0] = 0x10; // PAGEPROG
   return transfer(false, 1) && readyStatus();
 }
-bool readPage(uint32_t page) {
+static bool readInRange(uint32_t page, bool app) {
   sPageReport = {0x3152504c, page, 0, 0, 0, 0}; // LPR1
   auto reject = [](Error error) {
     sPageReport.error = static_cast<uint32_t>(error);
     return false;
   };
   // Qualification is restricted to the existing 4..12 MiB OS slot.
-  if (page < 2048 || page >= 6144) return reject(Error::Range);
+  if (app ? !appBlock(page / 64) : (page < 2048 || page >= 6144)) return reject(Error::Range);
   snapshot();
   // Exact physically captured BCH layout: four 512-byte GF13 chunks,
   // strength 2, ten metadata bytes, 2112 physical bytes. Never reconfigure
@@ -272,5 +276,26 @@ bool readPage(uint32_t page) {
   sPage[2028] = pair; sPage[2029] = pair >> 8;
   sPageReport.ready = 1;
   return true;
+}
+bool blockUsable(uint32_t block) { return usableInRange(block,false); }
+bool eraseOSBlock(uint32_t block) { return eraseInRange(block,false); }
+bool programOSPage(uint32_t page,const uint8_t *data) { return programInRange(page,data,false); }
+bool readPage(uint32_t page) { return readInRange(page,false); }
+bool appBlockUsable(uint32_t block) { return usableInRange(block,true); }
+bool eraseAppBlock(uint32_t block) { return eraseInRange(block,true); }
+bool programAppPage(uint32_t page,const uint8_t *data) { return programInRange(page,data,true); }
+bool readAppPage(uint32_t page) { return readInRange(page,true); }
+bool readRawAppPage(uint32_t page,uint8_t *destination) {
+  if(!destination || !appBlock(page / 64) || !writableGeometry()) return false;
+  sCommand[0]=0; sCommand[1]=sCommand[2]=0;
+  sCommand[3]=page; sCommand[4]=page>>8; sCommand[5]=page>>16;
+  if(!transfer(false,6)) return false;
+  sCommand[0]=0x30;
+  if(!transfer(false,1)) return false;
+  for(unsigned i=0;i<5000;i++) {
+    if(reg32(GPMI+0xb0)&(1u<<24)) return transfer(true,2,destination,2112);
+    Ion::Timing::usleep(10);
+  }
+  return false;
 }
 } }

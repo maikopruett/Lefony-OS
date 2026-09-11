@@ -35,6 +35,15 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 See [current status](docs/STATUS.md) for limitations and the distinction between
 hardware-tested behavior and modeled behavior.
 
+The [native SDK](sdk/README.md) builds and runs C++ app packages in
+the emulator. It includes starter projects, `AGENTS.md`, drawing/input APIs and
+automatic publication tooling, signed ABI 1 packages and USB installation.
+Physical app storage uses an explicit backed-up migration and remains a
+development candidate awaiting hardware qualification.
+See [implementation status](docs/NATIVE-APP-SDK-STATUS.md) and the
+[full SDK/store plan](docs/NATIVE-APP-SDK-PLAN.md). The [setup runbook](docs/NATIVE-APP-SETUP.md)
+covers the provisioned website, signing keys, OAuth and validator service.
+
 ## Start contributing
 
 You can work on the host tools and unit tests without owning a calculator,
@@ -125,6 +134,7 @@ do not repartition an unprovisioned calculator.
 | `native/prime_g2/` | Boot capsule, recovery stub, NAND layout and physical U-Boot integration |
 | `scripts/` | Firmware builds, preparation, installer, signing, history and diagnostics |
 | `vm/` | QEMU board models, emulator runners, boot media and integration tests |
+| `sdk/` | Experimental native C++ SDK, templates, examples and publisher tools |
 | `tests/` | Host tests and explicitly public emulator signing fixtures |
 | `hardware/prime_g2/` | Register contracts, measured facts, and hardware qualification notes |
 | `docs/` | Architecture, contributor guides, installer and technical references |

@@ -1,0 +1,20 @@
+[Unit]
+Description=Lefony automatic native app build consumer
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=lefony-builder
+Group=lefony-builder
+WorkingDirectory=/opt/lefony
+EnvironmentFile=/etc/lefony-validator.env
+ExecStart=/usr/bin/python3 -B /opt/lefony/sdk/publisher/worker.py --store ${LEFONY_STORE_ORIGIN} --image ${LEFONY_VALIDATOR_IMAGE} --signing-key /etc/lefony-app-signing/app-private.pem --qualification /etc/lefony-validator-qualification.json
+TimeoutStartSec=240
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=/etc/lefony-app-signing
+# This host controls Docker. Isolate it from unrelated services and credentials.

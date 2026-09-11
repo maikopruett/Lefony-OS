@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Build a Linux base from checked compiler sources and the pinned custom QEMU.
+# BASE_IMAGE must be supplied as an Ubuntu 24.04 image@sha256:... reference.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+ARG JOBS=2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential ca-certificates curl git ninja-build pkg-config python3 python3-venv \
+    libgmp-dev libmpfr-dev libmpc-dev libisl-dev zlib1g-dev libzstd-dev \
+    libglib2.0-dev libpixman-1-dev libsdl2-dev bzip2 xz-utils texinfo \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /opt/build
+RUN curl --fail --location --retry 3 --max-time 600 -o binutils.tar.bz2 https://ftp.gnu.org/gnu/binutils/binutils-2.47.tar.bz2 \
+    && echo '3068128c75cda9f898ccb4211d360246e8e195ffcc9dfb655b23ae23a54800e8  binutils.tar.bz2' | sha256sum -c - \
+    && curl --fail --location --retry 3 --max-time 600 -o gcc.tar.xz https://ftp.gnu.org/gnu/gcc/gcc-16.2.0/gcc-16.2.0.tar.xz \
+    && echo 'e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e  gcc.tar.xz' | sha256sum -c - \
+    && tar -xf binutils.tar.bz2 && tar -xf gcc.tar.xz
+RUN mkdir binutils-build && cd binutils-build \
+    && CFLAGS=-O2 CXXFLAGS=-O2 ../binutils-2.47/configure --target=arm-none-eabi --prefix=/opt/toolchain --disable-nls --enable-multilib \
+    && make -j${JOBS} && make install
+ENV PATH="/opt/toolchain/bin:${PATH}"
+RUN mkdir gcc-build && cd gcc-build \
+    && CFLAGS=-O2 CXXFLAGS=-O2 ../gcc-16.2.0/configure --target=arm-none-eabi --prefix=/opt/toolchain \
+       --disable-nls --without-headers --enable-languages=c,c++ --enable-multilib \
+       --with-multilib-list=aprofile,rmprofile --with-system-zlib --with-zstd \
+    && make -j${JOBS} all-gcc && make install-gcc \
+    && make -j${JOBS} all-target-libgcc && make install-target-libgcc
+COPY vm/build-prime-g2-qemu.sh /opt/lefony/vm/build-prime-g2-qemu.sh
+COPY vm/patches /opt/lefony/vm/patches
+COPY vm/qemu /opt/lefony/vm/qemu
+RUN JOBS=${JOBS} PRIME_G2_QEMU_OUTPUT=/opt/runtime/qemu-system-arm sh /opt/lefony/vm/build-prime-g2-qemu.sh \
+    && test "$(arm-none-eabi-g++ -dumpfullversion)" = 16.2.0
+# Retain exact compiler source archives and patched QEMU source for operators
+# preparing corresponding-source releases. Public submission builds never enter
+# this image construction step. Final publication pins the resulting image digest.
+RUN mkdir -p /usr/share/lefony-sources \
+    && mv binutils.tar.bz2 gcc.tar.xz /usr/share/lefony-sources/ \
+    && tar --exclude=.git -czf /usr/share/lefony-sources/qemu-prime-source.tar.gz -C /opt/lefony/build . \
+    && cp /opt/lefony/vm/build-prime-g2-qemu.sh /usr/share/lefony-sources/ \
+    && rm -rf /opt/build /opt/lefony/build /tmp/lefony-qemu-*
+WORKDIR /tmp

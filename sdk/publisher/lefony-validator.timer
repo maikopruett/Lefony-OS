@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll Lefony's automatic build queue
+
+[Timer]
+OnBootSec=30
+OnUnitInactiveSec=10
+AccuracySec=1
+Unit=lefony-validator.service
+
+[Install]
+WantedBy=timers.target

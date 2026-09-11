@@ -35,6 +35,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     env:
+      LEFONY_APP_PUBLIC_KEYS: ${{ github.workspace }}/ports/lefony-prime-g2/app-trust-roots.json
       LEFONY_UPDATE_PUBLIC_KEY: ${{ github.workspace }}/ports/lefony-prime-g2/release-signing.pub
     steps:
       - uses: actions/checkout@v4

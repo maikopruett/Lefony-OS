@@ -26,6 +26,10 @@ htmlcov/
 *.dtb
 *.zImage
 *.lfu
+*.lfapp
+*.lfsrc
+/sdk/examples/*/build/
+/sdk/templates/*/build/
 *.pdf
 *.zip
 *.tar

@@ -75,6 +75,11 @@ if [ "$NATIVE_PLATFORM" = prime_g2 ]; then
         "$RELEASE_PUBLIC_KEY" "$SOURCE/ion/src/prime_g2/update_trust_root.h"
 fi
 
+if [ -n "${LEFONY_APP_PUBLIC_KEYS:-}" ]; then
+    python3 "$REPO/scripts/configure_native_app_keys.py" \
+        "$LEFONY_APP_PUBLIC_KEYS" "$SOURCE/ion/src/prime_g2/app_trust_roots.h"
+fi
+
 python3 "$REPO/scripts/prepare_prime_settings.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_brightness.py" "$SOURCE"
 

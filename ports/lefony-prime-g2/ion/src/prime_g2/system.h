@@ -16,6 +16,7 @@ enum class MemoryType : uint8_t {
 };
 
 void initMemory();
+void mapNativeApp(void *code, void *data);
 void cleanDataCacheRange(const void *address, size_t length);
 void invalidateDataCacheRange(const void *address, size_t length);
 void cleanInvalidateDataCacheRange(const void *address, size_t length);

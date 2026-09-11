@@ -21,6 +21,8 @@ namespace {
 /* ARMv7 short-descriptor table. One section descriptor covers 1 MiB and the
  * 4096-entry table therefore describes the complete 32-bit address space. */
 alignas(16384) uint32_t sTranslationTable[4096];
+alignas(1024) uint32_t sAppCodePages[256];
+alignas(1024) uint32_t sAppDataPages[256];
 
 constexpr uint32_t Section = 2u;
 constexpr uint32_t Bufferable = 1u << 2;
@@ -108,6 +110,24 @@ void initMemory() {
 
 void cleanDataCacheRange(const void *address, size_t length) {
   cacheOperation(address, length, 0);
+}
+
+void mapNativeApp(void *code, void *data) {
+  // ARMv7 short-descriptor small pages: user AP=11; APX protects code,
+  // small-page bit 0 is XN. Normal WBWA, shareable, non-global mappings.
+  constexpr uint32_t RW = 3u | (3u<<4) | (1u<<6) | (1u<<10) | (1u<<11) | 12u;
+  constexpr uint32_t RX = 2u | (3u<<4) | (1u<<6) | (1u<<9) | (1u<<10) | (1u<<11) | 12u;
+  for (unsigned i=0;i<256;i++) {
+    sAppCodePages[i] = code ? (reinterpret_cast<uintptr_t>(code)+i*4096)|RX : 0;
+    sAppDataPages[i] = data && i!=0 && i!=239 ? (reinterpret_cast<uintptr_t>(data)+i*4096)|RW : 0;
+  }
+  sTranslationTable[0x100] = code ? reinterpret_cast<uintptr_t>(sAppCodePages)|1u : 0;
+  sTranslationTable[0x102] = data ? reinterpret_cast<uintptr_t>(sAppDataPages)|1u : 0;
+  cleanDataCacheRange(sAppCodePages,sizeof(sAppCodePages));
+  cleanDataCacheRange(sAppDataPages,sizeof(sAppDataPages));
+  cleanDataCacheRange(sTranslationTable,sizeof(sTranslationTable));
+  uint32_t zero=0;
+  __asm volatile("dsb sy\n mcr p15,0,%0,c8,c7,0\n mcr p15,0,%0,c7,c5,0\n dsb sy\n isb" :: "r"(zero) : "memory");
 }
 
 void invalidateDataCacheRange(const void *address, size_t length) {

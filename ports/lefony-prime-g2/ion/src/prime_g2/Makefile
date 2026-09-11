@@ -1,4 +1,6 @@
 ion_src += $(addprefix ion/src/prime_g2/, \
+  app_management.cpp \
+  app_storage.cpp \
   backlight.cpp \
   battery_adc.cpp \
   block_storage.cpp \
@@ -14,6 +16,8 @@ ion_src += $(addprefix ion/src/prime_g2/, \
   keyboard.cpp \
   nand_update.cpp \
   nand_physical.cpp \
+  native_app.cpp \
+  native_app_context.s \
   platform.cpp \
   persistence.cpp \
   services.cpp \

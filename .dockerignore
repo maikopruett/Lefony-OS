@@ -1,0 +1,16 @@
+# Native app validator build context: no local keys, captures or app submissions.
+**
+!sdk/
+!sdk/**
+sdk/**/build/
+sdk/**/__pycache__/
+!dist/
+!dist/lefony-os-prime-g2-vm-native.elf
+
+# Trusted base-image build inputs; no generated trees or signing material.
+!vm/
+!vm/build-prime-g2-qemu.sh
+!vm/patches/
+!vm/patches/**
+!vm/qemu/
+!vm/qemu/**

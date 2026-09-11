@@ -16,7 +16,7 @@ PUBLIC_KEYS = {
     'tests/fixtures/prime_g2_emulator_update_public.pem': '90f5157ff9743a69ef05250c207ecbadaeb072d0513848739eb4a3e1245a0c6c',
 }
 PRIVATE_SUFFIXES = {'.mtd', '.readback', '.bin', '.elf', '.imx', '.img', '.raw',
-                    '.qcow2', '.dtb', '.dts', '.zimage', '.lfu', '.pdf', '.zip',
+                    '.qcow2', '.dtb', '.dts', '.zimage', '.lfu', '.lfapp', '.lfsrc', '.pdf', '.zip',
                     '.tar', '.gz', '.bz2', '.xz', '.key', '.pem', '.ppm', '.pyc'}
 OUTPUT_ROOTS = {'build', 'dist', '.venv', '.private', '.cache', 'tmp', '.git'}
 PRIVATE_KEY = re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----')

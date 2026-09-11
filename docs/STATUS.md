@@ -24,9 +24,21 @@ notes under `hardware/prime_g2/` record observations and failures at particular
 revisions; historical success does not qualify every later build. Do not infer
 physical power-loss safety or battery calibration from an emulator pass.
 
-Physical application persistence remains RAM-only; VM persistence uses atomic
+Built-in calculator application persistence remains RAM-only on physical hardware; VM persistence uses atomic
 SD-backed slots. Saving an expression in the UI is not yet a promise that it
 will survive a physical power cycle.
+
+## Native SDK preview
+
+The [native SDK](../sdk/README.md) builds C++ packages for an experimental
+user-mode runtime with a Native apps launcher on both targets. Physical
+firmware requires signed ABI 1 apps and provisioned app storage. Drawing, bounded callbacks,
+fault recovery, independent app signatures and source-based publication tooling
+are implemented. A macOS desktop candidate and read-only website deployment
+are available; see the [setup runbook](NATIVE-APP-SETUP.md). ABI 1, signed packages, paired app/data transactions and USB installation are
+implemented. [Storage migration](NATIVE-APP-STORAGE.md) intentionally retires
+part of the stock filesystem after a verified raw backup. Physical migration,
+restore, power-loss behavior and flash endurance still require qualification. See [SDK implementation status](NATIVE-APP-SDK-STATUS.md).
 
 ## Installer and recovery
 

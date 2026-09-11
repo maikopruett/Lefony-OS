@@ -7,7 +7,7 @@ THEME_REPO = local
 
 # Reader and External are host/filesystem-oriented Upsilon additions. Keep the
 # initial native image to applications that use Ion's in-memory record store.
-EPSILON_APPS = calculation graph rpn code statistics probability solver atomic sequence regression settings
+EPSILON_APPS = calculation graph rpn code statistics probability solver atomic sequence regression settings native_apps
 
 ION_KEYBOARD_LAYOUT = layout_B2
 EPSILON_TELEMETRY = 0

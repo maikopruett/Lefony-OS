@@ -73,11 +73,18 @@ _start:
   mov r2, lr
   mrs r3, spsr
   mov r0, #\kind
+  push {r0-r3}
+  bl prime_app_fault
+  cmp r0, #0
+  bne 9f
+  pop {r0-r3}
   b prime_g2_exception_report
+9:
+  add sp, sp, #72
+  b prime_app_leave
 .endm
 
 fatal_exception exception_undefined, 1
-fatal_exception exception_svc, 2
 fatal_exception exception_prefetch_abort, 3
 fatal_exception exception_data_abort, 4
 fatal_exception exception_reserved, 5
@@ -91,8 +98,24 @@ exception_irq:
   sub lr, lr, #4
   stmdb sp!, {r0-r3, r12, lr}
   mrs r0, spsr
-  stmdb sp!, {r0}
+  vmrs r1, fpscr
+  push {r0,r1}
+  vpush {d0-d15}
+  vpush {d16-d31}
+  mov r0,#0
+  vmsr fpscr,r0
   bl prime_g2_irq_dispatch
-  ldmia sp!, {r0}
+  ldr r0, [sp,#256]
+  ldr r1, [sp,#284]
+  bl prime_app_irq_expired
+  cmp r0,#0
+  bne 8f
+  vpop {d16-d31}
+  vpop {d0-d15}
+  pop {r0,r1}
+  vmsr fpscr,r1
   msr spsr_cxsf, r0
   ldmia sp!, {r0-r3, r12, pc}^
+8:
+  add sp,sp,#288
+  b prime_app_leave

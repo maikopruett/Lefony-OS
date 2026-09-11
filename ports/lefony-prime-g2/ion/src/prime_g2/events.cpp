@@ -5,6 +5,7 @@
 #include "touch.h"
 #include "display.h"
 #include "development_update.h"
+#include "app_management.h"
 
 #include <ion/events.h>
 
@@ -22,6 +23,7 @@ Event getPlatformEvent() {
   PrimeG2::USBDiagnostics::poll();
   PrimeG2::Display::pollRefreshTrial();
   PrimeG2::DevelopmentUpdate::poll();
+  PrimeG2::AppManagement::poll();
 #if !PRIME_G2_EMULATOR
   if (firstPhysicalPoll) PrimeG2::Display::bootProgress(2);
 #endif

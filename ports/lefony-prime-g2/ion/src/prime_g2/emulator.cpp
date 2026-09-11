@@ -11,6 +11,7 @@
 #include "system.h"
 #include "interrupts.h"
 #include "watchdog.h"
+#include "native_app.h"
 
 #include <ion/timing.h>
 #include <ion.h>
@@ -28,6 +29,7 @@
 #include <string.h>
 
 extern "C" {
+bool __attribute__((weak)) prime_g2_launch_native_app() { return false; }
 void __attribute__((weak)) prime_g2_preferences_sync() {}
 void __attribute__((weak)) prime_g2_preferences_factory_reset() {}
 int __attribute__((weak)) prime_g2_preferences_get_for_test(const char *) { return -1; }
@@ -252,6 +254,32 @@ void processLine() {
   }
   if (strcmp(cursor, "PING") == 0) {
     reply("PONG");
+    return;
+  }
+  if (strncmp(cursor, "APP LOAD ", 9) == 0) {
+    cursor += 9;
+    unsigned size;
+    if (!takeUnsigned(cursor,size) || *cursor || size>PrimeG2::NativeApp::MaximumPackage) {
+      reply("ERR app size"); return;
+    }
+    reply(PrimeG2::NativeApp::load(reinterpret_cast<const uint8_t *>(PrimeG2::NativeApp::StagingAddress),size)?"OK":"ERR app package");
+    return;
+  }
+  if (strncmp(cursor, "APP DIAG ", 9) == 0) {
+    cursor+=9; unsigned index;
+    if (!takeUnsigned(cursor,index) || *cursor || index>2) { reply("ERR app diagnostic"); return; }
+    replyInteger("VALUE ",PrimeG2::NativeApp::diagnostic(index)); return;
+  }
+  if (strcmp(cursor,"APP LAUNCH")==0) {
+    reply(prime_g2_launch_native_app()?"OK":"ERR app launcher"); return;
+  }
+  if (strncmp(cursor, "APP EVENT ", 10) == 0) {
+    cursor += 10;
+    unsigned event,first,second;
+    if (!takeUnsigned(cursor,event) || !takeUnsigned(cursor,first) || !takeUnsigned(cursor,second) || *cursor) {
+      reply("ERR app event"); return;
+    }
+    replyInteger("RESULT ",PrimeG2::NativeApp::invoke(event,first,second));
     return;
   }
   if (strcmp(cursor, "INFO") == 0) {
