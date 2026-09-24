@@ -485,13 +485,67 @@ class OperationGuardTests(unittest.TestCase):
             uboot_history_dir=root / "uboot-history",
         )
 
-    def record_uboot(self, root: Path):
+    def record_uboot(self, root: Path, status="cold-boot-known-good"):
         artifact = root / "u-boot-pad.imx"
         make_uboot(artifact)
         return installer.uboot_history.record_build(
             artifact, history_dir=root / "uboot-history", source=MODULE_PATH.parents[1],
-            status="cold-boot-known-good", notes="Installer test baseline.",
+            status=status, notes="Installer test baseline.",
         )
+
+    def test_unqualified_bootloader_baselines_allow_audit_but_not_install(self):
+        statuses = (
+            "unverified", "emulator-cold-boot-qualified", "nand-readback-verified",
+            "linux-nand-boot-verified", "physical-failed-black",
+            "physical-failed-white", "superseded",
+        )
+        for status in statuses:
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                make_capsule(root / "upsilon.zImage")
+                entry = self.record_uboot(root, status=status)
+                with mock.patch.object(
+                    installer.Detector, "probe", return_value=installer.DeviceStatus(
+                        "recovery-fastboot", "RECOVERY", "fastboot", None, 1.0
+                    ),
+                ):
+                    app = installer.LefonyOSPrimeInstaller(self.make_args(root))
+                # The sole entry is selected for inspection even when it is not
+                # qualified. Selection alone must never authorize installation.
+                self.assertEqual(app.selected_uboot, entry)
+                self.assertEqual(app.validation_errors("verify-uboot"), [])
+                with mock.patch.object(installer.tempfile, "mkdtemp") as stage:
+                    with self.assertRaisesRegex(RuntimeError, "not qualified"):
+                        app.prepare_operation("install")
+                    stage.assert_not_called()
+                operation = app.prepare_operation("verify-uboot")
+                try:
+                    script = operation.script.read_text()
+                    self.assertNotIn("nandwrite", script)
+                    self.assertNotIn("flash_erase", script)
+                finally:
+                    installer.shutil.rmtree(operation.stage)
+
+    def test_manual_bootloader_selection_cannot_bypass_qualification(self):
+        from dataclasses import replace
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            make_capsule(root / "upsilon.zImage")
+            entry = self.record_uboot(root)
+            with mock.patch.object(
+                installer.Detector, "probe", return_value=installer.DeviceStatus(
+                    "recovery-fastboot", "RECOVERY", "fastboot", None, 1.0
+                ),
+            ):
+                app = installer.LefonyOSPrimeInstaller(self.make_args(root))
+            for status in installer.uboot_history.QUALIFIED_STATUSES:
+                app.selected_uboot = replace(entry, status=status)
+                self.assertEqual(app.validation_errors("install"), [])
+            app.selected_uboot = replace(entry, status="unverified")
+            with mock.patch.object(installer.tempfile, "mkdtemp") as stage:
+                with self.assertRaisesRegex(RuntimeError, "not qualified"):
+                    app.prepare_operation("install")
+                stage.assert_not_called()
 
     def test_uboot_verification_requires_and_stages_a_history_baseline(self):
         with tempfile.TemporaryDirectory() as directory:

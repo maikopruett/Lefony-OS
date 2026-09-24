@@ -65,15 +65,25 @@ def main():
                     answer += chunk
                 return answer.decode().strip()
 
+            def wait_guest_ms(milliseconds):
+                # GPT virtual time can lag host wall time under TCG load.
+                # Wait for the normal firmware timer, without advancing it or
+                # changing the input path/acceptance assertions.
+                start = int(raw('TIME GET').split()[1])
+                deadline = time.monotonic() + 10
+                while int(raw('TIME GET').split()[1]) - start < milliseconds:
+                    assert time.monotonic() < deadline, 'guest timer stopped during input synchronization'
+                    time.sleep(.01)
+
             def press(name):
                 row, col = matrix[name]
                 for down in (True, False):
                     q.command(f"writew 0x020b8008 {((row << 8) | col | (0x8000 if down else 0)):#x}")
-                    time.sleep(.2)
+                    wait_guest_ms(200)
 
             def touch(command):
                 assert raw(command) == "OK"
-                time.sleep(.5)
+                wait_guest_ms(500)
 
             def app(index):
                 state = raw("STATE")

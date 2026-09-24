@@ -9,10 +9,13 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'sdk/tools'))
 from cli import package
+from build import lock_value,write_json
 from runner import exercise
 
 
 def main():
+    # This checked-in platform fixture always exercises the current SDK.
+    write_json(ROOT/'sdk/examples/counter/sdk.lock.json',lock_value(ROOT/'sdk',1))
     output=ROOT/'build/sdk-ui'; output.mkdir(parents=True,exist_ok=True)
     def controls(channel):
         monitor=socket.socket(socket.AF_UNIX); monitor.settimeout(5)

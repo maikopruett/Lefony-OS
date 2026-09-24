@@ -857,6 +857,9 @@ class LefonyOSPrimeInstaller:
             if self.selected_uboot is None:
                 errors.append("no qualified U-Boot history baseline is selected")
             else:
+                if (action == "install"
+                        and self.selected_uboot.status not in uboot_history.QUALIFIED_STATUSES):
+                    errors.append("selected U-Boot history entry is not qualified for Lefony NAND installation")
                 artifact = self.uboot_history_dir / self.selected_uboot.artifact
                 if not artifact.is_file():
                     errors.append(f"archived U-Boot artifact is missing: {artifact}")

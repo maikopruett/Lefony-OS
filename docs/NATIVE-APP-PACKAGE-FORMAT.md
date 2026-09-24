@@ -133,3 +133,13 @@ Firmware advertising app status capability bit 3 accepts icon commits through
 attachment digest for a current catalog index. See [storage protocol](NATIVE-APP-STORAGE.md).
 Standalone SDK executable installs remain valid and use the fallback until an
 icon is installed from the store.
+
+## Explicit schema 1 extension (local candidate)
+
+The original five-field schema 0 remains supported and is still the default.
+Schema 1 uses the same 64-byte LFAPP0 header with word 8 set to 1 and an ABI 1
+manifest containing exactly five additional fields. See the versioned
+[package/source/USB contract](NATIVE-APP-CONTRACT-EXTENSIONS.md). This does not
+change the LFAPP1 signature envelope, keys, ELF limits, storage geometry or
+version-ordering policy. Older readers reject the new schema; the coordinated
+reader deployment must precede publication of SDK writers that require it.

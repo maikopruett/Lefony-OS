@@ -12,9 +12,18 @@ The checked geometry is [app_layout.json](../native/prime_g2/app_layout.json).
 
 ## Filesystem and accounting
 
-Unmodified littlefs **v2.11.3**, commit
+The local [FILE5 root-recovery candidate](NATIVE-APP-ROOT-RECOVERY.md) stores
+complete canonical document/file roots in separate payload and metadata copies.
+It adds one 128 KiB payload block per protected root plus metadata, with matching
+admission headroom. Healthy legacy roots migrate on their next successful root
+commit; there is no startup bulk conversion. Matching firmware is required.
+
+Pinned littlefs **v2.11.3**, commit
 `6cb4e86540eca0d9ba62500a298385c9d863c8be`, is vendored with its BSD-3-Clause
 license under `ports/lefony-prime-g2/ion/src/prime_g2/littlefs/`.
+The [local change note](../ports/lefony-prime-g2/ion/src/prime_g2/littlefs/LEFONY-CHANGES.md)
+records cache invalidation after a failed backend read; the upstream pin and
+filesystem representation are unchanged.
 The wrapper supplies static caches, aligned 2 KiB NAND page transfers, bounded
 hardware operations, bad-block rejection and the existing GPMI/APBH/BCH driver.
 No hardware timing, ECC layout or register definitions change. When the existing

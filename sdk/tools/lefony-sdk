@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 from cli import main
-raise SystemExit(main())
+if __name__ == '__main__':
+    from multiprocessing import freeze_support
+    freeze_support()
+    from sdk_environment import configure_output
+    configure_output()
+    raise SystemExit(main())

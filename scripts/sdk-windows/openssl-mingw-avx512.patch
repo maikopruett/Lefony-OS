@@ -1,0 +1,74 @@
+From 224ea84b4054de105447cde407fa3d39004a563d Mon Sep 17 00:00:00 2001
+From: Andrey Matyukov <andrey.matyukov@intel.com>
+Date: Thu, 10 Mar 2022 14:27:33 -0700
+Subject: [PATCH] aes-gcm-avx512.pl: Fixed mingw64 build
+
+Decoration prefix for some assembler labels in aes-gcm-avx512.pl was
+fixed for mingw64 build.
+
+Reviewed-by: Matt Caswell <matt@openssl.org>
+Reviewed-by: Tomas Mraz <tomas@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/17868)
+---
+ crypto/modes/asm/aes-gcm-avx512.pl | 10 +++++-----
+ crypto/perlasm/x86_64-xlate.pl     |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/modes/asm/aes-gcm-avx512.pl b/crypto/modes/asm/aes-gcm-avx512.pl
+index 1c7ee8769aab1..a154f9a5ab703 100644
+--- a/crypto/modes/asm/aes-gcm-avx512.pl
++++ b/crypto/modes/asm/aes-gcm-avx512.pl
+@@ -4767,7 +4767,7 @@ sub GCM_COMPLETE {
+ .align  8
+ .L${func_name}_seh_info:
+     .byte   1   # version 1, no flags
+-    .byte   \$L\$${func_name}_seh_prolog_end-\$L\$${func_name}_seh_begin
++    .byte   .L${func_name}_seh_prolog_end-.L${func_name}_seh_begin
+     .byte   31 # num_slots = 1*8 + 2 + 1 + 2*10
+     # FR = rbp; Offset from RSP = $XMM_STORAGE scaled on 16
+     .byte   @{[$UWOP_REG_NUMBER{rbp} | (($XMM_STORAGE / 16 ) << 4)]}
+@@ -4780,7 +4780,7 @@ sub GCM_COMPLETE {
+       # Scaled-by-16 stack offset
+       my $xmm_reg_offset = ($reg_idx - 6);
+       $code .= <<___;
+-    .byte   \$L\$${func_name}_seh_save_xmm${reg_idx}-\$L\$${func_name}_seh_begin
++    .byte   .L${func_name}_seh_save_xmm${reg_idx}-.L${func_name}_seh_begin
+     .byte   @{[$UWOP_SAVE_XMM128 | (${reg_idx} << 4)]}
+     .value  $xmm_reg_offset
+ ___
+@@ -4788,11 +4788,11 @@ sub GCM_COMPLETE {
+ 
+     $code .= <<___;
+     # Frame pointer (occupy 1 slot)
+-    .byte   \$L\$${func_name}_seh_setfp-\$L\$${func_name}_seh_begin
++    .byte   .L${func_name}_seh_setfp-.L${func_name}_seh_begin
+     .byte   $UWOP_SET_FPREG
+ 
+     # Occupy 2 slots, as stack allocation < 512K, but > 128 bytes
+-    .byte   \$L\$${func_name}_seh_allocstack_xmm-\$L\$${func_name}_seh_begin
++    .byte   .L${func_name}_seh_allocstack_xmm-.L${func_name}_seh_begin
+     .byte   $UWOP_ALLOC_LARGE
+     .value  `($XMM_STORAGE + 8) / 8`
+ ___
+@@ -4801,7 +4801,7 @@ sub GCM_COMPLETE {
+     # Occupy 1 slot each
+     foreach my $reg ("rsi", "rdi", "r15", "r14", "r13", "r12", "rbp", "rbx") {
+       $code .= <<___;
+-    .byte   \$L\$${func_name}_seh_push_${reg}-\$L\$${func_name}_seh_begin
++    .byte   .L${func_name}_seh_push_${reg}-.L${func_name}_seh_begin
+     .byte   @{[$UWOP_PUSH_NONVOL | ($UWOP_REG_NUMBER{$reg} << 4)]}
+ ___
+     }
+diff --git a/crypto/perlasm/x86_64-xlate.pl b/crypto/perlasm/x86_64-xlate.pl
+index 1830b25565995..eab46502d06a3 100755
+--- a/crypto/perlasm/x86_64-xlate.pl
++++ b/crypto/perlasm/x86_64-xlate.pl
+@@ -811,7 +811,7 @@
+ 				    }
+ 				    last;
+ 				  };
+-		/\.rva|\.long|\.quad/
++		/\.rva|\.long|\.quad|\.byte/
+ 			    && do { $$line =~ s/([_a-z][_a-z0-9]*)/$globals{$1} or $1/gei;
+ 				    $$line =~ s/\.L/$decor/g;
+ 				    last;

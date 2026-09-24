@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "resources": [
+    {
+      "id": "book",
+      "type": "rgb565",
+      "path": "assets/book.png",
+      "transparent": 63519
+    },
+    {
+      "id": "cards",
+      "type": "blob",
+      "path": "assets/cards.txt"
+    }
+  ]
+}

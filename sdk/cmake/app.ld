@@ -9,7 +9,7 @@ SECTIONS {
   .data : { *(.data*) } :data
   .bss (NOLOAD) : { *(.bss*) *(COMMON) } :data
   ASSERT(. <= 0x102ef000, "app data exceeds reservation")
-  .unsupported : { *(.init_array*) *(.fini_array*) *(.ctors*) *(.dtors*) }
+  .unsupported : { KEEP(*(.init_array*)) KEEP(*(.fini_array*)) KEEP(*(.ctors*)) KEEP(*(.dtors*)) }
   ASSERT(SIZEOF(.unsupported) == 0, "dynamic global constructors are unsupported")
   /DISCARD/ : { *(.ARM.exidx*) *(.ARM.extab*) *(.comment) *(.note*) }
 }

@@ -1,0 +1,1254 @@
+{
+  "schema": 1,
+  "listing_cases": [
+    {
+      "case": "plain-text",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "<script>literal text</script> **Markdown**",
+      "release_notes": "First release."
+    },
+    {
+      "case": "unicode-trimming",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "\ufeff\u2003 Hello \ud83c\udf0d \r\n",
+      "release_notes": "\u00a0"
+    },
+    {
+      "case": "astral-limit",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d",
+      "release_notes": "First release."
+    },
+    {
+      "case": "astral-over-limit",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d",
+      "release_notes": "First release."
+    },
+    {
+      "case": "notes-limit",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "A useful app.",
+      "release_notes": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "case": "notes-over-limit",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "A useful app.",
+      "release_notes": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "case": "empty-description",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": " \r\n",
+      "release_notes": "First release."
+    },
+    {
+      "case": "nul",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "hi\u0000there",
+      "release_notes": "First release."
+    },
+    {
+      "case": "unpaired-surrogate",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": "\ud800",
+      "release_notes": "First release."
+    },
+    {
+      "case": "not-text",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true
+      },
+      "description": 12,
+      "release_notes": "First release."
+    },
+    {
+      "case": "permission-required",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": false
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "permission-not-number",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": 1
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "schema-not-bool",
+      "valid": false,
+      "config": {
+        "schema": true,
+        "publish_source": true
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "unknown-field",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "name": "second identity"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repository",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com/example/project"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-http",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "http://github.com/a/b"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-credentials",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://user:pass@github.com/a/b"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-query",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com/a/b?token=x"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-fragment",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com/a/b#x"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-port",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com:65536/a/b"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-empty-label",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github..com/a/b"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-backslash",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com\\@evil.com"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "repo-newline",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "repository_url": "https://github.com/a/b\n"
+      },
+      "description": "A useful app.",
+      "release_notes": "First release."
+    },
+    {
+      "case": "short-description",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "Plot and explore 3D graphs."
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-blank",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "   "
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-too-long",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-maximum",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-unicode",
+      "valid": true,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-unicode-overflow",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d\ud83c\udf0d"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-multiline",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "First\nSecond"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-nul",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": "a\u0000b"
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    },
+    {
+      "case": "short-not-text",
+      "valid": false,
+      "config": {
+        "schema": 1,
+        "publish_source": true,
+        "short_description": 12
+      },
+      "description": "Detailed app instructions.",
+      "release_notes": ""
+    }
+  ],
+  "image_cases": [
+    {
+      "case": "rgba-icon",
+      "kind": "icon",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAGP8slRAAAAAElFTkSuQmCC",
+      "clean_sha256": "8d447892b6efbc450beab391a7003090694cfcd0014d20766150112cab1675a0"
+    },
+    {
+      "case": "rgb-with-transparency",
+      "kind": "icon",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAABnRSTlMAAAABAP9CZoIrAAAAIklEQVR4nO3BAQ0AAADCoPdPbQ8HFAAAAAAAAAAAAAAA8G4wQAABiwCo9wAAAABJRU5ErkJggg==",
+      "clean_sha256": "4b9a3a9619c954d556bb1ef2aecdb211c65465e61bd9cfadf5bded166dee0fbe"
+    },
+    {
+      "case": "strip-private-text",
+      "kind": "icon",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAF3RFWHRBdXRob3IAUHJpdmF0ZSBtZXRhZGF0YV1OcecAAAAnSURBVHic7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAgHcDQEAAAY/yyVEAAAAASUVORK5CYII=",
+      "clean_sha256": "8d447892b6efbc450beab391a7003090694cfcd0014d20766150112cab1675a0"
+    },
+    {
+      "case": "largest-icon",
+      "kind": "icon",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAED0lEQVR4nO3BMQEAAADCoPVPbQdvoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4DcC8AAB2WfxiAAAAABJRU5ErkJggg==",
+      "clean_sha256": "074065f07e35265d9695cced0f42844dbb02e5766c4ed185d0a372b2d033b093"
+    },
+    {
+      "case": "smallest-screenshot",
+      "kind": "screenshot",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAKAAAAB4CAYAAAB1ovlvAAAAYUlEQVR4nO3BgQAAAADDoPlTH+ECVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwDcshwABSAg04AAAAABJRU5ErkJggg==",
+      "clean_sha256": "d5175d72867d84e09ec6d46b09a0943e0a64508a8927c787e52d642e8a02dfea"
+    },
+    {
+      "case": "largest-screenshot",
+      "kind": "screenshot",
+      "valid": true,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAABQAAAAPACAYAAABq3NR5AAASv0lEQVR4nOzBAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA24MDEgAAAABB/1/3I1QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4CCCUAAZY0QUEAAAAASUVORK5CYII=",
+      "clean_sha256": "cfc519e4f1fb1f257572ff64b9ebad21a79dbd9cc073c506e2d511b7c30fff6c"
+    },
+    {
+      "case": "small-icon",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAD8AAAA/CAYAAABXXxDfAAAAJklEQVR4nO3BAQ0AAADCoPdPbQ8HFAAAAAAAAAAAAAAAAAAAACcGPkMAAW95MtoAAAAASUVORK5CYII="
+    },
+    {
+      "case": "nonsquare-icon",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABBCAYAAABhNaJ7AAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAADODUFBAAE8b9ItAAAAAElFTkSuQmCC"
+    },
+    {
+      "case": "small-screenshot",
+      "kind": "screenshot",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAKAAAAB3CAYAAACE9Eu6AAAAYUlEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAEwMqBgABwZwE8wAAAABJRU5ErkJggg=="
+    },
+    {
+      "case": "large-screenshot",
+      "kind": "screenshot",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAABQEAAAPACAYAAACFHr9HAAASw0lEQVR4nOzBAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA24MDEgAAAABB/1/3I1QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICDABclAAEW/CWYAAAAAElFTkSuQmCC"
+    },
+    {
+      "case": "invalid-filter",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAkklEQVR4nO3QMQ0AAAjAMB78W0ZGD1YFy3aeWx2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIB2C0cBQUNjXDwAAAAASUVORK5CYII="
+    },
+    {
+      "case": "interlaced",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAGP8slRAAAAAElFTkSuQmCC"
+    },
+    {
+      "case": "animated",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACGFjVEwAAAABAAAAALQt6aAAAAAnSURBVHic7cEBDQAAAMKg909tDjegAAAAAAAAAAAAAAAAAAAAgHcDQEAAAY/yyVEAAAAASUVORK5CYII="
+    },
+    {
+      "case": "bad-crc",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAGP8slRAAAAAElFTkSuQmCD"
+    },
+    {
+      "case": "trailing-bytes",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAGP8slRAAAAAElFTkSuQmCCeA=="
+    },
+    {
+      "case": "trailing-zlib-stream",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAMElEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAF4nKsAAAB5AHn+z03aAAAAAElFTkSuQmCC"
+    },
+    {
+      "case": "oversized-pixels",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAJ0lEQVR4nO3BAQkAAAACoGY3vx2BmgAAAAAAAAAAAAAAAAAAAADvOkC5AHmRtLJtAAAAAElFTkSuQmCC"
+    },
+    {
+      "case": "truncated-zlib",
+      "kind": "icon",
+      "valid": false,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAJ0lEQVR4nO3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAAAAAAAAAIB3A0BAAAGP8gAAAABJRU5ErkJggg=="
+    }
+  ],
+  "manifest_cases": [
+    {
+      "case": "minimal",
+      "valid": true,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "writer-abort-api12",
+      "valid": true,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT",
+          "schema": 1,
+          "data_schema": 0,
+          "minimum_api": 12,
+          "required_capabilities": 8216,
+          "optional_capabilities": 0
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "future-api",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT",
+          "schema": 1,
+          "data_schema": 0,
+          "minimum_api": 13,
+          "required_capabilities": 0,
+          "optional_capabilities": 0
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "missing-screenshot",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          }
+        ]
+      }
+    },
+    {
+      "case": "duplicate-file",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "escaped-file",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "../private",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "zero-file",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 0,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "huge-package",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 2101313,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "bool-size",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": true,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "uppercase-hash",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "newline-hash",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000\n"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "unknown-manifest-field",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ],
+        "token": "secret"
+      }
+    },
+    {
+      "case": "unnormalized-listing",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": " An app. ",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "bool-dimension",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": true,
+            "height": 64
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    },
+    {
+      "case": "unexpected-media-field",
+      "valid": false,
+      "value": {
+        "schema": 1,
+        "app": {
+          "abi": 1,
+          "id": "publication-probe",
+          "name": "Publication probe",
+          "version": "1.0.0",
+          "license": "MIT"
+        },
+        "listing": {
+          "schema": 1,
+          "publish_source": true,
+          "description": "An app.",
+          "release_notes": ""
+        },
+        "inputs_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "files": [
+          {
+            "path": "source.lfsrc",
+            "bytes": 100,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "package.lfapp",
+            "bytes": 5000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "report.json",
+            "bytes": 800,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "path": "icon.png",
+            "bytes": 500,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 64,
+            "height": 64,
+            "filename": "/Users/private"
+          },
+          {
+            "path": "screenshots/01.png",
+            "bytes": 1000,
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "width": 320,
+            "height": 240
+          }
+        ]
+      }
+    }
+  ]
+}

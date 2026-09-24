@@ -83,6 +83,7 @@ uint16_t sBatteryRawADC = 0;
 uint8_t sBatteryPercent = 50;
 bool sBatteryCharging = false;
 bool sBatteryCalibrated = false;
+uint64_t sBatteryEstimateAt = 0;
 uint8_t sChargerState = 8;
 uint8_t sBatterySenseState = 0;
 uint8_t sVbusSense = PFVbusUndervoltage | PFVbusIn2System;
@@ -97,6 +98,7 @@ uint64_t sNextBatteryPoll = 0;
 Ion::RTC::Mode sRTCMode = Ion::RTC::Mode::Disabled;
 Ion::RTC::DateTime sEmulatedRTC = {0, 0, 12, 30, 8, 2026, 6};
 uint64_t sRTCSetAt = 0;
+bool sRTCUserSet = false;
 KDColor sLEDColor = KDColorBlack;
 uint16_t sLEDBlinkPeriod = 0;
 uint8_t sLEDBlinkDutyPercent = 0;
@@ -329,7 +331,8 @@ Ion::RTC::DateTime dateTimeFromSeconds(uint32_t seconds) {
           static_cast<int>(month), year, weekday};
 }
 
-uint32_t readSNVSSeconds() {
+uint32_t readSNVSSeconds(bool *stable = nullptr) {
+  if (stable) *stable = false;
   uint64_t first = 0;
   for (unsigned attempts = 0; attempts < 100; attempts++) {
     uint64_t high = PrimeG2::reg32(SNVSLPSRTCMR);
@@ -338,7 +341,7 @@ uint32_t readSNVSSeconds() {
     uint64_t second =
       (static_cast<uint64_t>(PrimeG2::reg32(SNVSLPSRTCMR)) << 32) |
       PrimeG2::reg32(SNVSLPSRTCLR);
-    if (first == second) break;
+    if (first == second) { if (stable) *stable = true; break; }
   }
   return static_cast<uint32_t>(first >> 15);
 }
@@ -409,6 +412,7 @@ void sampleBatteryVoltage() {
 
   uint8_t nextPercent = primePercentForMillivolts(sBatteryMillivolts);
   uint64_t now = batteryClock();
+  sBatteryEstimateAt = now;
   if (sBatteryFull) {
     nextPercent = 100;
   }
@@ -595,6 +599,14 @@ void poll() {
                  !Persistence::commitInProgress());
 }
 
+void noteVerificationProgress() {
+  // Catalog authentication also runs during Board::init, before the regular
+  // event loop exists. Only that loop may first arm the watchdog.
+  if(Watchdog::enabled())
+    Watchdog::poll(Display::guardsIntact() && Ion::stackSafe() &&
+                   !Persistence::commitInProgress());
+}
+
 void noteUserActivity() {
   sIdleStartedAt = idleClock();
   if (sIdleDimmed && !sPowerSuspended && !sPowerOff) {
@@ -675,6 +687,27 @@ uint16_t batteryMillivolts() { return sBatteryMillivolts; }
 uint16_t batteryRawADC() { return sBatteryRawADC; }
 uint8_t batteryPercent() { return sBatteryPercent; }
 bool batteryEstimateIsCalibrated() { return sBatteryCalibrated; }
+uint32_t batteryEstimateAgeMillis() {
+  uint64_t now = batteryClock();
+  if (!sBatteryCalibrated || !sBatteryPresent || now < sBatteryEstimateAt) return 0xffffffffu;
+  uint64_t age = now - sBatteryEstimateAt;
+  return age < 0xffffffffu ? static_cast<uint32_t>(age) : 0xffffffffu;
+}
+bool calendarSnapshot(Ion::RTC::DateTime *value, bool *setThisBoot) {
+  if (!value || !setThisBoot) return false;
+  *setThisBoot = false;
+#if PRIME_G2_EMULATOR
+  *value = emulatedDateTime();
+#else
+  bool stable = false;
+  uint32_t seconds = readSNVSSeconds(&stable);
+  if (!stable) return false;
+  *value = dateTimeFromSeconds(seconds);
+#endif
+  if (!validDateTime(*value)) return false;
+  *setThisBoot = sRTCUserSet;
+  return true;
+}
 uint8_t chargerState() { return sChargerState; }
 uint8_t batterySenseState() { return sBatterySenseState; }
 uint8_t vbusSense() { return sVbusSense; }
@@ -693,6 +726,8 @@ bool setRTCForTest(Ion::RTC::DateTime value) {
   if (!validDateTime(value)) return false;
   sEmulatedRTC = value;
   sRTCSetAt = Ion::Timing::millis();
+  sRTCUserSet = daysFromCivil(value.tm_year, value.tm_mon, value.tm_mday) * 86400 +
+    value.tm_hour * 3600 + value.tm_min * 60 + value.tm_sec <= 0xffffffffu;
   return true;
 #else
   (void)value;
@@ -863,6 +898,10 @@ void setMode(Mode mode) {
 Mode mode() { return sRTCMode; }
 void setDateTime(DateTime value) {
   if (!validDateTime(value)) return;
+  // The existing calendar stores uint32 seconds. Do not call a wrapped date
+  // trustworthy merely because its original civil fields passed validation.
+  sRTCUserSet = daysFromCivil(value.tm_year, value.tm_mon, value.tm_mday) * 86400 +
+    value.tm_hour * 3600 + value.tm_min * 60 + value.tm_sec <= 0xffffffffu;
 #if PRIME_G2_EMULATOR
   sEmulatedRTC = value;
   sRTCSetAt = Timing::millis();

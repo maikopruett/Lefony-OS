@@ -1,0 +1,417 @@
+{
+  "schema": 1,
+  "platform": "darwin-arm64",
+  "pillow_version": "12.3.0",
+  "pillow_revision": "bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+  "wheel": {
+    "file": "pillow-12.3.0-cp314-cp314-macosx_11_0_arm64.whl",
+    "url": "https://files.pythonhosted.org/packages/c7/da/32c752228ae345f489e3a42499d817b6c3996da7e8a3bc7a04fc806b243b/pillow-12.3.0-cp314-cp314-macosx_11_0_arm64.whl",
+    "sha256": "e158cb00350dc278f3b91551101aa7d12415a66ebf2c91d8d5ac14e56ddd3ad0"
+  },
+  "sources": [
+    {
+      "file": "libjpeg-turbo-3.1.4.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libjpeg-turbo-3.1.4.1.tar.gz",
+      "sha256": "ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022",
+      "bytes": 2528617,
+      "id": "jpeg",
+      "version": "3.1.4.1",
+      "role": "runtime"
+    },
+    {
+      "file": "tiff-4.7.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/tiff-4.7.1.tar.gz",
+      "sha256": "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69",
+      "bytes": 4000609,
+      "id": "tiff",
+      "version": "4.7.1+pillow-patch",
+      "role": "runtime"
+    },
+    {
+      "file": "libwebp-1.6.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libwebp-1.6.0.tar.gz",
+      "sha256": "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564",
+      "bytes": 4296070,
+      "id": "webp",
+      "version": "1.6.0",
+      "role": "runtime"
+    },
+    {
+      "file": "libxcb-1.17.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libxcb-1.17.0.tar.gz",
+      "sha256": "2c69287424c9e2128cb47ffe92171e10417041ec2963bceafb65cb3fcf8f0b85",
+      "bytes": 661593,
+      "id": "xcb",
+      "version": "1.17.0",
+      "role": "runtime"
+    },
+    {
+      "file": "libXau-1.0.12.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libXau-1.0.12.tar.gz",
+      "sha256": "2402dd938da4d0a332349ab3d3586606175e19cb32cb9fe013c19f1dc922dcee",
+      "bytes": 418722,
+      "id": "xau",
+      "version": "1.0.12",
+      "role": "runtime"
+    },
+    {
+      "file": "xz-5.8.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xz-5.8.3.tar.gz",
+      "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+      "bytes": 2771455,
+      "id": "xz",
+      "version": "5.8.3",
+      "role": "runtime"
+    },
+    {
+      "file": "zlib-ng-2.3.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/zlib-ng-2.3.3.tar.gz",
+      "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+      "bytes": 2447397,
+      "id": "zlib-ng",
+      "version": "2.3.3",
+      "role": "runtime"
+    },
+    {
+      "file": "xcb-proto-1.17.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xcb-proto-1.17.0.tar.gz",
+      "sha256": "392d3c9690f8c8202a68fdb89c16fd55159ab8d65000a6da213f4a1576e97a16",
+      "bytes": 206094,
+      "id": "xcb-proto",
+      "version": "1.17.0",
+      "role": "build-input"
+    },
+    {
+      "file": "xorgproto-2025.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xorgproto-2025.1.tar.gz",
+      "sha256": "d6f89f65bafb8c9b735e0515882b8a1511e8e864dde5e9513e191629369f2256",
+      "bytes": 1127613,
+      "id": "xorgproto",
+      "version": "2025.1",
+      "role": "build-input"
+    },
+    {
+      "file": "libpthread-stubs-0.5.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libpthread-stubs-0.5.tar.gz",
+      "sha256": "593196cc746173d1e25cb54a93a87fd749952df68699aab7e02c085530e87747",
+      "bytes": 74938,
+      "id": "pthread-stubs",
+      "version": "0.5",
+      "role": "build-input"
+    },
+    {
+      "file": "pkg-config-0.29.2.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/pkg-config-0.29.2.tar.gz",
+      "sha256": "6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591",
+      "bytes": 2016830,
+      "id": "pkg-config",
+      "version": "0.29.2",
+      "role": "build-input"
+    },
+    {
+      "file": "libpng-1.6.58.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libpng-1.6.58.tar.gz",
+      "sha256": "a9d4df463d36a6e5f9c29bd6f4967312d17e996c1854f3511f833924eb1993cf",
+      "bytes": 1592190,
+      "id": "libpng",
+      "version": "1.6.58",
+      "role": "build-input"
+    },
+    {
+      "file": "pillow-bb1d8e8.tar.gz",
+      "url": "https://codeload.github.com/python-pillow/Pillow/tar.gz/bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+      "sha256": "3088957d53e64d5bc802dc043d64de2d76796c3f3b973113bdbb4c9ecd1b30a1",
+      "bytes": 47129949,
+      "id": "pillow",
+      "version": "12.3.0",
+      "role": "source-recipes-and-tiff-patch"
+    },
+    {
+      "file": "multibuild-4546f4d.tar.gz",
+      "url": "https://codeload.github.com/multi-build/multibuild/tar.gz/4546f4d4820ffd0104b872c3b6187260b3e64edc",
+      "sha256": "e19297569173d647e2f7e3ddeb7a336789b4a3efad8180402a23b10da355076c",
+      "bytes": 822658,
+      "id": "multibuild",
+      "version": "4546f4d4820ffd0104b872c3b6187260b3e64edc",
+      "role": "build-recipes"
+    },
+    {
+      "file": "libavif-1.4.2.tar.gz",
+      "url": "https://codeload.github.com/AOMediaCodec/libavif/tar.gz/refs/tags/v1.4.2",
+      "sha256": "2b645287340ba5a631d268b551dc2d72bd73ac33335962dd36dcdb6d8366921d",
+      "bytes": 14665927,
+      "id": "avif",
+      "version": "1.4.2",
+      "role": "runtime"
+    },
+    {
+      "file": "lcms2-2.19.1.tar.gz",
+      "url": "https://downloads.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+      "sha256": "bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8",
+      "bytes": 5728743,
+      "id": "lcms",
+      "version": "2.19.1",
+      "role": "runtime"
+    },
+    {
+      "file": "openjpeg-2.5.4.tar.gz",
+      "url": "https://codeload.github.com/uclouvain/openjpeg/tar.gz/refs/tags/v2.5.4",
+      "sha256": "a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a",
+      "bytes": 2157028,
+      "id": "openjpeg",
+      "version": "2.5.4",
+      "role": "runtime"
+    },
+    {
+      "file": "aom-v3.14.1.tar.gz",
+      "url": "https://aomedia.googlesource.com/aom/+archive/refs/tags/v3.14.1.tar.gz",
+      "sha256": "bf71743d7c6b72236abb9fd0e911b86b5dc256af8275a8502690994443a519ef",
+      "bytes": 6437822,
+      "id": "aom",
+      "version": "3.14.1",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "dav1d-1.5.3.tar.gz",
+      "url": "https://code.videolan.org/videolan/dav1d/-/archive/1.5.3/dav1d-1.5.3.tar.gz",
+      "sha256": "cbe212b02faf8c6eed5b6d55ef8a6e363aaab83f15112e960701a9c3df813686",
+      "bytes": 1713950,
+      "id": "dav1d",
+      "version": "1.5.3",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libyuv-644251f.tar.gz",
+      "url": "https://chromium.googlesource.com/libyuv/libyuv/+archive/644251f252a84bf8ce91ff0aca86a9b16b069ab8.tar.gz",
+      "sha256": "7101e34504439be13be0c0dd14128ca620da62399df1f28aab36e3e43a8b0705",
+      "bytes": 598291,
+      "id": "libyuv",
+      "version": "644251f252a84bf8ce91ff0aca86a9b16b069ab8",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libwebp-git-v1.6.0.tar.gz",
+      "url": "https://chromium.googlesource.com/webm/libwebp/+archive/refs/tags/v1.6.0.tar.gz",
+      "sha256": "965ce15eb5cee3a53e66269bc603ce8b7dc8ba24de1e9080ad0f89410698d8ba",
+      "bytes": 3845497,
+      "id": "sharpyuv-static",
+      "version": "1.6.0",
+      "role": "avif-static-codec"
+    }
+  ],
+  "binaries": {
+    "PIL/.dylibs/libXau.6.dylib": [
+      "xau"
+    ],
+    "PIL/.dylibs/libavif.16.4.2.dylib": [
+      "avif",
+      "aom",
+      "dav1d",
+      "libyuv",
+      "sharpyuv-static"
+    ],
+    "PIL/.dylibs/libjpeg.62.4.0.dylib": [
+      "jpeg"
+    ],
+    "PIL/.dylibs/liblcms2.2.dylib": [
+      "lcms"
+    ],
+    "PIL/.dylibs/liblzma.5.dylib": [
+      "xz"
+    ],
+    "PIL/.dylibs/libopenjp2.2.5.4.dylib": [
+      "openjpeg"
+    ],
+    "PIL/.dylibs/libsharpyuv.0.dylib": [
+      "webp"
+    ],
+    "PIL/.dylibs/libtiff.6.dylib": [
+      "tiff",
+      "pillow"
+    ],
+    "PIL/.dylibs/libwebp.7.dylib": [
+      "webp"
+    ],
+    "PIL/.dylibs/libwebpdemux.2.dylib": [
+      "webp"
+    ],
+    "PIL/.dylibs/libwebpmux.3.dylib": [
+      "webp"
+    ],
+    "PIL/.dylibs/libxcb.1.1.0.dylib": [
+      "xcb"
+    ],
+    "PIL/.dylibs/libz.1.3.1.zlib-ng.dylib": [
+      "zlib-ng"
+    ],
+    "PIL/_avif.cpython-314-darwin.so": [
+      "pillow"
+    ],
+    "PIL/_imaging.cpython-314-darwin.so": [
+      "pillow"
+    ],
+    "PIL/_imagingcms.cpython-314-darwin.so": [
+      "pillow"
+    ],
+    "PIL/_imagingmath.cpython-314-darwin.so": [
+      "pillow"
+    ],
+    "PIL/_imagingtk.cpython-314-darwin.so": [
+      "pillow"
+    ],
+    "PIL/_webp.cpython-314-darwin.so": [
+      "pillow"
+    ]
+  },
+  "installed_files": {
+    "PIL/MpoImagePlugin.py": "094f1478f9f46ec9b4abb10f5cd1772c7288e487b707912eaaebc964e46e4c10",
+    "PIL/ImageMode.py": "69a6551c088211a9ce0362b58cddc3956dcd3ca6bc0e6e672174d712bcf2166b",
+    "PIL/_imagingft.cpython-314-darwin.so": "581ea6b7f1b359e13c65dbd50617b161fae526f3343d377f69f7b06a92c3092f",
+    "PIL/PngImagePlugin.py": "5911ebb3c8e58edf4fccace85ade20c3a062cc41dc55340bfb7b40f0bf1861c5",
+    "PIL/AvifImagePlugin.py": "2ab961497bdd1519461deccb6581daf6bdc282f6dfba77d3ba72c630b5d8946d",
+    "PIL/_imagingmath.pyi": "ddf071712a6926be84384714a23bdf946dc47a083b96fd90a7474d41020bacfe",
+    "PIL/XbmImagePlugin.py": "15de86543128ef79f2148080dd9df0e0b8e4c28656be11c1eab2829b9c95ae1a",
+    "PIL/_imagingcms.cpython-314-darwin.so": "499367f62c264922309c8ef3cfa6783ed1526397b63f301bcb03d2c301e5ed56",
+    "PIL/PcxImagePlugin.py": "fa96552bb1f1d24490b671a2cba50e177aa2e507a331841b70c5a579bb11d71e",
+    "PIL/SunImagePlugin.py": "1ddc64864d29c69046c5884f25f0832f0b1870ed4a8f18eda6534c15889b22f9",
+    "PIL/ImageFile.py": "983c4f35e0c51046d4c636998ec77000cd2da208870a03b205e104cd0b2df629",
+    "PIL/SpiderImagePlugin.py": "c9ba6e8872e8fbd07520bdd1ea6bcc4f0c1b15d9564892317811a537c5ca6f4a",
+    "PIL/TarIO.py": "06a6140a10816fd17b4a1fae67cea2cf50eda32d83d286cdc069bae73d6b75cd",
+    "PIL/_imagingmorph.pyi": "ddf071712a6926be84384714a23bdf946dc47a083b96fd90a7474d41020bacfe",
+    "PIL/MpegImagePlugin.py": "83b05977dde45a9162e35486ff0285a22d3210fb22a08e248f8e5bd85fb756bc",
+    "PIL/BdfFontFile.py": "0aa08fa855fc2774eac3ae73f72771132721aa6234a9ffd183290f71100e9c4e",
+    "PIL/GribStubImagePlugin.py": "f3233855eb8dcd86c09e87f1729df2ae8643ded95ef0af1d716f8fb981eacfba",
+    "PIL/ImageStat.py": "1554e26161827223d6d500fad5bec361995c0ea474752ea1b0b8eafa070a706e",
+    "PIL/PixarImagePlugin.py": "97fe06c017749804e72176096f09a6383536bcfef07b02eee8146f887081d842",
+    "PIL/GimpPaletteFile.py": "8481d0f4b279ae2d21cb57bfbd961e0fe9faed459d8440e529ce2f0f181a51d8",
+    "PIL/ImageColor.py": "20603d0b6ba67840ff1334b60af8fa2ac53456eb42f51b2d58860f7bcb83b159",
+    "PIL/ImageText.py": "9f77bda821b1a7093f4774eca60288f970db5aa56e4b74da0b071dee7c1346f3",
+    "PIL/QoiImagePlugin.py": "104ea5388aaaaf2ba9b8fd3cd68a8e5624c27ea0f7a9103be7cef99c63fbad95",
+    "PIL/ContainerIO.py": "c2406a2f618301be5f877c2bb5f4c651faa2a098a90a5fa58361b16e342b4d9c",
+    "PIL/_typing.py": "db3df7654a7d6909e44aa5f3351dd99fb974e1dd96fa8023d4e899862c8517af",
+    "PIL/_webp.cpython-314-darwin.so": "c075339b1f7020dde97483cbe7883d8dcea92f9702d95c8c4f7624e8988d147e",
+    "PIL/MspImagePlugin.py": "090ea4bef4ace419526875867ff9ce404b2c654b0dffb5366bf426cce921467e",
+    "PIL/_imagingtk.pyi": "ddf071712a6926be84384714a23bdf946dc47a083b96fd90a7474d41020bacfe",
+    "PIL/MicImagePlugin.py": "8fdd548b3bcbfb381766039cabfe285816d25fa2cfab527d90d1e47484ccd50c",
+    "PIL/_version.py": "fe7d75d4019326aca24ae57d4ab190cd62ba1225b175051119cd61cd87e42b1d",
+    "PIL/ImtImagePlugin.py": "48be48aec1dc6e596dc6d5f8bff1d516162747a85a27400e77634785928c2266",
+    "PIL/GifImagePlugin.py": "fe956c85ac3a65ba9f01daec1acc3fc58b485dabcf25c90fe9b686039acae361",
+    "PIL/_imagingmath.cpython-314-darwin.so": "5dfdd75222e90effa5925d24680bb54f03a4fb141a4eddab2da4c440dde49f14",
+    "PIL/PalmImagePlugin.py": "9ae33cd1925dd310aaf84b2957103b83035f58742069e69cecb2e5bdde914239",
+    "PIL/ImageQt.py": "3d3b794cfca78162fe56ebf1fdbc271f5ec43817b7b44ee5e21b959af1903f96",
+    "PIL/ImageMath.py": "a820d28d35a6f94c7157b9b07204895288a8716f8bb156ad1244090b0415eab2",
+    "PIL/PaletteFile.py": "b2e0dd00be953258d7c38a049f5be14ede03438bdba481c6777038a313a013ab",
+    "PIL/FontFile.py": "eb86240aaac643c1c79b47d4b5028f21bd124ddffce80f4635df4403db000036",
+    "PIL/PdfParser.py": "7f5dee39ca48e76d2d801bde078fc18b05578fe501c261f9a3277a2de25eb6b9",
+    "PIL/ExifTags.py": "61c257add6fffd463aa788e37f998b3920c57fe931db10faf9bd921eef36bdf3",
+    "PIL/ImageCms.py": "dc00c0fe9e2c479ab41f2d3d1adf65e579e67d9786a84328c224b5c6cd6ce883",
+    "PIL/FpxImagePlugin.py": "f7175b4dac1e2d40e9a29b8a64309e1c10c6b196e36e82f36778fe93eb37e125",
+    "PIL/_imaging.cpython-314-darwin.so": "45c3360f256bf7776887c68233cff09d62880d0d0472044cf4424e54870c5254",
+    "PIL/ImageChops.py": "1848e5ca67280ed03938e788c505485fde810feb3a01785bed39922d89f6b548",
+    "PIL/_imagingcms.pyi": "659f222288ba10758bbe001d7e6d613c3e42426c62ef92e2265e71f321b16285",
+    "PIL/_webp.pyi": "ddf071712a6926be84384714a23bdf946dc47a083b96fd90a7474d41020bacfe",
+    "PIL/_deprecate.py": "2a1c8b566418555c30d2b3916d4db84dededf1f3adf46d8b78ce9f24659b974a",
+    "PIL/BufrStubImagePlugin.py": "4032cc32835fb8d0ac6539f755353ca360358371560e31ba36ccb53741bed9e5",
+    "PIL/PSDraw.py": "401ecc18cba66fe3ea8d9138cec81adaabd387bb3112d848cfc9db7dfc2379c6",
+    "PIL/PcdImagePlugin.py": "fa09cc52a407d11f9a963b1dde7652f5e048d63ef98a3583fc765f69d13746c4",
+    "PIL/ImageFilter.py": "1b85df7ac6aadc3d9daeeb3c8dc2c6f1682fc0eeb5927f6ca16da113b8277bf8",
+    "PIL/ImageDraw2.py": "7b04d8392e62dba3c1069aaecca187b12cda34752e22ff5eda4614a1bb8383cb",
+    "PIL/ImagePath.py": "e72506e570948a5d4a2934c0ffc3e01a172683e9a7b9ef862b41704c19618f0e",
+    "PIL/DcxImagePlugin.py": "3a50afeb20c8d0b2d935bb9423bb3af452350ee02b3f21b1a37602cd0d67f078",
+    "PIL/__init__.py": "7361b6ad3878589affe5956e4a4da24d71398b0891fd3a8c15e9362217b4ca01",
+    "PIL/JpegPresets.py": "967a961e8e032c81c8ba571d1e9d0d27b0967b11edf13df0e759082a52df9080",
+    "PIL/Hdf5StubImagePlugin.py": "113338c9e49ccbe7908bc522acfe872352ef34e7b4b565bb364f67ca7dd4230a",
+    "PIL/features.py": "14f904863b416914aaa6480735876ec31885b7272ee0d8d92b010c5b1b5e98f5",
+    "PIL/ImageDraw.py": "e83a5fc1f270e69f243e6cbcdd5cc548e997199aab276fa19a67ded591bb3c9a",
+    "PIL/GimpGradientFile.py": "cd675b313f95b2c5f1d138340ce9b2b13a14818f9fc825c9bd89854a927578d8",
+    "PIL/ImageWin.py": "7277958eec1fd6ad9c1b43ac3757a8ecf57f17f51c03de2031ca23c201e2e372",
+    "PIL/IcoImagePlugin.py": "506cc80e5434d9907e54912ca3223b616993c76e99881d841c9675aaf076f094",
+    "PIL/_tkinter_finder.py": "188678b2d985854a2c987292addc5c8d2b62a1c0cd7f2267ed10627b6496c54d",
+    "PIL/EpsImagePlugin.py": "94cb1da75871ec97ac6cb07bff57e5809929810ec9d5140fbed555e815adbc81",
+    "PIL/TgaImagePlugin.py": "18c08cff8b345a8c893aa9daab5f311473a868dc2721dee794a142366f033f21",
+    "PIL/ImageMorph.py": "a2d7f97fd03e638028b1f9751386161156ad8030489c6a7ac560497c0274351b",
+    "PIL/Jpeg2KImagePlugin.py": "c9ddaff5bd5fa20c03903694df5650479b15f41861b81e79f177daa2bb346558",
+    "PIL/WalImageFile.py": "759db52034124f6a3b63b800f90c51cf0231d9a88e6c63b5528b2075dd84a497",
+    "PIL/PcfFontFile.py": "f8b619c765457ea5e3f2faf780718010081f9033f95a3e4abfb9242aac54968d",
+    "PIL/BlpImagePlugin.py": "615058c368c247d06baa095fe99756f39913153eebe2307f2262699cd09f7967",
+    "PIL/ImageTk.py": "6f94a7b5c9065ecd040ac2363267498370925fa02d10bb168743a1c6ee35bbf9",
+    "PIL/GbrImagePlugin.py": "0d8caf85e905075b0e40b1163f061b7f40847c676075ac75722fb70ee49e2204",
+    "PIL/ImageOps.py": "938f56b053a035ed06278d90d7cfb275807ab8ccf5e27db52c23595ccda97fff",
+    "PIL/_imaging.pyi": "7d3f934c6412d24ca6d60bfbee05d3290b49ac098ed4dca74b92ca06d1b71ba3",
+    "PIL/PdfImagePlugin.py": "a35d4ee2ac5b9b90389bd92da67dc7add13b95ed9d145df2e81b4c7fc74721a6",
+    "PIL/ImageShow.py": "ba0a31498cc64937dafc015e578cc35ca4fcf42fbecca75af356a04221c54f90",
+    "PIL/ImageEnhance.py": "e04961cff972cb12e6c741a4487af038098d2764e4a9540f1de8f31a285950c2",
+    "PIL/WmfImagePlugin.py": "cd1e267adcf947e35c3bc14dd5ad390658bcde078e69b4e929dae1793b51a30d",
+    "PIL/ImageGrab.py": "124cd6534e7fe23f8344277ded5cd71c9a870844e4ac6f701f34dc41013992da",
+    "PIL/_imagingft.pyi": "718c92cef70a0428873c1b2fb6d3227bd01d7d4704b2a651fb7db9e9842dcf64",
+    "PIL/_avif.cpython-314-darwin.so": "1a283064f621095d7adc628c75de816d860900a89beadbef4629e4c1316a940f",
+    "PIL/WebPImagePlugin.py": "634360a326abfcd29ec5e05f6b84c3be6e5a783e7c4dd6ad46bd0eba182dae23",
+    "PIL/FliImagePlugin.py": "e33c47f085c15fd0c68ba74944ce98e4d31d6c0d5df7dc7af7a99c1991f11f32",
+    "PIL/TiffTags.py": "766dea350424b9a2caab3513be794689403c2b7222cd038006f69cff08edb45d",
+    "PIL/CurImagePlugin.py": "6412c04ec22516b5f9aefe8395e135a12b5e394b338ccf5bd5b39c24fe54e3fa",
+    "PIL/_imagingmorph.cpython-314-darwin.so": "29a3498d1787c761b5c977d50a2ee10e1f8732a606c46daef3192f87d7731bae",
+    "PIL/_util.py": "7f185676b2c04727363ec3203779bdfd4d5d637a1429b57b9a4a0771782879e0",
+    "PIL/GdImageFile.py": "f0eadd77d114e0e6d9bbb3cd5d33da33c967ea3a4bc7c41d12f087fcb5e926c0",
+    "PIL/TiffImagePlugin.py": "440b2a3a80b280d18cda3fc70d9fd206e2fa44e9897c9550f70b51395047b273",
+    "PIL/_imagingtk.cpython-314-darwin.so": "ff65736f5611eab64235902ac3e0edda35977c8975df049d4570167f78c30677",
+    "PIL/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "PIL/IptcImagePlugin.py": "e26086c6d5aa7a68de3ff6766eb7704f46095fe8e68c0fce670c14a77a50daaa",
+    "PIL/ImagePalette.py": "667e20ff1710d4a0e57f494a72f3cd72320f7ae7d0c7e92d3b91dc777c8a771f",
+    "PIL/BmpImagePlugin.py": "e0067eb268d1257de5a1d746652938a39107a06eb5e3fe415d31ee07b7a83b0f",
+    "PIL/ImageTransform.py": "faa7a4ecfde5ccb75d717b7d716b79c3f2f5d491a9db2637009b4e7e62409037",
+    "PIL/IcnsImagePlugin.py": "42ed4565d672c7eb1b5a8803e623661fb870b92dc1911717b2a20316c1ab8620",
+    "PIL/McIdasImagePlugin.py": "6da388903f822087828011537fc928b3ddbc3ca06e094a9861adfcbb75844bff",
+    "PIL/FitsImagePlugin.py": "f9fac59844400abddc273bff8fb7eeba3f5c1fb27bcba27beab662377fa6a820",
+    "PIL/_avif.pyi": "ddf071712a6926be84384714a23bdf946dc47a083b96fd90a7474d41020bacfe",
+    "PIL/XpmImagePlugin.py": "c1e0ab0e03b71fdea52d0fae5d8f859e8c35649e100110e964062dcc991e7cba",
+    "PIL/DdsImagePlugin.py": "85cf455296d054ac95c971d03cd3a8ea245cba2d1138b495d3533c2333f09050",
+    "PIL/ImageSequence.py": "32986092befdb1c9980609a2f5982e8437d5c07be92d25f9b995470d996b9f42",
+    "PIL/_binary.py": "a6e0e837223ccab3b0e91c77223c951d3b3fb9d69ac2ce52430ced719baf3975",
+    "PIL/Image.py": "04af3f2db7ffdd61e829fa7aa8f5481d394a0a4129a8fd8aa5b13908928fcd6d",
+    "PIL/__main__.py": "2e98f8bde7fc988ee3035b1109402855869e78f0ff51cf3df3117973b5cbc750",
+    "PIL/XVThumbImagePlugin.py": "5e08669d19bc63ff23d0edbc5cf6c746b98aec2ac656e47ce3882fd617c5e6e8",
+    "PIL/SgiImagePlugin.py": "24262e40fb7d61db86fbebf16939a5befcc775cc2a11bdbf9bdaeecfe18872db",
+    "PIL/report.py": "e0963af8853bb07d512ae45b3afcb57d4b74740a22efd157e2d609377a750d3d",
+    "PIL/ImImagePlugin.py": "f2c04e032ef196a3fbdb6b175a19c99f85680614c1cdb6504ed7d6fd7b1679f5",
+    "PIL/PsdImagePlugin.py": "255df65089c00df5c8e70001790ca279200a8f723b420f3e2d66c8336a3fd594",
+    "PIL/JpegImagePlugin.py": "27ebe8f59a7a12e40277f8f84ce4637c300145e181fb5bd05ad894b89c391bb1",
+    "PIL/ImageFont.py": "24fa5feeb91b4bf63eaad0ebba08a8161e9c889d9fd056a37c928134097b9649",
+    "PIL/PpmImagePlugin.py": "564cfa67fba33d48550fdba3715c155a20314f568a2b0dba488f60a6317d6d58",
+    "PIL/FtexImagePlugin.py": "652d16a811ed22d3688b45b9d80e1110e1ab0c87e1e347421832ebb9a5cb4451",
+    "PIL/.dylibs/libbrotlicommon.1.2.0.dylib": "3f4843c17f3cccc986279a4c9ac8a11dc3077c412fd856d1bad8231bf027a25f",
+    "PIL/.dylibs/libbrotlidec.1.2.0.dylib": "351fa4a2f4faed4147dfead81a8b0f5500ada31db64f74c8368bc1ab894f0dd1",
+    "PIL/.dylibs/liblcms2.2.dylib": "6c472f0956c937e85747a4f7c5987dec7c54a6c807006f50fe2e1df1e82ec5e5",
+    "PIL/.dylibs/libpng16.16.dylib": "92d120e199c0981bc26d71af66450cb1fc4f0764ce3ceb18369881e6e1c5861c",
+    "PIL/.dylibs/libxcb.1.1.0.dylib": "d7929b6650537224be0161cee998a0bf44f6d05b547ca86cbfbf6e93368726fd",
+    "PIL/.dylibs/libjpeg.62.4.0.dylib": "cf7c4e5c2d2c007fc51afcb95b649415cfe0bc4d7137ace897a6eff6550fa967",
+    "PIL/.dylibs/libfreetype.6.dylib": "996f9be86f5cee9a44924dba75e3db7ad8a1e83ec1695505c60d314f269b6109",
+    "PIL/.dylibs/libharfbuzz.0.dylib": "7e6800c210dcc2b6faa1e05ef42d1d4fdd0bb0dc88cd4640c7cd86ac715c51fd",
+    "PIL/.dylibs/libsharpyuv.0.dylib": "6b2d464413fc35783c79936f1e6be631585448a37765cf79c238be2ea5e5505b",
+    "PIL/.dylibs/libopenjp2.2.5.4.dylib": "ad0cb293fe3da9efcd8e3c5128c37e012d5abc88289f43c2721020e9cf408bdd",
+    "PIL/.dylibs/libavif.16.4.2.dylib": "ee0124cb07fb6419ed743cf9658b25211f7cc87d9081ad3e9416100db02c3c09",
+    "PIL/.dylibs/libz.1.3.1.zlib-ng.dylib": "39ffbe6a87460a579cf414c3ee668e449b32c2cdc2cc0b64921d53fd59cb56ed",
+    "PIL/.dylibs/libwebp.7.dylib": "0a2ba0179e6bcc1bccc1a88c38b7d8efd0302d45a1bfc1eb4cf1f1f03ede73f0",
+    "PIL/.dylibs/libXau.6.dylib": "002a604dc76919d6606c610be703a6547d78dd0f401639c9e95e5a79227190bf",
+    "PIL/.dylibs/libwebpmux.3.dylib": "f9c291035190c3af29494ce9fb62987c25ee78c4365c92c323ccc5ec8740143d",
+    "PIL/.dylibs/libwebpdemux.2.dylib": "f5ec6b6750ee91ff032ba62b18afc5f37c7bc842bfc9b2d325df41bc656ea066",
+    "PIL/.dylibs/liblzma.5.dylib": "a978dfb290d948f53867b6e3915fff71800062c770f176419391ccc95defd53b",
+    "PIL/.dylibs/libtiff.6.dylib": "e8988717b7470394a47d5ccd343130796b24ee70b6d885d3818e0e0b53238be1",
+    "pillow-12.3.0.dist-info/zip-safe": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "pillow-12.3.0.dist-info/WHEEL": "287dcfaefd8bce01e9472939cf623e6e3404fe6f96558e54813cb10f95d22721",
+    "pillow-12.3.0.dist-info/top_level.txt": "ae266aae4fa1c99aa1e5fd59d19c228b774a7f112c07286ef5c53d20e0c5f8d6",
+    "pillow-12.3.0.dist-info/METADATA": "8fc07146cab33ef7582361dab6eac596d340b03ec648f18217da7894f73838c8",
+    "pillow-12.3.0.dist-info/licenses/LICENSE": "dda12a98c1979cf3d94df1cff45d27a4cb3f04a60c76f76902ac54cac03ec0ce",
+    "pillow-12.3.0.dist-info/sboms/pillow-12.3.0.cdx.json": "40fa909b0f23405a7b97a6d91671a639a40acea7671b04387da22ba3e9fca50a"
+  },
+  "metadata_files": [
+    "pillow-12.3.0.dist-info/licenses/LICENSE",
+    "pillow-12.3.0.dist-info/sboms/pillow-12.3.0.cdx.json"
+  ],
+  "notes": [
+    "This selects the CPython 3.14 macOS ARM64 wheel; other wheels require separate review.",
+    "The original wheel is verified as a build input but is not included in corresponding-source archives.",
+    "Pillow build recipes and its TIFF patch are in the pinned Pillow Git source archive, not just its sdist.",
+    "Source hashes identify retained reviewed inputs; the upstream wheel build has not been reproduced.",
+    "The Pillow recipe uses an unpinned pillow-depends main mirror. Retained mirror files are bound to Git blobs at the last mirror revision preceding wheel upload; this is not an attestation of the original builder cache."
+  ]
+}

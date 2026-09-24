@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "status": "selected-for-port-qualification",
+  "name": "Freedoom Phase 1",
+  "version": "0.13.0",
+  "url": "https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip",
+  "archive_sha256": "3f9b264f3e3ce503b4fb7f6bdcb1f419d93c7b546f4df3e874dd878db9688f59",
+  "files": {
+    "COPYING.txt": {
+      "archive_path": "freedoom-0.13.0/COPYING.txt",
+      "bytes": 1644,
+      "sha256": "7c62f2c520769c798774f416637eec4921e5f0aafdac1245ae7c8a8cf65fe102"
+    },
+    "freedoom1.wad": {
+      "archive_path": "freedoom-0.13.0/freedoom1.wad",
+      "bytes": 28795076,
+      "sha256": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d"
+    },
+    "CREDITS-MUSIC.txt": {
+      "archive_path": "freedoom-0.13.0/CREDITS-MUSIC.txt",
+      "bytes": 9388,
+      "sha256": "2bb77677bbc4e587bba44ccb6514ee0f5397c7bb8ae9580b9188d3d6a57c0a31"
+    },
+    "CREDITS.txt": {
+      "archive_path": "freedoom-0.13.0/CREDITS.txt",
+      "bytes": 15872,
+      "sha256": "72364333d295c598d75ef9553d3b3661ad0b60e27271c87b7637c74b2f46918a"
+    }
+  },
+  "workload": "E1M1 single-player; gameplay, menu, save/load and held combinations still to be qualified",
+  "license": "BSD-3-Clause; preserve the exact COPYING.txt with packaged assets"
+}

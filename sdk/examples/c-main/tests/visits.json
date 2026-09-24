@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "name": "saved-visits",
+  "steps": [
+    {"program_exit": 0},
+    {"capture": "saved"},
+    {"pixel": ["saved", 0, 0, [255, 255, 255]]},
+    {"relaunch": true},
+    {"program_exit": 0},
+    {"capture": "incremented"},
+    {"different": ["saved", "incremented"]}
+  ]
+}

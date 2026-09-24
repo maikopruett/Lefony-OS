@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "sdk": "0.2.0-dev",
+  "status": "experimental",
+  "compiler": "16.2.0",
+  "language": "c++17",
+  "project_languages": ["c11", "c++17"],
+  "project_schema": 1,
+  "source_formats": [0, 1, 2],
+  "abi": 1,
+  "package_schema": 0,
+  "resource_schema": 1,
+  "storage_profiles": [
+    1,
+    2
+  ],
+  "usb_protocols": [
+    1,
+    2
+  ],
+  "limits": {
+    "code_start": 268435456,
+    "code_bytes": 1048576,
+    "data_start": 270536704,
+    "data_end": 271511552,
+    "stack_start": 271515648,
+    "stack_bytes": 65536,
+    "private_data_bytes": 65536,
+    "transfer_bytes": 4096,
+    "callback_ms": 1000,
+    "width": 320,
+    "height": 240
+  },
+  "supported_package_schemas": [
+    0,
+    1
+  ],
+  "api_revision": 12,
+  "capabilities": 16383
+}

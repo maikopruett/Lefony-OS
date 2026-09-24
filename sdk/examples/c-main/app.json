@@ -1,0 +1,12 @@
+{
+  "abi": 1,
+  "id": "c-main",
+  "name": "C Main",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "schema": 1,
+  "minimum_api": 3,
+  "required_capabilities": 24,
+  "optional_capabilities": 0,
+  "data_schema": 0
+}

@@ -39,6 +39,22 @@ test "$attempt" -lt 160
 
 raw() { python3 "$REPO_DIR/vm/prime-control.py" --socket "$SOCKET" raw "$@"; }
 
+# TIME ADVANCE changes the modeled source before all ten ADC samples have
+# passed through the normal two-phase filter. Wait for the exact steady value
+# with a bound; an immediate intermediate average is not a driver failure.
+await_voltage() {
+  expected_voltage=$1
+  voltage_attempt=0
+  while [ "$voltage_attempt" -lt 30 ]; do
+    observed_voltage=$(raw BATTERY VOLTAGE)
+    if [ "$observed_voltage" = "VALUE $expected_voltage" ]; then return 0; fi
+    voltage_attempt=$((voltage_attempt + 1))
+    sleep 0.1
+  done
+  echo "Battery filter did not settle: $observed_voltage, expected VALUE $expected_voltage" >&2
+  return 1
+}
+
 test "$(raw STACK SAFE)" = "VALUE 1"
 test "$(raw TIME ROLLOVER SELFTEST)" = OK
 test "$(raw BATTERY SET 2 3850 0)" = OK
@@ -51,12 +67,12 @@ test "$(raw BATTERY CALIBRATED)" = "VALUE 1"
 test "$(raw BATTERY CHARGER OPERATION)" = "VALUE 2"
 test "$(raw BATTERY CHARGER CONFIGURED)" = "VALUE 1"
 test "$(raw TIME ADVANCE 600000)" = OK
-test "$(raw BATTERY VOLTAGE)" = "VALUE 3835"
+await_voltage 3835
 test "$(raw BATTERY SET 2 3800 1)" = OK
 test "$(raw BATTERY VOLTAGE)" = "VALUE 3799"
 test "$(raw BATTERY CHARGING)" = "VALUE 1"
 test "$(raw TIME ADVANCE 100000)" = OK
-test "$(raw BATTERY VOLTAGE)" = "VALUE 3817"
+await_voltage 3817
 test "$(raw BATTERY SET 4 4200 0 2>/dev/null || true)" = "ERR invalid battery state"
 
 # PF1550 power input, charger phase, and battery presence are independent.
@@ -138,6 +154,11 @@ test "$(raw POWER PANEL)" = "VALUE 7939"
 
 # Exercise the native idle policy with a separate deterministic idle-clock
 # offset: dim at 45 seconds, suspend at 55 seconds, then reconstruct on wake.
+# Calendar TIME ADVANCE above refreshes PF1550 sense registers from the modeled
+# source, whose earlier charging fixture still had external power connected.
+# Idle is intentionally inhibited on external power. Unplug that source first.
+test "$(raw BATTERY SET 2 3850 0)" = OK
+test "$(raw BATTERY EXTERNAL)" = "VALUE 0"
 test "$(raw BRIGHTNESS SET 210)" = OK
 test "$(raw POWER IDLE ADVANCE 45000)" = OK
 idle_brightness=$(raw BRIGHTNESS GET | awk '{print $2}')

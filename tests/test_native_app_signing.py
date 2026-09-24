@@ -50,7 +50,8 @@ def test_signature_cannot_be_reused_after_recomputing_payload_hash(keys):
     with pytest.raises(ValueError, match='signature rejected'): verify(signed, [public])
 
 
-def test_guest_verifier_matches_openssl_and_rejects_tampering(keys, tmp_path):
+@pytest.mark.parametrize('with_progress', [False, True])
+def test_guest_verifier_matches_openssl_and_rejects_tampering(keys, tmp_path, with_progress):
     private, public = keys
     port = ROOT/'ports/lefony-prime-g2/ion/src/prime_g2'
     for name in ('native_app_signature.h','native_app_digest.h'):
@@ -60,21 +61,42 @@ def test_guest_verifier_matches_openssl_and_rejects_tampering(keys, tmp_path):
     source.write_text('''#include "native_app_signature.h"
 #include <stdio.h>
 uint8_t data[2101665];
-int main(){size_t n=fread(data,1,sizeof(data),stdin),length=0;const uint8_t *payload=nullptr;
-return PrimeG2::NativeAppSignature::unwrap(data,n,&payload,&length)?0:1;}
+unsigned progressCalls=0;
+void progress(){progressCalls++;}
+int main(int argc,char **){size_t n=fread(data,1,sizeof(data),stdin),length=0;const uint8_t *payload=nullptr;
+bool ok=PrimeG2::NativeAppSignature::unwrap(data,n,&payload,&length,argc>1?progress:nullptr);
+printf("%u\\n",progressCalls);
+if(!ok && (payload || length)) return 2;
+return ok?0:1;}
 ''')
     executable = tmp_path/'verify'
     subprocess.run(['c++','-std=c++17','-O2','-Wall','-Wextra','-Werror',str(source),'-o',str(executable)],check=True)
+    def run(data):
+        return subprocess.run([executable, *(['progress'] if with_progress else [])],
+                              input=data, capture_output=True, timeout=10)
     signed = sign(pack(META,image()),private)
-    assert subprocess.run([executable],input=signed).returncode == 0
+    accepted = run(signed)
+    assert accepted.returncode == 0
+    assert (int(accepted.stdout) > 0) == with_progress
+    large = run(sign(pack(META, image()+bytes(512*1024)), private))
+    assert large.returncode == 0
+    if with_progress:assert int(large.stdout)>int(accepted.stdout)
     for offset in (8, 12, 16, 20, 24, 56, 88, 96, 200, len(signed)-1):
         modified=bytearray(signed); modified[offset]^=1
-        assert subprocess.run([executable],input=modified).returncode == 1
-    assert subprocess.run([executable],input=signed[:-1]).returncode == 1
-    assert subprocess.run([executable],input=pack(META,image())).returncode == 1
+        rejected=run(modified)
+        assert rejected.returncode == 1
+        if with_progress and offset in (96,200):assert int(rejected.stdout)>0
+    # An attacker recomputing the payload hash still needs a valid signature,
+    # even after the OS has observed progress through verification.
+    modified=bytearray(signed);modified[-1]^=1
+    modified[56:88]=hashlib.sha256(modified[352:]).digest()
+    assert run(modified).returncode == 1
+    assert run(signed[:-1]).returncode == 1
+    assert run(pack(META,image())).returncode == 1
     shutil.copyfile(port/'app_trust_roots.h',tmp_path/'app_trust_roots.h')
     subprocess.run(['c++','-std=c++17','-O2','-Wall','-Wextra','-Werror',str(source),'-o',str(executable)],check=True)
-    assert subprocess.run([executable],input=signed).returncode == 1
+    rejected=run(signed)
+    assert rejected.returncode == 1 and int(rejected.stdout)==0
 
 
 def test_key_generation_never_replaces_an_identity(tmp_path):

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Native build utilities for Windows QEMU and dependency cross compilation.
+# Supply the retained GDB cross image and record its exact image ID.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN apt-get update && apt-get install --no-remove -y --no-install-recommends \
+      meson gettext gnupg libltdl-dev python3-pip python3-wheel \
+    && mkdir -p /usr/share/lefony-windows-qemu-cross \
+    && dpkg-query -W -f='${binary:Package}\t${Version}\t${Architecture}\n' \
+      > /usr/share/lefony-windows-qemu-cross/packages.tsv \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "name": "pocket-lab-interaction",
+  "steps": [
+    {"capture": "initial"},
+    {"key": "one"},
+    {"key": "two"},
+    {"key": "ok"},
+    {"capture": "first-sample"},
+    {"different": ["initial", "first-sample"]},
+    {"pixel": ["first-sample", 20, 154, [33, 166, 66]]},
+    {"key": "nine"},
+    {"key": "nine"},
+    {"touch": [[0, 70, 200]]},
+    {"touch": []},
+    {"capture": "second-sample"},
+    {"different": ["first-sample", "second-sample"]},
+    {"pixel": ["second-sample", 32, 151, [33, 166, 66]]},
+    {"touch": [[0, 200, 200]]},
+    {"touch": [[0, 200, 200], [1, 220, 200]]},
+    {"touch": []},
+    {"capture": "cancelled-clear"},
+    {"same": ["second-sample", "cancelled-clear"]},
+    {"touch": [[0, 230, 200]]},
+    {"touch": []},
+    {"capture": "cleared"},
+    {"different": ["second-sample", "cleared"]},
+    {"key": "back"},
+    {"capture": "menu"},
+    {"different": ["cleared", "menu"]}
+  ]
+}

@@ -1,0 +1,39 @@
+--- a/ion/src/shared/events_keyboard.cpp
++++ b/ion/src/shared/events_keyboard.cpp
+@@ -2,6 +2,9 @@
+ #include <ion/events.h>
+ #include <ion/timing.h>
+ #include <assert.h>
++#if defined(PLATFORM_PRIME_G2)
++#include "../prime_g2/key_edge_tracker.h"
++#endif
+ 
+ namespace Ion {
+ namespace Events {
+@@ -55,7 +58,13 @@
+   assert(*timeout > delayBeforeRepeat);
+   assert(*timeout > delayBetweenRepeat);
+   int time = 0;
++#if defined(PLATFORM_PRIME_G2)
++  // Retain observed releases across timeout/platform-event boundaries. A key
++  // pressed between waits must not become an indefinitely ignored held key.
++  static PrimeG2::KeyEdgeTracker keyEdges;
++#else
+   uint64_t keysSeenUp = 0;
++#endif
+   uint64_t keysSeenTransitioningFromUpToDown = 0;
+   while (true) {
+     Event platformEvent = getPlatformEvent();
+@@ -64,8 +73,12 @@
+     }
+ 
+     Keyboard::State state = Keyboard::scan();
++#if defined(PLATFORM_PRIME_G2)
++    keysSeenTransitioningFromUpToDown = keyEdges.update(state);
++#else
+     keysSeenUp |= ~state;
+     keysSeenTransitioningFromUpToDown = keysSeenUp & state;
++#endif
+ 
+     bool lock = isLockActive();
+ 

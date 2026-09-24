@@ -1,4 +1,10 @@
-# Automatic native app validation
+# Historical hosted native app validation
+
+This directory retains the older hosted-validator implementation for historical
+reproducibility. It is not required by the current local-SDK publication flow.
+Use [the current setup runbook](../../docs/NATIVE-APP-SETUP.md). Developers build
+and test locally; the website checks and signs submitted bytes without running
+them. The instructions below describe only the earlier deployment model.
 
 `worker.py` consumes one queued source submission from the website, runs a
 trusted image without network access, and reports a result. There is no manual

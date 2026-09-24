@@ -1,0 +1,9 @@
+RIGHT TRIANGLE
+c^2 = a^2 + b^2
+Area = a*b/2
+UNIT CIRCLE
+x = cos(t), y = sin(t)
+x^2 + y^2 = 1
+MEAN
+mean = sum(x) / n
+Each sample has equal weight

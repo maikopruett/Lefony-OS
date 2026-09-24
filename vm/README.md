@@ -69,6 +69,20 @@ Images, overlays, logs and sockets are local ignored build artifacts.
 The full suite needs the extended dependencies; it is not the default host
 unit-test command. Read its stage list in `native-suite.py` before running it.
 
+The smoke group includes a firmware-free USB control-endpoint regression. Run
+it separately against a candidate emulator with:
+
+```sh
+.venv/bin/python vm/test-prime-g2-usb-stall.py \
+  --qemu build/qemu-prime-g2/qemu-system-arm \
+  --output build/usb-protocol-stall
+```
+
+Use a new output directory for each run. The check exercises IN/OUT stalls,
+unchanged DMA descriptors and buffers while stalled, explicit clearing, and
+recovery on a new SETUP transaction through QEMU's USB cable socket. It records
+the emulator/test hashes and covers modeled behavior only.
+
 Stock boot and retained-DMA research scripts additionally need private captures;
 see [STATUS.md](../docs/STATUS.md). They are excluded from public CI. Never add
 stock ROMs, NAND images, flash readbacks, or vendor PDFs to this repository.

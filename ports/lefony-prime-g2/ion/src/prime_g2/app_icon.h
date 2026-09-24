@@ -8,9 +8,9 @@ constexpr unsigned Width = 55, Height = 56, PixelBytes = Width * Height * 2;
 constexpr unsigned PackageBytes = 352 + 64 + PixelBytes;
 constexpr unsigned CompressedBytes = 1 + (PixelBytes - 15) / 255 + 1 + PixelBytes;
 // A distinct signed payload domain: never interpreted as executable app bytes.
-inline const uint8_t *pixels(const uint8_t *package, size_t size, const uint8_t hash[32]) {
+inline const uint8_t *pixels(const uint8_t *package, size_t size, const uint8_t hash[32],NativeAppSignature::Progress progress=nullptr) {
   const uint8_t *payload; size_t bytes;
-  if (size != PackageBytes || !NativeAppSignature::unwrap(package,size,&payload,&bytes) ||
+  if (size != PackageBytes || !NativeAppSignature::unwrap(package,size,&payload,&bytes,progress) ||
       bytes != 64 + PixelBytes || memcmp(payload,"LFICON1\0",8) ||
       (hash && memcmp(payload+8,hash,32))) return nullptr;
   const uint8_t dimensions[8] = {Width,0,0,0,Height,0,0,0};

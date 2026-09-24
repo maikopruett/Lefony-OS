@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Canadian build: ARM64 Linux build tools produce an x86-64 Linux ARM compiler.
+# BASE_IMAGE must contain the pinned native ARM-hosted /opt/toolchain compiler.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN test "$(dpkg --print-architecture)" = arm64 \
+    && test "$(/opt/toolchain/bin/arm-none-eabi-gcc -dumpfullversion)" = 16.2.0 \
+    && sed -i '/^Types: deb$/a Architectures: arm64' /etc/apt/sources.list.d/ubuntu.sources \
+    && dpkg --add-architecture amd64 \
+    && printf '%s\n' \
+      'Types: deb' 'Architectures: amd64' \
+      'URIs: http://archive.ubuntu.com/ubuntu/' \
+      'Suites: noble noble-updates noble-security' \
+      'Components: main universe' \
+      'Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg' \
+      > /etc/apt/sources.list.d/lefony-cross.sources \
+    && apt-get update && apt-get install -y --no-install-recommends \
+      g++-x86-64-linux-gnu \
+      libgmp-dev:amd64 libmpfr-dev:amd64 libmpc-dev:amd64 libisl-dev:amd64 \
+      zlib1g-dev:amd64 libzstd-dev:amd64 \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

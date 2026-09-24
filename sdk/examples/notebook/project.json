@@ -1,0 +1,6 @@
+{
+  "schema": 2,
+  "runtime": "foreground-newlib-1",
+  "sources": ["src/main.cpp"],
+  "arguments": []
+}

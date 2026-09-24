@@ -1,0 +1,1 @@
+{"schema":1,"name":"controls","steps":[{"wait_ms":200},{"key":"down"},{"key":"ok"},{"capture":"disabled"},{"key":"ok"},{"key":"up"},{"key":"ok"},{"key":"seven"},{"capture":"edited"}]}

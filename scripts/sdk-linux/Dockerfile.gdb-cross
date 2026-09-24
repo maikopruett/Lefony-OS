@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Layer on Dockerfile.cross; do not replace a compiler build's recorded image.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN test "$(dpkg --print-architecture)" = arm64 \
+    && apt-get update && apt-get install -y --no-install-recommends \
+      libexpat1-dev:amd64 libstdc++6:amd64 \
+    && mkdir -p /opt/lefony-cross-deps/include /opt/lefony-cross-deps/lib \
+    && ln -s /usr/include/x86_64-linux-gnu/gmp.h /opt/lefony-cross-deps/include/ \
+    && for header in mpfr.h expat.h expat_external.h; do \
+         test -f "/usr/include/$header" && \
+         ln -s "/usr/include/$header" /opt/lefony-cross-deps/include/; \
+       done \
+    && for library in gmp mpfr expat; do \
+         test -f "/usr/lib/x86_64-linux-gnu/lib$library.so" && \
+         ln -s /usr/lib/x86_64-linux-gnu/lib$library.* /opt/lefony-cross-deps/lib/; \
+       done \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

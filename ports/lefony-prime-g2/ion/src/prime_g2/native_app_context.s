@@ -55,6 +55,47 @@ prime_app_enter:
   mov r11,#0
   mov r12,#0
   movs pc,lr
+.global prime_app_resume
+.type prime_app_resume,%function
+prime_app_resume:
+  /* The same kernel frame as prime_app_enter. Saved user state is privileged
+   * storage: the app cannot choose its SPSR or exception-return address. */
+  push {r4-r12,lr}
+  vpush {d0-d15}
+  vpush {d16-d31}
+  vmrs r4,fpscr
+  mrs r5,cpsr
+  push {r4,r5}
+  cpsid i
+  ldr r4,=prime_app_kernel_sp
+  str sp,[r4]
+  ldr r0,=prime_app_user_context
+  add r1,r0,#320
+  ldmia r1,{sp,lr}^
+  nop
+  vldmia r0!,{d16-d31}
+  vldmia r0!,{d0-d15}
+  ldmia r0!,{r1,r2}
+  msr spsr_cxsf,r1
+  vmsr fpscr,r2
+  ldmia r0,{r0-r12,pc}^
+.global prime_app_suspend
+prime_app_suspend:
+  /* Both IRQ and SVC build: d16..31, d0..15, SPSR, FPSCR, r0..12, PC.
+   * User SP/LR are banked and must be saved separately without writeback. */
+  mov r0,sp
+  ldr r1,=prime_app_user_context
+  mov r2,#80
+3:
+  ldr r3,[r0],#4
+  str r3,[r1],#4
+  subs r2,r2,#1
+  bne 3b
+  stmia r1,{sp,lr}^
+  nop
+  add sp,sp,#320
+  mov r0,#1
+  b prime_app_leave
 .global prime_app_leave
 prime_app_leave:
   cpsid i
@@ -90,6 +131,8 @@ exception_svc:
   pop {r0-r12,lr}
   movs pc,lr
 1:
+  cmp r0,#2
+  beq prime_app_suspend
   cmn r0,#100
   beq 2f
   add sp,sp,#320

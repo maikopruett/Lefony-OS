@@ -150,3 +150,19 @@ contract already understood by the website. Upload every output to a new draft
 GitHub release, use `release-notes.md` as its body, then publish only when that
 publication is authorized. Do not replace the current release's assets.
 Private test logs and acceptance records are not copied into the output.
+
+## Publishing an audited working-tree build
+
+A maintainer may package a tested public working-tree snapshot with
+`package_lefony_release.py --working-tree`. In this mode `--commit` identifies
+the base revision, and the manifest's `sourceState` binds the exact distributed
+source archive by SHA-256. The package README and release notes distinguish the
+base commit from the shipped source. This does not commit or push local edits.
+
+Use `package_native_public_source.py` to audit and snapshot the public files,
+then include that snapshot and the prepared physical firmware source before
+preparing the emulator target. Retain the actual build version, compiler,
+public trust inputs and preparation commands with the source. Build and test
+both targets, verify the existing signing identity and pinned recovery assets,
+and upload a complete new draft before publishing. The development qualification
+and all installer checks remain unchanged.

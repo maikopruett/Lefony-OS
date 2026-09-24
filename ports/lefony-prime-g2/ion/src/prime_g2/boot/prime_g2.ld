@@ -6,6 +6,9 @@ ENTRY(_start)
 
 MEMORY {
   IMAGE (rwx) : ORIGIN = 0x82000000, LENGTH = 48M
+  /* Dedicated, privileged USB staging; outside the image heap/stack and app
+   * virtual mappings. NOLOAD: never added to the signed capsule payload. */
+  USB_STAGE (rw) : ORIGIN = 0x8B000000, LENGTH = 32M
   FRAMEBUFFER (rw) : ORIGIN = 0x8F000000, LENGTH = 1M
 }
 
@@ -79,6 +82,11 @@ SECTIONS {
     KEEP(*(.framebuffer))
     _framebuffer_end = .;
   } > FRAMEBUFFER
+
+  /* Reserved DMA RAM is not an ELF load segment. Older bootelf loaders allow
+   * only IMAGE and FRAMEBUFFER; no initialization is needed before full DMA. */
+  _usb_stage_start = ORIGIN(USB_STAGE);
+  _usb_stage_end = ORIGIN(USB_STAGE) + LENGTH(USB_STAGE);
 
   /DISCARD/ : {
     *(.ARM.exidx*)

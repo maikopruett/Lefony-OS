@@ -77,7 +77,7 @@ class PrimeG2ChargerStatusTests(unittest.TestCase):
         self.assertIn("TYPE_PRIME_G2_ADC", model)
         self.assertIn("prime_adc_raw_for_mv", model)
         self.assertIn("qemu-prime-g2-adc.patch", build)
-        self.assertIn("PATCHSET_REV=r70", build)
+        self.assertIn("PATCHSET_REV=r71", build)
         self.assertIn("writel 0x02198000 0x00000001", qtest)
 
     def test_title_bar_uses_pmic_vbus_without_changing_usb_data_detection(self):

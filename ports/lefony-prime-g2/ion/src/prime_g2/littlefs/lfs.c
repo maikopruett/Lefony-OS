@@ -46,6 +46,12 @@ static int lfs_bd_read(lfs_t *lfs,
         lfs_block_t block, lfs_off_t off,
         void *buffer, lfs_size_t size) {
     uint8_t *data = buffer;
+    // File contents (including app SHA-256 readback) have their own file cache.
+    // The shared cache is used for structure/allocator reads and lower-level
+    // program verification, whose destination was invalidated before program.
+    int (*read)(const struct lfs_config *, lfs_block_t, lfs_off_t, void *, lfs_size_t) =
+            (rcache == &lfs->rcache && lfs->cfg->read_metadata)
+            ? lfs->cfg->read_metadata : lfs->cfg->read;
     if (off+size > lfs->cfg->block_size
             || (lfs->block_count && block >= lfs->block_count)) {
         return LFS_ERR_CORRUPT;
@@ -92,7 +98,7 @@ static int lfs_bd_read(lfs_t *lfs,
                 size >= lfs->cfg->read_size) {
             // bypass cache?
             diff = lfs_aligndown(diff, lfs->cfg->read_size);
-            int err = lfs->cfg->read(lfs->cfg, block, off, data, diff);
+            int err = read(lfs->cfg, block, off, data, diff);
             LFS_ASSERT(err <= 0);
             if (err) {
                 return err;
@@ -114,10 +120,13 @@ static int lfs_bd_read(lfs_t *lfs,
                     lfs->cfg->block_size)
                 - rcache->off,
                 lfs->cfg->cache_size);
-        int err = lfs->cfg->read(lfs->cfg, rcache->block,
+        int err = read(lfs->cfg, rcache->block,
                 rcache->off, rcache->buffer, rcache->size);
         LFS_ASSERT(err <= 0);
         if (err) {
+            // Lefony: failed backend reads leave buffer contents undefined.
+            // A retry must consult the device instead of accepting this cache.
+            lfs_cache_drop(lfs, rcache);
             return err;
         }
     }
@@ -6555,4 +6564,3 @@ int lfs_migrate(lfs_t *lfs, const struct lfs_config *cfg) {
     return err;
 }
 #endif
-

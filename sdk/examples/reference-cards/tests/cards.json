@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "name": "cards",
+  "steps": [
+    {
+      "capture": "triangle"
+    },
+    {
+      "pixel": [
+        "triangle",
+        262,
+        56,
+        [
+          33,
+          166,
+          66
+        ]
+      ]
+    },
+    {
+      "key": "ok"
+    },
+    {
+      "capture": "circle"
+    },
+    {
+      "different": [
+        "triangle",
+        "circle"
+      ]
+    },
+    {
+      "key": "left"
+    },
+    {
+      "capture": "triangle-again"
+    },
+    {
+      "same": [
+        "triangle",
+        "triangle-again"
+      ]
+    },
+    {
+      "touch": [
+        [
+          0,
+          235,
+          218
+        ]
+      ]
+    },
+    {
+      "touch": []
+    },
+    {
+      "capture": "circle-touch"
+    },
+    {
+      "same": [
+        "circle",
+        "circle-touch"
+      ]
+    },
+    {
+      "touch": [
+        [
+          0,
+          235,
+          218
+        ]
+      ]
+    },
+    {
+      "touch": [
+        [
+          0,
+          235,
+          218
+        ],
+        [
+          1,
+          250,
+          218
+        ]
+      ]
+    },
+    {
+      "touch": []
+    },
+    {
+      "capture": "cancelled"
+    },
+    {
+      "same": [
+        "circle-touch",
+        "cancelled"
+      ]
+    },
+    {
+      "key": "right"
+    },
+    {
+      "capture": "mean"
+    },
+    {
+      "different": [
+        "circle",
+        "mean"
+      ]
+    },
+    {
+      "key": "right"
+    },
+    {
+      "capture": "wrap"
+    },
+    {
+      "same": [
+        "triangle",
+        "wrap"
+      ]
+    },
+    {
+      "key": "back"
+    }
+  ]
+}

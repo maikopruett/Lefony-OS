@@ -1,0 +1,12 @@
+{
+  "abi": 1,
+  "id": "notebook",
+  "name": "Notebook",
+  "version": "0.6.2",
+  "license": "CC-BY-NC-SA-4.0",
+  "schema": 1,
+  "minimum_api": 12,
+  "required_capabilities": 11807,
+  "optional_capabilities": 0,
+  "data_schema": 0
+}

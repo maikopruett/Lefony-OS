@@ -6,13 +6,27 @@ import json
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'sdk/tools'))
-from signing import firmware_header
+from signing import firmware_header, public_der, SPKI_PREFIX, SPKI_SUFFIX
+import hashlib
+
+
+def emulator_header(key, output):
+    der = public_der(key)
+    values = [hashlib.sha256(der).digest(), der[len(SPKI_PREFIX):-len(SPKI_SUFFIX)]]
+    encoded = ','.join('{' + ','.join(f'0x{x:02x}' for x in value) + '}' for value in values)
+    output.write_text('// Public synthetic-workspace fixture; never a physical trust root.\n'
+                     '#if !PRIME_G2_EMULATOR\n#error Emulator app key included in physical build\n#endif\n'
+                     'constexpr LefonyAppTrustRoot LefonyEmulatorAppKey={' + encoded + '};\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('key_list', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--emulator-fixture', action='store_true')
     args = parser.parse_args()
+    if args.emulator_fixture:
+        emulator_header(args.key_list, args.output)
+        raise SystemExit(0)
     keys = json.loads(args.key_list.read_text())
     if not isinstance(keys, list) or not all(isinstance(key, str) for key in keys):
         parser.error('key list must be a JSON array of public PEM file paths')

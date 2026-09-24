@@ -28,14 +28,15 @@ uint32_t fileBlocks(uint32_t bytes) {
   return (bytes + 64 + (BlockBytes - 128) - 1) / (BlockBytes - 128);
 }
 } // namespace
-Volume::Volume(Backend backend)
-    : m_backend(backend), m_legacy(backend), m_fs{}, m_config{}, m_file{}, m_fileConfig{},
+Volume::Volume(Backend backend,AppFileStore::ReadCache *cache)
+    : m_backend(backend), m_legacy(backend), m_fs{}, m_documents(&m_fs), m_files(&m_fs,&m_documents), m_config{}, m_file{}, m_fileConfig{},
       m_readCache{}, m_writeCache{}, m_fileCache{}, m_lookahead{}, m_scratch{}, m_protected{},
       m_used{}, m_identity{}, m_header{}, m_path{}, m_package(nullptr), m_data(nullptr),
       m_packageBytes(0), m_dataBytes(0), m_cursor(0), m_hash{}, m_state(State::Unprovisioned),
       m_icon(false), m_mounted(false), m_open(false), m_legacyValid(false), m_finishedMigration(false) {
   m_config.context = this;
   m_config.read = readBlock;
+  m_config.read_metadata = readMetadata;
   m_config.prog = programBlock;
   m_config.erase = eraseBlock;
   m_config.sync = syncBlock;
@@ -54,8 +55,12 @@ Volume::Volume(Backend backend)
   m_config.metadata_max = 8192;
   m_config.inline_max = 256;
   m_fileConfig.buffer = m_fileCache;
+  m_documents.setChunkRetainer(retainChunk,this);
+  m_files.setChunkAdmission(admitChunk,this);
+  for(auto &reader:m_readers) reader.setCache(cache);
 }
 Volume::~Volume() {
+  closeSnapshots();
   if (m_mounted)
     lfs_unmount(&m_fs);
 }
@@ -72,12 +77,42 @@ int Volume::readBlock(const lfs_config *c, lfs_block_t block, lfs_off_t offset, 
       return LFS_ERR_CORRUPT;
   return 0;
 }
+int Volume::readMetadata(const lfs_config *c,lfs_block_t block,lfs_off_t offset,void *data,lfs_size_t size) {
+  auto &v=*static_cast<Volume *>(c->context);
+  if(block>=FSBlocks || offset%PageBytes || size%PageBytes || offset>BlockBytes || size>BlockBytes-offset) return LFS_ERR_INVAL;
+  for(uint32_t i=0;i<size;i+=PageBytes) {
+    uint32_t tag=block*PagesPerBlock+(offset+i)/PageBytes+1;
+    MetadataPage *cached=nullptr;
+    for(auto &page:v.m_metadata) if(page.tag==tag) {cached=&page;break;}
+    if(!cached) {
+      auto &page=v.m_metadata[v.m_metadataNext];page.tag=0;
+      int rc=readBlock(c,block,offset+i,page.data,PageBytes);
+      if(rc) return rc; // Failed/partial reads never become cache entries.
+      page.tag=tag;cached=&page;v.m_metadataNext=(v.m_metadataNext+1)%MetadataPages;
+    }
+    memcpy(static_cast<uint8_t *>(data)+i,cached->data,PageBytes);
+  }
+  return 0;
+}
+void Volume::invalidateMetadata(uint32_t block) {
+  // Also invalidate before commands that fail or are interrupted: their media
+  // effects can be uncertain. Never serve pre-write bytes during readback.
+  for(auto &page:m_metadata) if(page.tag && (page.tag-1)/PagesPerBlock==block) page.tag=0;
+}
+void Volume::refreshMetadata() {
+  // Revalidation across a consent/commit boundary must observe the medium,
+  // including changes outside this Volume's program/erase callbacks.
+  for(auto &page:m_metadata) page.tag=0;
+  m_metadataNext=0;
+  m_fs.rcache.block=static_cast<lfs_block_t>(-1);
+}
 int Volume::programBlock(const lfs_config *c, lfs_block_t block, lfs_off_t offset, const void *data,
                          lfs_size_t size) {
   auto &v = *static_cast<Volume *>(c->context);
   if (block >= FSBlocks || offset % PageBytes || size % PageBytes || offset > BlockBytes ||
       size > BlockBytes - offset)
     return LFS_ERR_INVAL;
+  v.invalidateMetadata(block);
   if (v.m_protected[block + 2] || !v.m_backend.usable(v.m_backend.context, FSFirst + block))
     return LFS_ERR_CORRUPT;
   for (uint32_t i = 0; i < size; i += PageBytes)
@@ -91,6 +126,7 @@ int Volume::eraseBlock(const lfs_config *c, lfs_block_t block) {
   auto &v = *static_cast<Volume *>(c->context);
   if (block >= FSBlocks)
     return LFS_ERR_INVAL;
+  v.invalidateMetadata(block);
   if (v.m_protected[block + 2] || !v.m_backend.usable(v.m_backend.context, FSFirst + block))
     return LFS_ERR_CORRUPT;
   return v.m_backend.erase(v.m_backend.context, FSFirst + block) ? 0 : LFS_ERR_CORRUPT;
@@ -158,9 +194,12 @@ bool Volume::mount() {
        m_state != State::Unprovisioned && m_state != State::Migrating))
     return false;
   if (m_mounted) {
+    if(!closeSnapshots()) { fail();return false; }
     lfs_unmount(&m_fs);
     m_mounted = false;
   }
+  for(auto &page:m_metadata) page.tag=0;
+  m_metadataNext=0;
   memset(m_protected, 0, sizeof(m_protected));
   m_finishedMigration = false;
   m_legacyValid = false;
@@ -232,7 +271,7 @@ bool Volume::initialize(uint8_t *package, size_t capacity, uint8_t *data, size_t
       fail();
       return false;
     }
-    return true;
+    return pruneOrphans();
   }
   if (m_state == State::Unprovisioned) {
     if (!m_legacy.reserve()) {
@@ -361,8 +400,13 @@ bool Volume::readHeader(const char *file, uint8_t header[64]) {
 bool Volume::entry(const char *id, Entry *out, bool icon) {
   char file[64];
   uint8_t header[64];
-  if (!out || !path(id, file, icon) || !readHeader(file, header))
-    return false;
+  if (!out || !path(id, file, icon)) return false;
+  if (!readHeader(file, header)) {
+    AppDocumentRoot::Root root;
+    if(icon || !documentRoot(id,&root)) return false;
+    uint32_t bytes;if(!m_documents.privateBytes(id,root.current,&bytes)) return false;
+    *out={root.serial,root.current.packageBytes,bytes};return true;
+  }
   *out = {get(header + 12), get(header + 16), get(header + 20)};
   return true;
 }
@@ -370,7 +414,9 @@ bool Volume::read(const char *id, uint8_t *package, size_t capacity, uint8_t *da
                   size_t dataCapacity, bool icon) {
   char file[64];
   uint8_t header[64];
-  if (!path(id, file, icon) || !readHeader(file, header) || !package || capacity < get(header + 16) ||
+  if(!path(id,file,icon)) return false;
+  if(!readHeader(file,header)) return !icon && m_mounted && m_documents.read(id,package,capacity,data,dataCapacity);
+  if (!package || capacity < get(header + 16) ||
       (get(header + 20) && (!data || dataCapacity < get(header + 20))) ||
       !openFile(file, LFS_O_RDONLY))
     return false;
@@ -390,7 +436,12 @@ bool Volume::read(const char *id, uint8_t *package, size_t capacity, uint8_t *da
   NativeAppHash::shaFinal(&hash, digest);
   return !memcmp(digest, header + 24, 32);
 }
-bool Volume::list(Visitor visitor, void *context) {
+int Volume::namespaceState(const char *id) {
+  char file[64];if(!m_mounted || m_open || !path(id,file)) return LFS_ERR_INVAL;
+  lfs_info info;int result=lfs_stat(&m_fs,file,&info);
+  return !result?1:result==LFS_ERR_NOENT?0:result;
+}
+bool Volume::list(Visitor visitor, void *context,bool includeUnreadable) {
   if (!m_mounted || m_open || !visitor)
     return false;
   lfs_dir_t dir;
@@ -408,8 +459,8 @@ bool Volume::list(Visitor visitor, void *context) {
       break;
     }
     info.name[length - 4] = 0;
-    Entry e;
-    if (!entry(info.name, &e) || !visitor(context, info.name, e)) {
+    Entry e{};
+    if ((!entry(info.name, &e) && !includeUnreadable) || !visitor(context, info.name, e)) {
       ok = false;
       break;
     }
@@ -442,7 +493,10 @@ bool Volume::space(Space *out) {
 }
 bool Volume::begin(const char *id, const uint8_t *package, uint32_t packageBytes,
                    const uint8_t *data, uint32_t dataBytes, bool icon) {
-  if (!m_mounted || (m_state != State::Ready && m_state != State::Complete) || !path(id, m_path, icon) ||
+  // Readers keep immutable chunks alive, but uninstall must not remove their
+  // namespace. The application lifecycle closes its handles before uninstall.
+  if(!icon && !packageBytes && hasSnapshots(id)) return false;
+  if (!m_mounted || m_fileOperation || (m_state != State::Ready && m_state != State::Complete) || !path(id, m_path, icon) ||
       packageBytes > MaximumPackage || dataBytes > MaximumData ||
       (packageBytes && (!package || packageBytes < 468)) || (dataBytes && !data) ||
       (!packageBytes && dataBytes))
@@ -453,9 +507,16 @@ bool Volume::begin(const char *id, const uint8_t *package, uint32_t packageBytes
     if (rc != 0 && rc != LFS_ERR_EXIST) return false;
   }
   m_icon = icon;
+  AppDocumentRoot::Root documents;
+  // An old writer must never replace a FILE3 root with a combined FILE2 file.
+  // Version-aware update/checkpoint methods own all subsequent mutations.
+  if(!icon && packageBytes && documentRoot(id,&documents)) return false;
+  m_documentOperation=false;
   Entry old = {};
-  entry(id, &old, icon);
-  if (old.generation == 0xffffffffu || (!packageBytes && !old.packageBytes))
+  bool readableEntry=entry(id,&old,icon);
+  lfs_info existing;int stat=lfs_stat(&m_fs,m_path,&existing);
+  if((stat && stat!=LFS_ERR_NOENT) || (!stat && !readableEntry)) return false;
+  if ((packageBytes && old.generation == 0xffffffffu) || (!packageBytes && !old.packageBytes))
     return false;
   Space usage;
   if (!space(&usage))
@@ -487,7 +548,57 @@ bool Volume::begin(const char *id, const uint8_t *package, uint32_t packageBytes
   m_state = packageBytes ? State::Writing : State::Committing;
   return true;
 }
+int Volume::readHomeOrder(uint8_t *out,uint32_t capacity) {
+  if(!out || !documentReady()) return -1;
+  lfs_info info;int rc=lfs_stat(&m_fs,"home-order",&info);
+  if(rc==LFS_ERR_NOENT) return 0;
+  if(rc || info.type!=LFS_TYPE_REG || info.size<72 || info.size>64+MaximumHomeOrder) return -1;
+  uint32_t bytes=info.size-64;if(bytes>capacity) return -1;
+  uint8_t header[64],digest[32];
+  bool ok=openFile("home-order",LFS_O_RDONLY) && lfs_file_read(&m_fs,&m_file,header,64)==64 &&
+    !memcmp(header,"LFHOME1\0",8) && get(header+16)==bytes;
+  if(ok) ok=lfs_file_read(&m_fs,&m_file,out,bytes)==static_cast<lfs_ssize_t>(bytes);
+  ok=closeFile() && ok;
+  if(ok) {NativeAppHash::sha256(out,bytes,digest);ok=!memcmp(digest,header+24,32);}
+  return ok?static_cast<int>(bytes):-1;
+}
+bool Volume::beginHomeOrder(const uint8_t *data,uint32_t bytes) {
+  if(!documentReady() || !data || bytes<8 || bytes>MaximumHomeOrder || !documentSpace(0,bytes,false)) return false;
+  // Reuse the existing write -> close -> full readback -> atomic rename path.
+  // The dedicated root file is outside every app's namespace and catalog.
+  m_documentOperation=false;m_icon=true;
+  memcpy(m_path,"home-order",11);m_package=data;m_packageBytes=bytes;
+  m_data=nullptr;m_dataBytes=0;m_cursor=0;memset(m_header,0,sizeof(m_header));
+  memcpy(m_header,"LFHOME1\0",8);put(m_header+16,bytes);
+  NativeAppHash::sha256(data,bytes,m_header+24);m_state=State::Writing;return true;
+}
 void Volume::step() {
+  if(m_fileOperation) {
+    m_files.step();using F=AppFileStore::Store::State;
+    if(m_fileAdmission && m_files.prepared()) {
+      m_fileAdmission=false;
+      if(!documentSpace(m_fileBudgetPackage,m_fileBudgetData,false)) { m_files.cancel();fail();return; }
+    }
+    switch(m_files.state()) {
+    case F::Complete:m_state=State::Complete;m_fileOperation=false;break;
+    case F::Failed:fail();break;
+    case F::Committing:m_state=State::Committing;break;
+    case F::Reading:m_state=State::Ready;break;
+    default:m_state=State::Writing;break;
+    }
+    return;
+  }
+  if(m_documentOperation) {
+    m_documents.step();
+    using S=AppDocumentStore::Store::State;
+    switch(m_documents.state()) {
+    case S::Complete:m_state=State::Complete;break;
+    case S::Failed:fail();break;
+    case S::Committing:m_state=State::Committing;break;
+    default:m_state=State::Writing;break;
+    }
+    return;
+  }
   bool ok = true;
   if (m_state == State::Writing) {
     if (!m_open)
@@ -541,8 +652,16 @@ void Volume::step() {
       if (rc != 0 && rc != LFS_ERR_NOENT) { fail(); return; }
     }
     ok = m_packageBytes ? lfs_rename(&m_fs, Pending, m_path) == 0 : lfs_remove(&m_fs, m_path) == 0;
-    if (ok)
+    if (ok) {
       m_state = State::Complete;
+      if(!m_packageBytes && !m_icon) {
+        char id[49];size_t n=strlen(m_path+5)-4;memcpy(id,m_path+5,n);id[n]=0;
+        if(!m_documents.prune(id)) fail();
+        else if(m_documents.state()!=AppDocumentStore::Store::State::Complete) {
+          m_documentOperation=true;m_state=State::Committing;
+        }
+      }
+    }
   }
   if (!ok) {
     closeFile();
@@ -555,12 +674,274 @@ bool Volume::finish() {
   return m_state == State::Complete;
 }
 void Volume::cancel() {
+  if(m_fileOperation) {
+    m_files.cancel();
+    if(m_files.state()==AppFileStore::Store::State::Idle) { m_fileOperation=false;m_state=State::Ready; }
+    else if(m_files.state()==AppFileStore::Store::State::Failed) fail();
+    return;
+  }
+  if(m_documentOperation) {
+    m_documents.cancel();
+    if(m_documents.state()==AppDocumentStore::Store::State::Idle) m_state=State::Ready;
+    else if(m_documents.state()==AppDocumentStore::Store::State::Failed) fail();
+    return;
+  }
   if (m_state == State::Writing || m_state == State::Verifying) {
     if (closeFile())
       m_state = State::Ready;
     else
       fail();
   }
+}
+bool Volume::documentReady() const {
+  return m_mounted && !m_open && !m_fileOperation && (m_state==State::Ready || m_state==State::Complete);
+}
+bool Volume::documentRoot(const char *id,AppDocumentRoot::Root *out) {
+  return m_mounted && !m_open && m_documents.root(id,out);
+}
+bool Volume::documentSpace(uint32_t packageBytes,uint32_t dataBytes,bool conversion) {
+  Space usage;if(!space(&usage) || !usage.capacity) return false;
+  // Include one FILE5 payload block, two metadata blocks for commit/recovery and four for the
+  // first objects/app directory pairs. Account for retained generations by
+  // using actual allocation; they cannot be credited as reclaimable space.
+  uint32_t needed=3+(conversion?4:0)+(packageBytes?fileBlocks(packageBytes):0)+
+    (dataBytes>256?fileBlocks(dataBytes):0);
+  uint32_t total=usage.capacity+ReserveBlocks*BlockBytes;
+  return usage.allocated<=total && needed<=(total-usage.allocated)/BlockBytes;
+}
+bool Volume::beginCheckpoint(const char *id,const uint8_t *data,uint32_t bytes,
+                             const uint32_t version[3],uint32_t schema,bool acceptUpgrade) {
+  if(!documentReady() || bytes>MaximumData || (bytes && !data) || !path(id,m_path)) return false;
+  AppDocumentRoot::Root before,after;bool converted=documentRoot(id,&before);
+  if(converted) {
+    if(before.serial==0xffffffffu) return false;
+    after=before;after.serial++;
+    if(!(before.flags&AppDocumentRoot::PendingUpgrade)) after.previous=before.current;
+  } else {
+    uint8_t header[64];
+    if(!version || !readHeader(m_path,header) || get(header+12)==0xffffffffu || acceptUpgrade) return false;
+    for(unsigned i=0;i<3;i++) { if(version[i]>999999) return false;after.highVersion[i]=version[i]; }
+    after.serial=get(header+12)+1;after.current.package=after.serial;after.current.packageBytes=get(header+16);
+  }
+  if(acceptUpgrade) {
+    if(!(before.flags&AppDocumentRoot::PendingUpgrade)) return false;
+    after.flags=0;after.previous={};
+  }
+  if(converted && before.current.dataKind==AppDocumentRoot::FileIndex) {
+    after.current.dataSchema=schema;
+    if(!m_files.begin(id,nullptr,bytes,before,after,false,0,data,true)) return false;
+    m_fileAdmission=true;m_fileBudgetPackage=bytes;m_fileBudgetData=AppFileIndex::MaximumBytes;
+    m_documentOperation=false;m_fileOperation=true;m_state=State::Writing;return true;
+  }
+  after.current.data=after.serial;after.current.dataBytes=bytes;after.current.dataSchema=schema;
+  if(!documentSpace(converted?0:after.current.packageBytes,bytes,!converted)) return false;
+  if(!m_documents.begin(id,before,after,nullptr,data,true,!converted)) return false;
+  m_documentOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::beginUpgrade(const char *id,const uint8_t *package,uint32_t bytes,const uint32_t version[3]) {
+  if(!documentReady() || !package || bytes<468 || bytes>MaximumPackage || !version) return false;
+  AppDocumentRoot::Root before;
+  if(!documentRoot(id,&before) || before.serial==0xffffffffu || before.flags&AppDocumentRoot::PendingUpgrade) return false;
+  int order=0;
+  for(unsigned i=0;i<3;i++) {
+    if(version[i]>999999) return false;
+    if(!order && version[i]!=before.highVersion[i]) order=version[i]>before.highVersion[i]?1:-1;
+  }
+  if(order<=0) return false;
+  auto after=before;after.serial++;after.previous=before.current;after.flags=AppDocumentRoot::PendingUpgrade;
+  memcpy(after.highVersion,version,sizeof(after.highVersion));after.current.package=after.serial;after.current.packageBytes=bytes;
+  if(!documentSpace(bytes,0,false)) return false;
+  if(!m_documents.begin(id,before,after,package,nullptr,false,false)) return false;
+  m_documentOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::beginAccept(const char *id,uint32_t expectedSchema) {
+  if(!documentReady()) return false;
+  AppDocumentRoot::Root before;
+  if(!documentRoot(id,&before) || before.serial==0xffffffffu || !(before.flags&AppDocumentRoot::PendingUpgrade) ||
+     before.current.dataSchema!=expectedSchema) return false;
+  auto after=before;after.serial++;after.flags=0;after.previous={};
+  if(!documentSpace(0,0,false)) return false;
+  if(!m_documents.begin(id,before,after,nullptr,nullptr,false,false)) return false;
+  m_documentOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::beginRollback(const char *id) {
+  if(!documentReady()) return false;
+  AppDocumentRoot::Root before;
+  if(!documentRoot(id,&before) || before.serial==0xffffffffu || !(before.flags&AppDocumentRoot::PendingUpgrade)) return false;
+  auto after=before;after.serial++;after.current=before.previous;after.previous={};after.flags=0;
+  if(!documentSpace(0,0,false)) return false;
+  if(!m_documents.begin(id,before,after,nullptr,nullptr,false,false)) return false;
+  m_documentOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::recoveryPackage(const char *id,uint8_t *package,size_t capacity,Entry *out) {
+  AppDocumentRoot::Root root;uint32_t bytes;
+  if(!out || !documentReady() || !documentRoot(id,&root) || !(root.flags&AppDocumentRoot::PendingUpgrade) ||
+     !m_documents.privateBytes(id,root.previous,&bytes) || !m_documents.readRecoveryPackage(id,package,capacity)) return false;
+  *out={root.previous.package,root.previous.packageBytes,bytes};return true;
+}
+bool Volume::pruneOrphans() {
+  lfs_dir_t dir;int rc=lfs_dir_open(&m_fs,&dir,"objects");
+  if(rc==LFS_ERR_NOENT) return true;
+  if(rc) { fail();return false; }
+  lfs_info info;bool ok=true;unsigned entries=0;
+  while((rc=lfs_dir_read(&m_fs,&dir,&info))>0) {
+    if(!strcmp(info.name,".") || !strcmp(info.name,"..")) continue;
+    char file[64];
+    if(++entries>MaximumEntries || info.type!=LFS_TYPE_DIR || !path(info.name,file)) { ok=false;break; }
+    lfs_info app;int exists=lfs_stat(&m_fs,file,&app);
+    if(exists==LFS_ERR_NOENT) {
+      if(!m_documents.prune(info.name)) { ok=false;break; }
+      m_documentOperation=true;m_state=State::Writing;
+      if(!finish()) { ok=false;break; }
+    } else if(exists) { ok=false;break; }
+  }
+  ok=(lfs_dir_close(&m_fs,&dir)==0)&&rc>=0&&ok;
+  if(!ok) fail();else { m_state=State::Ready;m_documentOperation=false; }
+  return ok;
+}
+bool Volume::nextFileRoot(const char *id,AppDocumentRoot::Root *before,AppDocumentRoot::Root *after) {
+  if(!documentReady() || !documentRoot(id,before) || before->serial==0xffffffffu) return false;
+  *after=*before;after->serial++;
+  if(!(before->flags&AppDocumentRoot::PendingUpgrade)) after->previous=before->current;
+  return true;
+}
+bool Volume::beginFile(const char *id,const char *name,uint32_t bytes,bool patch,uint32_t offset) {
+  AppDocumentRoot::Root before,after;
+  if(!name || bytes>64*1024*1024 || !nextFileRoot(id,&before,&after)) return false;
+  uint32_t extra=patch?((bytes+AppFileIndex::ChunkBytes-1)/AppFileIndex::ChunkBytes+2)*BlockBytes:bytes;
+  if(!m_files.begin(id,name,bytes,before,after,patch,offset)) return false;
+  m_fileAdmission=true;m_fileBudgetPackage=extra;m_fileBudgetData=AppFileIndex::MaximumBytes;
+  m_documentOperation=false;m_fileOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::admitChunk(void *context,uint32_t bytes) {
+  auto &volume=*static_cast<Volume *>(context);Space usage;
+  if(!volume.space(&usage)) return false;
+  // Growing user output must not consume the volume's reserved maintenance
+  // blocks. Package updates/recovery retain access to those blocks through
+  // documentSpace; staging leaves two metadata blocks plus the FILE5 payload
+  // and file index for its own commit, including an empty streamed output.
+  uint32_t needed=3+(bytes?fileBlocks(bytes):0)+fileBlocks(AppFileIndex::MaximumBytes);
+  return usage.allocated<=usage.capacity && needed<=(usage.capacity-usage.allocated)/BlockBytes;
+}
+bool Volume::beginStream(const char *id,const char *name,AppFileStore::Store::StreamMode mode) {
+  AppDocumentRoot::Root before,after;
+  if(!nextFileRoot(id,&before,&after) || !m_files.beginStream(id,name,mode,before,after)) return false;
+  // The final size is unknown. Admission reserves index/commit headroom before
+  // each chunk flush and again before publishing even an empty file.
+  m_fileAdmission=false;m_documentOperation=false;m_fileOperation=true;m_state=State::Writing;return true;
+}
+bool Volume::changeFile(const char *id,const char *name,const char *destination,bool directory) {
+  AppDocumentRoot::Root before,after;
+  if(!nextFileRoot(id,&before,&after) ||
+     !m_files.mutate(id,name,destination,directory,before,after)) return false;
+  m_fileAdmission=true;m_fileBudgetPackage=0;m_fileBudgetData=AppFileIndex::MaximumBytes;
+  m_documentOperation=false;m_fileOperation=true;m_state=State::Writing;return true;
+}
+int Volume::fileInfo(const char *id,const char *name,uint32_t *kind,uint32_t *bytes) {
+  if(!m_mounted || m_open || !kind || !bytes || !path(id,m_path)) return LFS_ERR_IO;
+  AppDocumentRoot::Root root;
+  if(documentRoot(id,&root)) return m_documents.fileInfo(id,root.current,name,kind,bytes);
+  // A verified FILE2 header has no named files. Corrupt/unknown roots fail;
+  // they must never be treated as an empty namespace or reformatted.
+  uint8_t header[64];return readHeader(m_path,header)?0:LFS_ERR_IO;
+}
+bool Volume::openFile(const char *id,const char *name) {
+  AppDocumentRoot::Root root;
+  if(!documentReady() || !documentRoot(id,&root) || !m_files.openRead(id,name,root)) return false;
+  m_documentOperation=false;m_fileOperation=true;m_fileAdmission=false;return true;
+}
+int Volume::listFiles(const char *id,const char *directory,uint32_t offset,uint32_t *generation,
+                       AppFileIndex::Entry *out,uint32_t capacity,uint32_t *next) {
+  if(!directory || (*directory && !AppFileIndex::path(directory)) || !generation ||
+     !out || !capacity || !next || (offset && !*generation)) return LFS_ERR_INVAL;
+  if(!m_mounted || m_open || m_state==State::Failed || !path(id,m_path)) return LFS_ERR_IO;
+  AppDocumentRoot::Root root;
+  if(documentRoot(id,&root)) {
+    if(*generation && *generation!=root.serial) return CatalogChanged;
+    int count=m_documents.listFiles(id,root.current,directory,offset,out,capacity,next);
+    if(count>=0) *generation=root.serial;
+    return count;
+  }
+  // A verified legacy header has an empty named namespace. Inspection must
+  // not convert it, create a root, or treat malformed media as an empty app.
+  uint8_t header[64];if(!readHeader(m_path,header)) return LFS_ERR_IO;
+  uint32_t serial=AppFileIndex::get(header+12);
+  if(*generation && *generation!=serial) return CatalogChanged;
+  if(*directory) return LFS_ERR_NOENT;
+  if(offset) return LFS_ERR_INVAL;
+  *generation=serial;*next=0;return 0;
+}
+bool Volume::fileUsage(const char *id,FileUsage *out) {
+  if(!m_mounted || m_open || m_state==State::Failed || !out || !path(id,m_path)) return false;
+  FileUsage usage{};AppDocumentRoot::Root root;
+  if(documentRoot(id,&root)) {
+    usage.generation=root.serial;usage.packageBytes=root.current.packageBytes;
+    if(!m_documents.fileUsage(id,root.current,&usage.data)) return false;
+  } else {
+    uint8_t header[64];if(!readHeader(m_path,header)) return false;
+    usage.generation=AppFileIndex::get(header+12);
+    usage.packageBytes=AppFileIndex::get(header+16);
+    usage.data.privateBytes=AppFileIndex::get(header+20);
+  }
+  *out=usage;return true;
+}
+bool Volume::closeReader() {
+  if(!m_fileOperation || !m_files.closeRead()) return false;
+  m_fileOperation=false;m_state=State::Ready;return true;
+}
+bool Volume::retainChunk(void *context,const char *id,uint32_t generation,uint32_t part) {
+  const auto &v=*static_cast<Volume *>(context);
+  for(const auto &reader:v.m_readers) if(reader.retains(id,generation,part)) return true;
+  return false;
+}
+bool Volume::hasSnapshots(const char *id) const {
+  for(const auto &reader:m_readers) if(reader.belongsTo(id)) return true;
+  return false;
+}
+int Volume::snapshotSlot(const char *id,uint32_t token) const {
+  if(!token) return -1;
+  unsigned slot=token%MaximumReaders;
+  return m_readerTokens[slot]==token && m_readers[slot].belongsTo(id)?static_cast<int>(slot):-1;
+}
+uint32_t Volume::openSnapshot(const char *id,const char *name) {
+  if(!m_mounted || m_open || m_state==State::Failed ||
+     (!documentReady() && !m_fileOperation) || m_readerSerial==0x3fffffffu) return 0;
+  unsigned slot=0;while(slot<MaximumReaders && m_readerTokens[slot]) slot++;
+  if(slot==MaximumReaders) return 0;
+  AppDocumentRoot::Root root;
+  // root/snapshot reject while the shared document engine is working. Already
+  // open snapshots have independent lfs files and can advance during that work.
+  if(!documentRoot(id,&root) || !m_readers[slot].open(&m_fs,&m_documents,id,name,root)) return 0;
+  uint32_t token=(++m_readerSerial)*MaximumReaders+slot;m_readerTokens[slot]=token;return token;
+}
+int Volume::readSnapshot(const char *id,uint32_t token,void *out,uint32_t bytes) {
+  int slot=snapshotSlot(id,token);return slot<0?-1:m_readers[slot].read(out,bytes);
+}
+int Volume::readCachedSnapshot(const char *id,uint32_t token,void *out,uint32_t bytes) {
+  int slot=snapshotSlot(id,token);return slot<0?-1:m_readers[slot].readCached(out,bytes);
+}
+bool Volume::stepSnapshot(const char *id,uint32_t token) {
+  int slot=snapshotSlot(id,token);if(slot<0) return false;
+  m_readers[slot].step();return true;
+}
+bool Volume::seekSnapshot(const char *id,uint32_t token,uint32_t offset) {
+  int slot=snapshotSlot(id,token);return slot>=0 && m_readers[slot].seek(offset);
+}
+bool Volume::snapshotInfo(const char *id,uint32_t token,SnapshotInfo *out) const {
+  int slot=snapshotSlot(id,token);if(slot<0 || !out) return false;
+  const auto &reader=m_readers[slot];
+  *out={reader.size(),reader.position(),reader.verifiedBytes(),reader.state()};return true;
+}
+bool Volume::closeSnapshot(const char *id,uint32_t token) {
+  int slot=snapshotSlot(id,token);if(slot<0) return false;
+  bool ok=m_readers[slot].close();m_readerTokens[slot]=0;return ok;
+}
+bool Volume::closeSnapshots(const char *id) {
+  bool ok=true;
+  for(unsigned i=0;i<MaximumReaders;i++) if(m_readerTokens[i] && (!id || m_readers[i].belongsTo(id))) {
+    ok=m_readers[i].close()&&ok;m_readerTokens[i]=0;
+  }
+  return ok;
 }
 } // namespace AppStorage
 } // namespace PrimeG2

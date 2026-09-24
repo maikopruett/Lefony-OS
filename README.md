@@ -17,6 +17,33 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 > separately. This is community firmware, not an HP-supported update. Prime G1
 > is not a supported target.
 
+## Latest updates — September 24, 2026
+
+- **Native C/C++ SDK:** conventional `main`/newlib support, ARM emulator
+  preview, input replay, GDB debugging, UI components and reference apps.
+  See the [SDK guide](sdk/README.md) and
+  [implementation ledger](docs/NATIVE-APP-SDK-1.0-PROGRESS.md).
+- **App files and recovery:** streaming files, private-data backup/restore,
+  retained app/data pairs, archives and developer-key management. See
+  [file exchange](sdk/FILE-EXCHANGE.md) and [archives](sdk/ARCHIVES.md).
+- **Faster transfers and startup:** recorded physical measurements show Doom
+  installation falling from 735 to 106 seconds and a verified native OS update
+  taking 4.9 seconds. Doom 0.2.3 also improves startup. See the
+  [storage measurements](docs/STORAGE-SPEED-RELEASE-20260924.md) and
+  [startup record](docs/DOOM-STARTUP-PERFORMANCE.md).
+- **App installation and Home ordering:** the current firmware candidate adds
+  an automatically dismissed progress screen and long-press app rearrangement
+  with saved ordering. See the
+  [implementation and validation record](docs/APP-INSTALL-AND-HOME-ORDER.md).
+- **Desktop SDK:** macOS ARM64 and Linux x86-64 bundles include a browser
+  emulator with clickable Prime keys and a zoomable touchscreen. See the
+  [download and qualification record](docs/SDK-EMULATOR-RELEASE.md).
+
+SDK 1.0 remains in development. Source changes, downloadable bundles and
+physical qualification have separate status; consult
+[current status](docs/STATUS.md) before selecting a candidate. Native Windows
+SDK distribution and broader hardware qualification remain unfinished.
+
 ## What works
 
 - Calculator history with touch scrolling and expression/answer recall.
@@ -35,15 +62,25 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 See [current status](docs/STATUS.md) for limitations and the distinction between
 hardware-tested behavior and modeled behavior.
 
-The [native SDK](sdk/README.md) builds and runs C++ app packages in
+The [native SDK](sdk/README.md) builds and runs C/C++ app packages in
 the emulator. It includes starter projects, `AGENTS.md`, drawing/input APIs and
 automatic publication tooling, signed ABI 1 packages and USB installation.
 Lefony reserves the fixed app region during OS startup, independently of the
 website. The browser reads installed apps and free capacity, and installs packages. This retires the
 stock HP filesystem and remains a development candidate awaiting hardware qualification.
 See [implementation status](docs/NATIVE-APP-SDK-STATUS.md) and the
-[full SDK/store plan](docs/NATIVE-APP-SDK-PLAN.md). The [setup runbook](docs/NATIVE-APP-SETUP.md)
-covers the provisioned website, signing keys, OAuth and validator service.
+[SDK maturity roadmap](docs/NATIVE-APP-SDK-MATURITY-PLAN.md) for the path to a
+complete developer platform. The [setup runbook](docs/NATIVE-APP-SETUP.md)
+covers the website, signing keys, OAuth and local publication. The current
+SDK candidate adds persistent synthetic workspaces, normal-input tests,
+debugging and a small [Pocket Lab example](sdk/examples/pocket-lab/src/main.cpp).
+See the [capability matrix](docs/NATIVE-APP-CAPABILITIES.md) for remaining gaps.
+The [SDK 1.0 development plan](docs/NATIVE-APP-SDK-1.0-PLAN.md) focuses on
+dependable C/C++ support, polished UI authoring and actual ARM emulator preview,
+durable files and basic USB/HTTPS connectivity. Four proving applications guide
+its milestones: Doom, Notebook, minigzip and Link Gallery. All four now have
+local ARM emulator journeys; current source, complete downloadable bundles and
+physical qualification have separate status in the SDK implementation ledger.
 
 ## Start contributing
 
@@ -143,7 +180,7 @@ do not repartition an unprovisioned calculator.
 | `native/prime_g2/` | Boot capsule, recovery stub, NAND layout and physical U-Boot integration |
 | `scripts/` | Firmware builds, preparation, installer, signing, history and diagnostics |
 | `vm/` | QEMU board models, emulator runners, boot media and integration tests |
-| `sdk/` | Experimental native C++ SDK, templates, examples and publisher tools |
+| `sdk/` | Experimental native C/C++ SDK, templates, examples and publisher tools |
 | `tests/` | Host tests and explicitly public emulator signing fixtures |
 | `hardware/prime_g2/` | Register contracts, measured facts, and hardware qualification notes |
 | `docs/` | Architecture, contributor guides, installer and technical references |

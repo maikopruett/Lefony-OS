@@ -76,6 +76,31 @@ The default backup directory is
 `build/prime-g2-native-nand/backups/`. An interrupted operation may still have
 produced a useful `pre-...-mtd1.mtd` backup there, so retain those files.
 
+### Capture the running OS without entering recovery
+
+For firmware exposing the existing slot-A page-read interface, capture the
+installed capsule with two independent reads:
+
+```sh
+.venv/bin/python scripts/prime_g2_readonly_os_capture.py \
+  --output build/prime-g2-os-capture --timeout 600
+```
+
+Use a new output directory. The tool requires an idle updater, active slot A
+and no pending boot. It reads only the capsule's validated declared length,
+rejects bad-block markers and changed updater state, and compares both SHA-256
+hashes. Its USB allowlist permits updater status and bounded slot-A page reads;
+it does not program NAND or reboot the calculator.
+
+Success creates `os.zImage`, `verification.zImage` and `report.json`. Until both
+reads pass, files stay in a sibling `.partial` directory; failed attempts retain
+that directory and their report. Keep these calculator-specific captures private
+under ignored `build/` or in a separate private backup location.
+
+This captures BCH-corrected OS bytes only. It excludes NAND spare/OOB bytes,
+bootloader copies and app/user data, and cannot replace the full recovery backup
+or qualify a firmware candidate. Active slot B requires the recovery backup path.
+
 ## Build history
 
 Every successful native, recovery-capsule, and signed-update build is archived
@@ -139,6 +164,11 @@ The installer defaults to the newest `cold-boot-known-good` entry rather than
 an unverified newer build. With the calculator in recovery, press `K` to read
 and verify both installed U-Boot copies. Readbacks are retained in the normal
 backup directory even when a mismatch is found.
+
+An unqualified entry may be selected for the read-only audit, including when
+the catalog contains no qualified baseline. Install rejects that selection
+before preparing a write operation. A matching readback or an emulator pass
+alone does not qualify a bootloader for physical Lefony installation.
 
 The validator parses the packed default environment exactly as U-Boot imports
 it and stops at its first double-NUL. It does not accept `bootcmd` text merely

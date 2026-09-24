@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Linux x86-64 packaging environment. Supply Ubuntu 24.04 pinned by digest and
+# build with --platform linux/amd64. Copy sdk/requirements-desktop.txt and
+# requirements-python-x86_64.txt beside this recipe in a dedicated context.
+# Emulated execution is not native-host
+# qualification; retain the resolved image and package/source inventories.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN test "$(dpkg --print-architecture)" = amd64 \
+    && apt-get update && apt-get install -y --no-install-recommends \
+       ca-certificates python3 python3-venv libpython3.12 \
+       binutils patchelf openssl libusb-1.0-0 libexpat1 \
+       libgmp10 libmpfr6 libmpc3 libisl23 libzstd1 \
+       libglib2.0-0t64 libpixman-1-0 libsdl2-2.0-0 \
+       dbus-daemon gnome-keyring \
+    && mkdir -p /usr/share/lefony-python \
+    && dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\t${source:Package}\t${source:Version}\n' \
+       > /usr/share/lefony-python/debian-packages.tsv \
+    && rm -rf /var/lib/apt/lists/*
+COPY requirements-desktop.txt /usr/share/lefony-python/requirements-desktop.txt
+COPY requirements-python-x86_64.txt /usr/share/lefony-python/requirements-python-x86_64.txt
+RUN python3 -m venv /opt/lefony-python \
+    && /opt/lefony-python/bin/python -m pip install --no-cache-dir --require-hashes --only-binary=:all: \
+       --report /usr/share/lefony-python/install-report.json \
+       -c /usr/share/lefony-python/requirements-desktop.txt \
+       -r /usr/share/lefony-python/requirements-python-x86_64.txt \
+    && /opt/lefony-python/bin/python -m pip install --no-index --no-deps \
+       -r /usr/share/lefony-python/requirements-desktop.txt \
+    && /opt/lefony-python/bin/python -m pip check \
+    && /opt/lefony-python/bin/python -m pip freeze --all \
+       > /usr/share/lefony-python/installed.txt
+# The selected QEMU build also links sndio; SDL's runtime dependency list alone
+# does not include it. Keep the complete build-time-selected runtime available.
+RUN apt-get update && apt-get install -y --no-install-recommends libsndio7.0 \
+    && dpkg-query -W -f='${Package}\t${Version}\t${Architecture}\t${source:Package}\t${source:Version}\n' \
+       > /usr/share/lefony-python/debian-packages.tsv \
+    && rm -rf /var/lib/apt/lists/*
+ENV PATH="/opt/lefony-python/bin:${PATH}"
+WORKDIR /work

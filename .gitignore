@@ -30,6 +30,10 @@ htmlcov/
 *.lfsrc
 /sdk/examples/*/build/
 /sdk/templates/*/build/
+/sdk/runtime/
+/sdk/examples/*/compile_commands.json
+/sdk/examples/*/sdk.lock.json
+/sdk/examples/*/.lefony/
 *.pdf
 *.zip
 *.tar

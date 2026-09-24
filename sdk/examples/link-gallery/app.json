@@ -1,0 +1,12 @@
+{
+  "abi": 1,
+  "id": "link-gallery",
+  "name": "Link Gallery",
+  "version": "0.2.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "schema": 1,
+  "minimum_api": 12,
+  "required_capabilities": 15455,
+  "optional_capabilities": 0,
+  "data_schema": 0
+}

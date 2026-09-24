@@ -460,6 +460,8 @@ OBJECT_DECLARE_SIMPLE_TYPE(PrimeUSBOTGState, PRIME_USBOTG)
 #define USB_ENDPTSTAT       0x1b8
 #define USB_ENDPTCOMPLETE   0x1bc
 #define USB_ENDPTCTRL0      0x1c0
+#define USB_EP0_RX_STALL    BIT(0)
+#define USB_EP0_TX_STALL    BIT(16)
 #define USB_STS_USBINT      BIT(0)
 #define USB_STS_ERROR       BIT(1)
 #define USB_STS_PORTCHANGE  BIT(2)
@@ -481,7 +483,7 @@ struct PrimeUSBOTGState {
     CharFrontend chr;
     uint32_t usbcmd, usbsts, usbintr, deviceaddr, endptlistaddr;
     uint32_t burstsize, portsc1, otgsc, usbmode, setupstat;
-    uint32_t endptprime, endptstat, endptcomplete, endptctrl0;
+    uint32_t endptprime, endptstat, endptcomplete, endptctrl0, endptctrl1;
     bool connected;
     bool suspended;
     bool rom_downloader;
@@ -497,7 +499,7 @@ struct PrimeUSBOTGState {
     uint8_t sdp_dcd[1768]; /* i.MX image v2: 220 register pairs + headers */
     uint16_t sdp_dcd_length, sdp_dcd_offset;
     bool sdp_skip_dcd;
-    uint8_t input[4096];
+    uint8_t input[65536];
     uint16_t input_len;
 };
 
@@ -699,7 +701,11 @@ static void prime_usb_complete(PrimeUSBOTGState *s, unsigned endpoint,
         return;
     }
     s->endptprime &= ~endpoint_bit;
-    s->endptstat &= ~endpoint_bit;
+    if (endpoint && !(next & USB_TD_TERMINATE)) {
+        s->endptstat |= endpoint_bit;
+    } else {
+        s->endptstat &= ~endpoint_bit;
+    }
     s->endptcomplete |= endpoint_bit;
     prime_usb_signal(s, USB_STS_USBINT);
 }
@@ -1138,8 +1144,45 @@ static void prime_usb_host_setup(PrimeUSBOTGState *s, const char *hex)
         return;
     }
     s->setupstat |= 1;
+    /* A new control SETUP clears the preceding protocol stall. See Linux
+     * ChipIdea commit 56ffa1d154c7e12af16273f0cdc42690dd05caf5. */
+    s->endptctrl0 &= ~(USB_EP0_RX_STALL | USB_EP0_TX_STALL);
     prime_usb_signal(s, USB_STS_USBINT);
     prime_usb_reply(s, "OK");
+}
+
+/* Full bulk packets advance an active dTD. Only exhausting its bytes or a
+ * short packet completes it. Synthetic EP0 commands carry the complete data
+ * phase, preserving the existing host interface. */
+static void prime_usb_packet_done(PrimeUSBOTGState *s, unsigned endpoint,
+                                  bool in, hwaddr td, uint32_t token,
+                                  uint32_t buffers[5], size_t length)
+{
+    size_t capacity = (token >> 16) & 0x7fff;
+    hwaddr qh = (s->endptlistaddr & ~0x7ffu) + (endpoint * 2 + in) * 64;
+    uint32_t cap = 0;
+    prime_usb_read32(qh, &cap);
+    unsigned maxpacket = (cap >> 16) & 0x7ff;
+    if (endpoint && maxpacket && length && !(length % maxpacket) && length < capacity) {
+        size_t remaining = length;
+        unsigned page = 0;
+        while (page < 5 && remaining >= 0x1000 - (buffers[page] & 0xfff)) {
+            remaining -= 0x1000 - (buffers[page] & 0xfff); page++;
+        }
+        if (page >= 5) { prime_usb_signal(s, USB_STS_ERROR); return; }
+        uint32_t advanced[5] = {0};
+        advanced[0] = buffers[page] + remaining;
+        for (unsigned i = 1; i + page < 5; i++) advanced[i] = buffers[i + page];
+        for (unsigned i = 0; i < 5; i++) {
+            prime_usb_write32(td + 8 + i * 4, advanced[i]);
+            prime_usb_write32(qh + 16 + i * 4, advanced[i]);
+        }
+        token = (token & ~(0x7fffu << 16)) | ((capacity - length) << 16);
+        prime_usb_write32(td + 4, token);
+        prime_usb_write32(qh + 12, token);
+    } else {
+        prime_usb_complete(s, endpoint, in, td, token, capacity - length);
+    }
 }
 
 static void prime_usb_host_in(PrimeUSBOTGState *s, unsigned endpoint,
@@ -1161,7 +1204,11 @@ static void prime_usb_host_in(PrimeUSBOTGState *s, unsigned endpoint,
     char *end = NULL;
     requested = strtoul(argument, &end, 10);
     uint32_t endpoint_bit = prime_usb_endpoint_bit(endpoint, true);
-    if (!argument[0] || *end || requested > 512 ||
+    if (endpoint == 0 && (s->endptctrl0 & USB_EP0_TX_STALL)) {
+        prime_usb_reply(s, "STALL");
+        return;
+    }
+    if (!argument[0] || *end || requested > (endpoint ? 16384 : 512) ||
         !(s->endptstat & endpoint_bit) ||
         !prime_usb_td(s, endpoint, true, &td, &token, buffers)) {
         prime_usb_reply(s, "NAK");
@@ -1169,14 +1216,14 @@ static void prime_usb_host_in(PrimeUSBOTGState *s, unsigned endpoint,
     }
     size_t available = (token >> 16) & 0x7fff;
     size_t amount = MIN((size_t)requested, available);
-    uint8_t data[512];
+    uint8_t data[16384];
     if (!prime_usb_transfer_memory(buffers, data, amount, false)) {
         prime_usb_signal(s, USB_STS_ERROR);
         prime_usb_reply(s, "ERR dma");
         return;
     }
     prime_usb_reply_data(s, data, amount);
-    prime_usb_complete(s, endpoint, true, td, token, available - amount);
+    prime_usb_packet_done(s, endpoint, true, td, token, buffers, amount);
 }
 
 static void prime_usb_host_out(PrimeUSBOTGState *s, unsigned endpoint,
@@ -1192,9 +1239,13 @@ static void prime_usb_host_out(PrimeUSBOTGState *s, unsigned endpoint,
     }
     hwaddr td;
     uint32_t token, buffers[5];
-    uint8_t data[512];
+    uint8_t data[16384];
     size_t length;
     uint32_t endpoint_bit = prime_usb_endpoint_bit(endpoint, false);
+    if (endpoint == 0 && (s->endptctrl0 & USB_EP0_RX_STALL)) {
+        prime_usb_reply(s, "STALL");
+        return;
+    }
     if (!prime_usb_decode_hex(hex, data, sizeof(data), &length) ||
         !(s->endptstat & endpoint_bit) ||
         !prime_usb_td(s, endpoint, false, &td, &token, buffers)) {
@@ -1208,7 +1259,7 @@ static void prime_usb_host_out(PrimeUSBOTGState *s, unsigned endpoint,
         prime_usb_reply(s, "ERR length");
         return;
     }
-    prime_usb_complete(s, endpoint, false, td, token, capacity - length);
+    prime_usb_packet_done(s, endpoint, false, td, token, buffers, length);
     prime_usb_reply(s, "OK");
 }
 
@@ -1370,6 +1421,7 @@ static uint64_t prime_usb_read(void *opaque, hwaddr offset, unsigned size)
     case USB_ENDPTSTAT: return s->endptstat;
     case USB_ENDPTCOMPLETE: return s->endptcomplete;
     case USB_ENDPTCTRL0: return s->endptctrl0;
+    case USB_ENDPTCTRL0 + 4: return s->endptctrl1;
     default: return 0;
     }
 }
@@ -1414,6 +1466,7 @@ static void prime_usb_write(void *opaque, hwaddr offset, uint64_t value,
         break;
     case USB_ENDPTCOMPLETE: s->endptcomplete &= ~v; break;
     case USB_ENDPTCTRL0: s->endptctrl0 = v; break;
+    case USB_ENDPTCTRL0 + 4: s->endptctrl1 = v; break;
     default: break;
     }
     prime_usb_irq(s);
@@ -1437,7 +1490,7 @@ static void prime_usb_reset(DeviceState *dev)
     s->usbcmd = s->usbsts = s->usbintr = s->deviceaddr = 0;
     s->endptlistaddr = s->burstsize = s->otgsc = s->usbmode = 0;
     s->setupstat = s->endptprime = s->endptstat = s->endptcomplete = 0;
-    s->endptctrl0 = 0;
+    s->endptctrl0 = s->endptctrl1 = 0;
     s->suspended = false;
     qemu_set_irq(s->cable[0], s->connected);
     qemu_set_irq(s->cable[1], s->connected);
@@ -1497,7 +1550,7 @@ static int prime_usb_post_load(void *opaque, int version_id)
 }
 
 static const VMStateDescription prime_usb_vmstate = {
-    .name = TYPE_PRIME_USBOTG, .version_id = 4, .minimum_version_id = 3,
+    .name = TYPE_PRIME_USBOTG, .version_id = 5, .minimum_version_id = 3,
     .post_load = prime_usb_post_load,
     .fields = (const VMStateField[]) {
         VMSTATE_UINT32_ARRAY_V(usbnc_ctrl, PrimeUSBOTGState, 2, 4),
@@ -1517,6 +1570,7 @@ static const VMStateDescription prime_usb_vmstate = {
         VMSTATE_UINT32(endptstat, PrimeUSBOTGState),
         VMSTATE_UINT32(endptcomplete, PrimeUSBOTGState),
         VMSTATE_UINT32(endptctrl0, PrimeUSBOTGState),
+        VMSTATE_UINT32_V(endptctrl1, PrimeUSBOTGState, 5),
         VMSTATE_BOOL(connected, PrimeUSBOTGState),
         VMSTATE_BOOL(suspended, PrimeUSBOTGState),
         VMSTATE_BOOL(rom_downloader, PrimeUSBOTGState),

@@ -39,3 +39,29 @@ upstream sources and pins. Release distributions must also retain all component
 notices from the actual pinned source trees and include the corresponding
 source/build material required by their licenses. Proprietary HP firmware,
 ROMs, vendor PDFs and private captures are not licensed or distributed here.
+
+## Additional license for the conventional app-side runtime
+
+Copyright (c) 2026 Maiko Pruett. The following original Lefony files are
+available under **CC-BY-NC-SA-4.0 OR MIT**, at the recipient's option. The
+copyright holder approved the additional MIT grant on 2026-09-12. The full
+permission and disclaimer are in [LICENSES/MIT.txt](LICENSES/MIT.txt).
+
+- `sdk/include/lefony/app_c.h`
+- `sdk/include/lefony/files.h` and `sdk/include/lefony/files_wire.h`
+- `sdk/include/lefony/foreground.h` and `sdk/include/lefony/foreground_wire.h`
+- `sdk/include/lefony/input_stream.h` and `sdk/include/lefony/input_stream_wire.h`
+- `sdk/lib/start.s`
+- `sdk/lib/newlib/start.c`, `sdk/lib/newlib/os.c` and `sdk/lib/newlib/files.c`
+- `sdk/cmake/foreground.ld`
+
+The original startup-argument template in `sdk/tools/runtime.py:arguments`
+and its generated declarations receive the same additional MIT permission.
+Generated files carry the MIT notice; project argument values and app code
+retain their own terms. The host generator remains GPL-3.0-or-later.
+
+This grant is limited to the material named above. Firmware, Upsilon,
+Escher/Poincare, other SDK helpers, third-party libraries and game assets
+retain their existing licenses. SDK distributions include this scope and
+the complete MIT text. See the [linked-input review](docs/NATIVE-APP-LINKED-LICENSE-REVIEW.md)
+for the separate Doom packaging audit.

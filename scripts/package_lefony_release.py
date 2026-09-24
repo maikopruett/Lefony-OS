@@ -34,7 +34,8 @@ def describe(path):
             'sha256': hashlib.sha256(data).hexdigest()}
 
 
-def package(root, output, version, commit, private_key, recovery_directory=None):
+def package(root, output, version, commit, private_key, recovery_directory=None,
+            working_tree=False):
     parts = parse_version(version)
     if not re.fullmatch(r'[a-f0-9]{40}', commit):
         raise ValueError('Release needs a full source commit')
@@ -76,6 +77,13 @@ def package(root, output, version, commit, private_key, recovery_directory=None)
             'Recovery components and their upstream references/notices are separate downloads in this release.',
         ]
         manifest['message'] = 'Development browser recovery installation is available for testing.'
+    if working_tree:
+        notes[0] = 'Working-tree development build for HP Prime G2.'
+        notes.append('The commit identifies the base revision. The corresponding-source archive contains the exact public working tree and prepared firmware sources used for this build.')
+        manifest['sourceState'] = {
+            'kind': 'working-tree', 'baseCommit': commit,
+            'archiveSha256': manifest['assets']['source']['sha256'],
+        }
     # The ZIP contains firmware, signed capsule, emulator ELF and attribution.
     # Full corresponding source is a separate release asset to avoid duplication.
     with zipfile.ZipFile(output / FILES['package'], 'w', zipfile.ZIP_DEFLATED) as archive:
@@ -83,7 +91,8 @@ def package(root, output, version, commit, private_key, recovery_directory=None)
             archive.write(output / FILES[name], FILES[name])
         for path in [root / 'LICENSE.md', root / 'THIRD_PARTY_NOTICES.md', *sorted((root / 'LICENSES').glob('*.txt'))]:
             archive.write(path, str(path.relative_to(root)))
-        archive.writestr('README.txt', '\n'.join(notes) + f'\nSource: https://github.com/maikopruett/Lefony-OS/tree/{commit}\nDownload lefony-os-source.tar.gz from this same release for the full prepared source.\n')
+        source_label = 'Base commit' if working_tree else 'Source'
+        archive.writestr('README.txt', '\n'.join(notes) + f'\n{source_label}: https://github.com/maikopruett/Lefony-OS/tree/{commit}\nDownload lefony-os-source.tar.gz from this same release for the full prepared source.\n')
         archive.writestr('build.json', json.dumps(manifest, indent=2) + '\n')
     manifest['assets']['package'] = describe(output / FILES['package'])
     (output / 'lefony-release.json').write_text(json.dumps(manifest, indent=2) + '\n')
@@ -102,5 +111,7 @@ if __name__ == '__main__':
     parser.add_argument('--private-key', type=Path, required=True)
     parser.add_argument('--output', type=Path, default=ROOT / 'dist/release')
     parser.add_argument('--recovery-dir', type=Path, help='Directory containing the exact pinned public recovery files')
+    parser.add_argument('--working-tree', action='store_true', help='Identify --commit as the base of the exact working-tree source archive, not a clean source revision')
     args = parser.parse_args()
-    package(ROOT, args.output, args.version, args.commit, args.private_key, args.recovery_dir)
+    package(ROOT, args.output, args.version, args.commit, args.private_key, args.recovery_dir,
+            args.working_tree)

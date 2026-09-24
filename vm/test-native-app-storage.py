@@ -14,6 +14,7 @@ import json
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'sdk/tools'))
 from cli import package
+from build import lock_value,write_json
 from runner import Channel
 from device import Client, FIRST_BLOCK
 from signing import sign, HEADER, MAGIC, public_der, openssl
@@ -39,6 +40,7 @@ def main():
     parser.add_argument('--public-key',required=True,type=Path)
     parser.add_argument('--preprovisioned',action='store_true',help='Also exercise an existing legacy volume')
     parser.add_argument('--many-apps',action='store_true',help='Install nine apps and launch the ninth from the normal menu');args=parser.parse_args()
+    write_json(ROOT/'sdk/examples/counter/sdk.lock.json',lock_value(ROOT/'sdk',1))
     unsigned=package(ROOT/'sdk/examples/counter').read_bytes()
     signed=sign(unsigned,args.signing_key)
     screenshots=ROOT/'build/sdk-installed-counter';screenshots.mkdir(exist_ok=True)
@@ -95,11 +97,34 @@ def main():
                         if 'return' in reply:return reply
                         if 'error' in reply:raise AssertionError(reply)
                 execute('qmp_capabilities')
+                def wait_guest_ms(milliseconds):
+                    # Home icon refresh runs on a 300 ms guest timer. Host
+                    # sleeps alone can capture before that timer fires in TCG.
+                    start=int(channel.command('TIME GET').split()[1])
+                    deadline=time.monotonic()+10
+                    while int(channel.command('TIME GET').split()[1])-start<milliseconds:
+                        assert time.monotonic()<deadline,'guest timer stopped during storage UI check'
+                        time.sleep(.01)
                 def press(row,col):
-                    for down in (True,False):
-                        q(f'writew 0x020b8008 {((row<<8)|col|(0x8000 if down else 0)):#x}');time.sleep(.25)
+                    # Observe normal event dispatch while holding a native-app
+                    # key. A timer read alone does not prove keyboard delivery.
+                    native='STATE app=12 ' in channel.command('STATE')
+                    tracked=native and (row,col)==(7,0)
+                    sequence=channel.command('APP DIAG 7') if tracked else None
+                    try:
+                        q(f'writew 0x020b8008 {((row<<8)|col|0x8000):#x}')
+                        if tracked:
+                            deadline=time.monotonic()+5
+                            while channel.command('APP DIAG 7')==sequence:
+                                assert time.monotonic()<deadline,'normal dispatch did not deliver Confirm'
+                                time.sleep(.01)
+                        else:
+                            time.sleep(.25)
+                    finally:
+                        q(f'writew 0x020b8008 {((row<<8)|col):#x}')
+                        time.sleep(.75) # Normal driver release/debounce.
                 def capture(name):
-                    time.sleep(.3);path=screenshots/(name+'.ppm');execute('screendump',{'filename':str(path)});return path.read_bytes()
+                    wait_guest_ms(600);path=screenshots/(name+'.ppm');execute('screendump',{'filename':str(path)});return path.read_bytes()
                 host=PrimeUSBHost(usb);host.connect_and_enumerate();client=Client(Transport(host))
                 # Startup must finish before any host mount/provision command.
                 connected=client.status();assert connected['state']==2 and connected['reserved']&2,connected
@@ -127,7 +152,7 @@ def main():
                     installed=client.install(signed,[args.public_key]);assert installed['id']=='counter'
                     assert client.read_package(installed['slot'],len(signed))==signed
                     print('PASS: signed ABI 1 upload, atomic commit and USB byte readback',flush=True)
-                    time.sleep(.5);assert capture('menu-after-install')!=before,'Installed tile did not appear live'
+                    wait_guest_ms(500);assert capture('menu-after-install')!=before,'Installed tile did not appear live'
                     corrupt=bytearray(icon);corrupt[-1]^=1
                     for invalid in (signed_icon(bytes(32)),bytes(corrupt)):
                         upload_icon(invalid)
@@ -147,11 +172,11 @@ def main():
                     replacement=signed_icon(hashlib.sha256(signed).digest(),struct.pack('<H',0xf81f)*(55*56))
                     upload_icon(replacement);assert client.wait()['state']==6
                     frame=Image.open(io.BytesIO(capture('menu-icon-replaced'))).convert('RGB')
-                    assert sum(1 for pixel in frame.getdata() if pixel==(255,0,255))>=3000,'Cached menu icon did not refresh without input'
+                    assert sum(1 for pixel in frame.get_flattened_data() if pixel==(255,0,255))>=3000,'Cached menu icon did not refresh without input'
                     upload_icon(icon);assert client.wait()['state']==6
                     check_icon(capture('menu-icon-restored'))
                     print('PASS: replacing a cached icon redraws the visible tile without user input',flush=True)
-                    press(7,0);initial=capture('initial');time.sleep(1);press(7,0);saved_frame=capture('saved');assert initial!=saved_frame
+                    press(7,0);initial=capture('initial');wait_guest_ms(1000);press(7,0);saved_frame=capture('saved');assert initial!=saved_frame
                     press(4,6);client.wait();assert client.catalog()[0]['generation']==2
                     assert 'STATE app=0 ' in channel.command('STATE'),'Back did not return directly to the main menu'
                     print('PASS: normal launcher/key input commits app-private data on exit',flush=True)
@@ -164,12 +189,12 @@ def main():
                     assert client.read(0x6d,32,0)==hashlib.sha256(icon).digest()
                     print('PASS: exact icon colors rendered through the home menu, including cold restart',flush=True)
                     # Goodix touch traverses the normal menu table/controller.
-                    assert channel.command('TOUCH FRAME 1 0 265 180')=='OK';time.sleep(.25)
-                    assert channel.command('TOUCH FRAME 0')=='OK';time.sleep(.5)
+                    assert channel.command('TOUCH FRAME 1 0 265 180')=='OK';wait_guest_ms(250)
+                    assert channel.command('TOUCH FRAME 0')=='OK';wait_guest_ms(500)
                     assert capture('restored')==saved_frame,'Saved app data did not survive cold restart'
                     press(4,6);client.wait()
                     client.remove('counter');assert client.catalog()==[]
-                    time.sleep(.5);capture('menu-after-remove')
+                    wait_guest_ms(500);capture('menu-after-remove')
                     assert 'STATE app=0 home_row=3 home_column=1' in channel.command('STATE'),'Removed tile remained selected'
                     press(5,7) # Settings shortcut must never open the hidden runtime.
                     assert 'STATE app=11 ' in channel.command('STATE')

@@ -126,6 +126,8 @@ def main() -> int:
             ("sbom", ["./vm/generate-native-sbom.py"], 30),
         ],
         "smoke": [
+            ("usb-protocol-stall", [sys.executable, "./vm/test-prime-g2-usb-stall.py",
+                                    "--output", str(root / "usb-protocol-stall")], 45),
             ("direct-elf", ["./vm/test-native-direct.sh"], 240),
             ("smoke", ["./vm/test-native-vm.sh"], 240),
             ("protocol", ["./vm/test-native-protocol.sh"], 300),
@@ -183,9 +185,10 @@ def main() -> int:
         ).stdout.strip(),
         "upstream": (REPO / "ports" / "lefony-prime-g2" / "UPSTREAM").read_text().strip(),
         "artifacts": {
-            "native_elf_sha256": sha256(REPO / "dist" / "lefony-os-prime-g2-vm-native.elf"),
-            "boot_media_sha256": sha256(REPO / "build" / "prime-g2-native-vm" / "lefony-os-boot.img"),
-            "u_boot_sha256": sha256(REPO / "build" / "prime-g2-native-vm" / "u-boot" / "u-boot.elf"),
+            # Honor the same explicit candidate paths passed to each runner.
+            "native_elf_sha256": sha256(REPO / env.get("NATIVE_ELF", "dist/lefony-os-prime-g2-vm-native.elf")),
+            "boot_media_sha256": sha256(REPO / env.get("NATIVE_BOOT_MEDIA", "build/prime-g2-native-vm/lefony-os-boot.img")),
+            "u_boot_sha256": sha256(REPO / env.get("UBOOT_ELF", "build/prime-g2-native-vm/u-boot/u-boot.elf")),
         },
         "results": [asdict(result) for result in results],
         "passed": not failed,

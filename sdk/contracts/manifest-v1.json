@@ -1,0 +1,719 @@
+{
+  "schema": 1,
+  "api_revision": 1,
+  "capabilities": 7,
+  "cases": [
+    {
+      "case": "legacy",
+      "manifest": "{\"abi\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"name\":\"Sample\",\"version\":\"1.0.0\"}",
+      "header_schema": 0,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "legacy-abi-zero",
+      "manifest": "{\"abi\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"name\":\"Sample\",\"version\":\"1.0.0\"}",
+      "header_schema": 0,
+      "abi": 0,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "required-three",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "unknown-optional",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4294967292,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "uint32-max-data-schema",
+      "manifest": "{\"abi\":1,\"data_schema\":4294967295,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "escaped-name",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"A \\\"quote\\\" \\\\ B\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "maximum-fields",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"license\":\"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\",\"minimum_api\":1,\"name\":\"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"999999.999999.999999\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": true
+    },
+    {
+      "case": "future-api",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":2,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "unknown-required",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":2147483648,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "schema-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":0,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "schema-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":2,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "schema-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":true,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "abi-invalid-0",
+      "manifest": "{\"abi\":0,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "abi-invalid-1",
+      "manifest": "{\"abi\":2,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "abi-invalid-2",
+      "manifest": "{\"abi\":true,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":0,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":-1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":true,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1.5,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":4294967296,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "minimum_api-invalid-5",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":\"1\",\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "required_capabilities-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":-1,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "required_capabilities-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":true,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "required_capabilities-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":1.5,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "required_capabilities-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":4294967296,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "required_capabilities-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":\"1\",\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "optional_capabilities-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":-1,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "optional_capabilities-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":true,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "optional_capabilities-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":1.5,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "optional_capabilities-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4294967296,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "optional_capabilities-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":\"1\",\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "data_schema-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":-1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "data_schema-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":true,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "data_schema-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1.5,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "data_schema-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":4294967296,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "data_schema-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":\"1\",\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-abi",
+      "manifest": "{\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-id",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-name",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-version",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-license",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-schema",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-required_capabilities",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-optional_capabilities",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-minimum_api",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "missing-data_schema",
+      "manifest": "{\"abi\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "id-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"A\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "id-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"1a\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "id-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"a/b\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "id-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "id-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "name-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "name-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\" \",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "name-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "name-invalid-3",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"\\n\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "name-invalid-4",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"\\u00e9\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "version-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "version-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0000000\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "version-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"latest\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "license-invalid-0",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "license-invalid-1",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"\\u0000\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "license-invalid-2",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "overlap",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":3,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "extra",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"extra\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "header-zero-new-manifest",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 0,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "header-one-old-manifest",
+      "manifest": "{\"abi\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"name\":\"Sample\",\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "header-two",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 2,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "header-abi-mismatch",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 0,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "duplicate",
+      "manifest": "{\"abi\":1,\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "leading-zero",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":01,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "float-integer",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1.0,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "exponent",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1e0,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "whitespace",
+      "manifest": " {\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "trailing",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"} ",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "unicode-escape",
+      "manifest": "{\"abi\":1,\"data_schema\":1,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"\\u0053ample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "negative-zero",
+      "manifest": "{\"abi\":1,\"data_schema\":-0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":1,\"name\":\"Sample\",\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "reordered",
+      "manifest": "{\"data_schema\":1,\"minimum_api\":1,\"optional_capabilities\":4,\"required_capabilities\":3,\"schema\":1,\"license\":\"CC-BY-NC-SA-4.0\",\"version\":\"1.0.0\",\"name\":\"Sample\",\"id\":\"sample\",\"abi\":1}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": false,
+      "supported": false
+    },
+    {
+      "case": "typography-api9",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":9,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":1024,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "typography-future-api",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":10,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":1024,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "typography-future-feature",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":9,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":2048,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "system-api10",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":10,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":2048,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "system-future-api",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":11,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":2048,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "system-optional-api9",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":9,\"name\":\"Sample\",\"optional_capabilities\":2048,\"required_capabilities\":0,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "channel-required",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":11,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":4096,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "channel-future-api",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":12,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":4096,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "channel-optional-api10",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":10,\"name\":\"Sample\",\"optional_capabilities\":4096,\"required_capabilities\":0,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "abort-required",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":12,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":8192,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "abort-future-api",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":13,\"name\":\"Sample\",\"optional_capabilities\":0,\"required_capabilities\":8192,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    },
+    {
+      "case": "abort-optional-api11",
+      "manifest": "{\"abi\":1,\"data_schema\":0,\"id\":\"sample\",\"license\":\"CC-BY-NC-SA-4.0\",\"minimum_api\":11,\"name\":\"Sample\",\"optional_capabilities\":8192,\"required_capabilities\":0,\"schema\":1,\"version\":\"1.0.0\"}",
+      "header_schema": 1,
+      "abi": 1,
+      "valid": true,
+      "supported": false
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Unix build tools producing native Windows x86-64 GDB and its libraries.
+# Supply a retained Linux build image and record its image ID; no Windows execution.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN apt-get update && apt-get install --no-remove -y --no-install-recommends \
+      g++-mingw-w64-x86-64-posix binutils-mingw-w64-x86-64 \
+      dpkg-dev autoconf automake libtool python3-pefile \
+    && mkdir -p /usr/share/lefony-windows-cross \
+    && dpkg-query -W -f='${binary:Package}\t${Version}\t${Architecture}\n' \
+      > /usr/share/lefony-windows-cross/packages.tsv \
+    && x86_64-w64-mingw32-g++-posix -v \
+      2> /usr/share/lefony-windows-cross/compiler.txt \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work

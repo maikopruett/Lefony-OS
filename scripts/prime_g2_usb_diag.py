@@ -140,6 +140,14 @@ class LibUSB:
                 f"USB device {vid:04X}:{pid:04X} not found or inaccessible"
             )
 
+    def bulk_upload(self,target,data,**kwargs):
+        # Share the SDK transport implementation; firmware is the only target.
+        import sys
+        tools_path=str(Path(__file__).resolve().parents[1]/'sdk'/'tools')
+        if tools_path not in sys.path:sys.path.insert(0,tools_path)
+        from bulk_libusb import transfer
+        return transfer(self,target,data,(1,),**kwargs)
+
     def close(self) -> None:
         if getattr(self, "handle", None):
             self.lib.libusb_close(self.handle)
@@ -455,7 +463,9 @@ def stage_capsule(device: LibUSB, path: Path, progress=None) -> dict[str, int]:
                      index=len(payload) >> 16)
         if progress:
             progress(0, len(payload))
-        for offset in range(0, len(payload), chunk_size):
+        fast=getattr(device,"bulk_upload",None)
+        sent=fast(1,payload,progress=progress or (lambda done,total:None)) if fast else False
+        for offset in range(len(payload) if sent else 0, len(payload), chunk_size):
             chunk = payload[offset:offset + chunk_size]
             device.write(REQUEST_RECOVERY_CHUNK, chunk, offset & 0xFFFF,
                          offset >> 16)

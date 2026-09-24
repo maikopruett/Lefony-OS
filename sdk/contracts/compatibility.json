@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "provenance": "Pre-existing local ABI 1 packages, preserved before SDK changes; not a claim of store-release identity",
+  "packages": [
+    {"file": "counter-0.1.0.lfapp", "id": "counter", "abi": 1, "sha256": "7c48a894db5d2dd7ea17fe85344afef7a113729f5d543d5b34c82246ed852a7d"},
+    {"file": "surface-3d-0.1.0.lfapp", "id": "surface-3d", "abi": 1, "sha256": "fd750a8314346f4eb2d9084263be3954345472f6b4a3e048208ee4a06043b992"}
+  ]
+}

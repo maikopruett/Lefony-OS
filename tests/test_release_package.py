@@ -13,7 +13,8 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from package_lefony_release import package
 
 
-def test_package_allowlist_and_integrity(tmp_path):
+@pytest.mark.parametrize('working_tree', [False, True])
+def test_package_allowlist_and_integrity(tmp_path, working_tree):
     (tmp_path / 'dist').mkdir()
     (tmp_path / 'ports/lefony-prime-g2').mkdir(parents=True)
     (tmp_path / 'LICENSES').mkdir()
@@ -30,15 +31,25 @@ def test_package_allowlist_and_integrity(tmp_path):
     (tmp_path / 'dist/private-backup.mtd').write_bytes(b'must not be included')
     output = tmp_path / 'dist/release'
     manifest = package(tmp_path, output, '1.0.0+123', 'a' * 40,
-                       ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem')
+                       ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem',
+                       working_tree=working_tree)
     assert manifest['status'] == 'package'
     assert manifest['qualification'] == 'build-tested'
+    if working_tree:
+        assert manifest['sourceState'] == {
+            'kind': 'working-tree', 'baseCommit': 'a' * 40,
+            'archiveSha256': manifest['assets']['source']['sha256'],
+        }
+    else:
+        assert 'sourceState' not in manifest
     assert json.loads((output / 'lefony-release.json').read_text()) == manifest
     for asset in manifest['assets'].values():
         data = (output / Path(asset['path']).name).read_bytes()
         assert len(data) == asset['bytes']
         assert hashlib.sha256(data).hexdigest() == asset['sha256']
     with zipfile.ZipFile(output / 'lefony-os-prime-g2.zip') as archive:
+        assert json.loads(archive.read('build.json'))['assets']['source'] == manifest['assets']['source']
+        assert ('Base commit:' in archive.read('README.txt').decode()) == working_tree
         assert set(archive.namelist()) == {
             'lefony-os-prime-g2-native.bin', 'lefony-os-prime-g2-vm-native.elf',
             'lefony-os-prime-g2.lfu', 'release-signing.pub', 'LICENSE.md',

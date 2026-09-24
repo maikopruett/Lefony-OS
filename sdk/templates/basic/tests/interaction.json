@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "name": "counter-input",
+  "steps": [
+    {"capture": "initial"},
+    {"key": "ok"},
+    {"capture": "incremented"},
+    {"different": ["initial", "incremented"]},
+    {"touch": [[0, 200, 160]]},
+    {"touch": []},
+    {"capture": "reset"},
+    {"same": ["initial", "reset"]},
+    {"key": "back"},
+    {"capture": "menu"},
+    {"different": ["reset", "menu"]}
+  ]
+}

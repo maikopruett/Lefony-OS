@@ -7,7 +7,7 @@ QEMU_COMMIT=c3d48b7d1e89604920e5b81b91140c2ad39a1943
 # Bump this whenever an already-applied patch changes semantics. Keeping the
 # patch-set revision in both paths prevents an old modified source tree or
 # Meson object from silently surviving a corrected hardware model.
-PATCHSET_REV=r70
+PATCHSET_REV=r71
 SOURCE_DIR=${PRIME_G2_QEMU_SOURCE_DIR:-"$REPO_DIR/build/qemu-prime-g2-source-$QEMU_VERSION-$PATCHSET_REV"}
 # Include the checkout identity: different clones must never share a Meson
 # source link or objects, even when the upstream and patch revision match.

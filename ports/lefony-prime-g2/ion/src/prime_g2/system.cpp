@@ -23,6 +23,7 @@ namespace {
 alignas(16384) uint32_t sTranslationTable[4096];
 alignas(1024) uint32_t sAppCodePages[256];
 alignas(1024) uint32_t sAppDataPages[256];
+alignas(1024) uint32_t sAppHeapPages[8][256];
 
 constexpr uint32_t Section = 2u;
 constexpr uint32_t Bufferable = 1u << 2;
@@ -134,6 +135,23 @@ void invalidateDataCacheRange(const void *address, size_t length) {
   cacheOperation(address, length, 1);
 }
 
+void mapNativeAppHeap(void *heap) {
+  // Negotiated foreground profile: eight MiB with first/last-page guards.
+  // Identical user RW+XN small-page attributes to the legacy app data pages.
+  constexpr uint32_t RW = 3u | (3u<<4) | (1u<<6) | (1u<<10) | (1u<<11) | 12u;
+  for(unsigned section=0;section<8;section++) {
+    for(unsigned page=0;page<256;page++) {
+      unsigned index=section*256+page;
+      sAppHeapPages[section][page]=heap && index && index!=2047 ?
+        (reinterpret_cast<uintptr_t>(heap)+index*4096)|RW : 0;
+    }
+    sTranslationTable[0x110+section]=heap ? reinterpret_cast<uintptr_t>(sAppHeapPages[section])|1u : 0;
+  }
+  cleanDataCacheRange(sAppHeapPages,sizeof(sAppHeapPages));
+  cleanDataCacheRange(sTranslationTable,sizeof(sTranslationTable));
+  uint32_t zero=0;
+  __asm volatile("dsb sy\n mcr p15,0,%0,c8,c7,0\n mcr p15,0,%0,c7,c5,0\n dsb sy\n isb" :: "r"(zero) : "memory");
+}
 void cleanInvalidateDataCacheRange(const void *address, size_t length) {
   cacheOperation(address, length, 2);
 }

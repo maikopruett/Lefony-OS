@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "platform": "windows-AMD64",
+  "scope": "Reviewed retained cross-build component inputs; no native Windows execution or complete SDK qualification. Archive hashes record the originating artifact; collection checks its exact SHA256SUMS and every extracted file.",
+  "artifacts": {
+    "compiler": {
+      "version": "16.2.0",
+      "archive_sha256": "3e43b03bd33d5aff05ab5d6ad07a89e33b6eb1e997d1170a3af2583c3c20ff5a",
+      "sums_sha256": "78d9f8837c86e788d3a811f903ceb3037f210cdab62f01331b7c3ee6b50d9c29"
+    },
+    "gdb": {
+      "version": "17.2",
+      "archive_sha256": "7416b08b65632fcd3f88aeb0c7794e5ff4fb2b80a67ccd6a1ad025ee28b035f4",
+      "sums_sha256": "f65c3a9ed3caf325775a21c0e39a5964033483d29534594157d8f5ee3e072305"
+    },
+    "qemu": {
+      "version": "11.1.1-r70",
+      "archive_sha256": "cab5e0ba68b6e6fa51c5afabd5be0a4cecf6af42d0dad6e0e0b729a03251e38b",
+      "sums_sha256": "ec34c9b033a36ce04b0e17d33fee64a3dbfcdcb0ea5fca7a45dc1ae5aebcff41"
+    },
+    "libraries": {
+      "version": "libusb-1.0.27-1_openssl-3.0.13-0ubuntu3.15",
+      "archive_sha256": "df4ec78b438374b955b25d74a659eabaf23b9d25faa63e144619f6f0c4685845",
+      "sums_sha256": "0d916ff8efe0613fddc3f4679b36148119612dd3c10efc6115ad6ae13db3c7eb"
+    }
+  }
+}

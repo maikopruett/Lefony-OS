@@ -1,0 +1,12 @@
+{
+  "abi": 1,
+  "schema": 1,
+  "id": "reference-cards",
+  "name": "Reference Cards",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-SA-4.0",
+  "minimum_api": 1,
+  "required_capabilities": 2,
+  "optional_capabilities": 1,
+  "data_schema": 0
+}

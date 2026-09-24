@@ -4,8 +4,12 @@
 #include "battery_adc.h"
 #include "nand_update.h"
 #include "nand_physical.h"
+#include "storage_profile.h"
 #include "development_update.h"
 #include "app_management.h"
+#include "native_app.h"
+#include "app_file_exchange.h"
+#include "app_channel.h"
 #include "registers.h"
 #include "services.h"
 #include "system.h"
@@ -37,6 +41,7 @@ constexpr uintptr_t ENDPTFLUSH = USB + 0x1B4;
 constexpr uintptr_t ENDPTSTAT = USB + 0x1B8;
 constexpr uintptr_t ENDPTCOMPLETE = USB + 0x1BC;
 constexpr uintptr_t ENDPTCTRL0 = USB + 0x1C0;
+constexpr uintptr_t ENDPTCTRL1 = USB + 0x1C4;
 
 constexpr uint32_t InterruptUsb = 1u << 0;
 constexpr uint32_t InterruptError = 1u << 1;
@@ -99,7 +104,7 @@ static_assert(sizeof(TransferDescriptor) == 32,
               "ChipIdea transfer descriptor must be 32 bytes");
 
 struct alignas(2048) ControllerMemory {
-  QueueHead queueHeads[2]; // endpoint 0 OUT, endpoint 0 IN
+  QueueHead queueHeads[4]; // EP0 OUT/IN, bulk EP1 OUT/IN
   TransferDescriptor descriptors[2];
 };
 
@@ -116,12 +121,30 @@ uint32_t sLastSetupWords[2] = {};
 uint8_t sConfiguration = 0;
 uint64_t sLastManagementTime = 0;
 bool sManagementSeen = false;
+bool sAppControlTransfer = false;
+bool sAppUSBProgressSeen = false;
+uint64_t sLastAppUSBProgress = 0;
 bool sInstallAfterStatus = false;
 
 constexpr uint32_t RecoveryMagic = 0x4D475243; // "CRGM" little endian
 constexpr size_t RecoveryCapacity = 8u * 1024u * 1024u;
 enum class RecoveryState : uint32_t { Idle, Receiving, Ready, Error };
-uint8_t sRecoveryImage[RecoveryCapacity] __attribute__((aligned(64)));
+constexpr uint32_t BulkCapacity = 32u * 1024u * 1024u;
+constexpr uint32_t BulkDescriptorBytes = 16384;
+extern "C" uint8_t _usb_stage_start;
+uint8_t *const sBulkStage=&_usb_stage_start;
+alignas(64) uint8_t sRecoveryImage[RecoveryCapacity];
+alignas(64) TransferDescriptor sBulkDescriptors[BulkCapacity/BulkDescriptorBytes];
+// LFB1: versioned RAM transport. Received != installed; commit remains EP0.
+uint32_t sBulkState=0,sBulkSequence=0,sBulkTarget=0,sBulkLength=0;
+uint32_t sBulkReceived=0,sBulkApplied=0,sBulkError=0,sBulkFileSequence=0;
+uint32_t sBulkCursor=0,sBulkCount=0;
+uint64_t sBulkProgressTime=0;
+uint8_t *sBulkData=nullptr;
+bool sBulkApplyAfterStatus=false,sBulkFileAttached=false;
+bool bulkBusy() {return sBulkState>=1 && sBulkState<=3;}
+bool abortBulk();
+void pollBulk();
 RecoveryState sRecoveryState = RecoveryState::Idle;
 uint32_t sRecoveryLength = 0;
 uint32_t sRecoveryReceived = 0;
@@ -165,8 +188,10 @@ constexpr uint8_t DeviceDescriptor[] = {
 };
 
 constexpr uint8_t ConfigurationDescriptor[] = {
-  9, 2, 18, 0, 1, 1, 0, 0x80, 25,
-  9, 4, 0, 0, 0, 0xFF, 0x4D, 0x47, 0
+  9, 2, 32, 0, 1, 1, 0, 0x80, 25,
+  9, 4, 0, 0, 2, 0xFF, 0x4D, 0x47, 0,
+  7, 5, 0x01, 2, 0x00, 0x02, 0,
+  7, 5, 0x81, 2, 0x00, 0x02, 0
 };
 
 constexpr uint8_t DeviceQualifierDescriptor[] = {
@@ -335,14 +360,19 @@ bool resetController() {
 }
 
 bool flushEndpoint0() {
-  if ((reg32(ENDPTSTAT) | reg32(ENDPTPRIME)) & Endpoint0Mask) {
-    reg32(ENDPTFLUSH) = Endpoint0Mask;
-    if (!waitFor(ENDPTFLUSH, Endpoint0Mask, false, 2000)) {
-      fail(8, ENDPTFLUSH);
-      return false;
+  // Like ChipIdea's Linux hw_ep_flush, recheck endpoint activity after FLUSH
+  // clears: a concurrent prime can require another flush. Keep one bounded
+  // budget for the whole operation so a broken controller cannot trap the UI.
+  for (unsigned attempt = 0; attempt < 2000; attempt++) {
+    uint32_t flushing = reg32(ENDPTFLUSH) & Endpoint0Mask;
+    if (!flushing) {
+      if (!((reg32(ENDPTSTAT) | reg32(ENDPTPRIME)) & Endpoint0Mask)) return true;
+      reg32(ENDPTFLUSH) = Endpoint0Mask;
     }
+    Ion::Timing::usleep(10);
   }
-  return true;
+  fail(8, ENDPTFLUSH);
+  return false;
 }
 
 void prime(unsigned direction, const void *data, uint16_t length) {
@@ -365,13 +395,15 @@ void prime(unsigned direction, const void *data, uint16_t length) {
     PrimeG2::System::cleanDataCacheRange(data, length);
   if (!direction && data != nullptr && length != 0)
     PrimeG2::System::cleanInvalidateDataCacheRange(data, length);
-  PrimeG2::System::cleanDataCacheRange(&sControllerMemory,
-                                        sizeof(sControllerMemory));
+  PrimeG2::System::cleanDataCacheRange(&td, sizeof(td));
+  PrimeG2::System::cleanDataCacheRange(&qh, sizeof(qh));
   PrimeG2::barrier();
   reg32(ENDPTPRIME) = 1u << (direction ? 16 : 0);
 }
 
 void stallControl() {
+  sAppControlTransfer = false;
+  sAppUSBProgressSeen = false;
   sPendingAddress = -1;
   if (sTraceCurrentRequest) sEnumeration.phase = 6;
   if (!flushEndpoint0()) return;
@@ -433,6 +465,135 @@ void handleRecoveryDataOut(uint16_t received) {
   sRecoveryReceived += received;
 }
 
+// Register and DMA layout checked against Linux drivers/usb/chipidea/{bits.h,udc.h,udc.c}.
+// Never enable device streaming: the i.MX6UL erratum still applies.
+bool abortBulk() {
+  sBulkApplyAfterStatus=false;
+  for(unsigned attempt=0;attempt<2000;attempt++) {
+    if(!(reg32(ENDPTFLUSH)&0x20002u)) {
+      if(!((reg32(ENDPTSTAT)|reg32(ENDPTPRIME))&0x20002u)) {
+        if(bulkBusy() && (sBulkTarget==3 || sBulkTarget==4)) PrimeG2::AppManagement::disconnect();
+        if(bulkBusy() && sBulkTarget==1) sRecoveryState=RecoveryState::Error;
+        sBulkState=0;sBulkData=nullptr;PrimeG2::AppManagement::setBulkActive(false);return true;
+      }
+      reg32(ENDPTFLUSH)=0x20002u;
+    }
+    Ion::Timing::usleep(10);
+  }
+  // Do not reuse a buffer if the controller may still own it.
+  sBulkState=5;sBulkError=1;fail(15,ENDPTFLUSH);return false;
+}
+bool primeBulk() {
+  sBulkCount=(sBulkLength+BulkDescriptorBytes-1)/BulkDescriptorBytes;
+  for(uint32_t i=0;i<sBulkCount;i++) {
+    auto &td=sBulkDescriptors[i];memset(&td,0,sizeof(td));
+    uint32_t bytes=sBulkLength-i*BulkDescriptorBytes;if(bytes>BulkDescriptorBytes) bytes=BulkDescriptorBytes;
+    td.next=i+1<sBulkCount?reinterpret_cast<uintptr_t>(&sBulkDescriptors[i+1]):TransferTerminate;
+    td.token=(bytes<<16)|TransferActive|(i+1==sBulkCount?TransferIoc:0);
+    uintptr_t address=reinterpret_cast<uintptr_t>(sBulkData+i*BulkDescriptorBytes);
+    td.buffer[0]=address;for(unsigned j=1;j<5;j++) td.buffer[j]=(address+j*4096u)&~4095u;
+  }
+  auto &qh=sControllerMemory.queueHeads[sBulkTarget>=4?3:2];qh.overlayToken=0;
+  qh.overlayNext=reinterpret_cast<uintptr_t>(sBulkDescriptors);
+  if(sBulkTarget>=4) PrimeG2::System::cleanDataCacheRange(sBulkData,sBulkLength);
+  else PrimeG2::System::cleanInvalidateDataCacheRange(sBulkData,sBulkLength);
+  PrimeG2::System::cleanDataCacheRange(sBulkDescriptors,sBulkCount*sizeof(TransferDescriptor));
+  PrimeG2::System::cleanDataCacheRange(&qh,sizeof(qh));PrimeG2::barrier();
+  uint32_t mask=sBulkTarget>=4?(1u<<17):2u;
+  reg32(ENDPTCOMPLETE)=mask;reg32(ENDPTPRIME)=mask;
+  sBulkState=1;sBulkProgressTime=Ion::Timing::millis();return true;
+}
+bool beginBulk(const uint8_t *data) {
+  uint32_t r[6];memcpy(r,data,sizeof(r));
+  if(r[0]!=0x3142464c || r[1]!=1 || r[2]<1 || r[2]>5 || !r[3] ||
+     r[3]>BulkCapacity || r[5] || bulkBusy() || sBulkSequence==0xffffffffu ||
+     !(sStatus&StatusHighSpeed)) return false;
+  uint8_t *destination=nullptr;
+  if(r[2]==1) {
+    if(r[4] || PrimeG2::AppManagement::busy() || sRecoveryState!=RecoveryState::Receiving ||
+       sRecoveryReceived || r[3]!=sRecoveryLength) return false;
+    destination=sRecoveryImage;
+  } else if(r[2]==2) {
+    if(r[4]) return false;
+    destination=PrimeG2::AppManagement::bulkPackage(r[3]);
+  } else if(r[2]==5) {
+    if(r[4]) return false;
+    destination=const_cast<uint8_t *>(PrimeG2::AppManagement::bulkPackageRead(r[3]));
+  } else {
+    PrimeG2::AppFileExchange::Status status{};size_t size=0;
+    if(!PrimeG2::AppManagement::response(0x70,0,reinterpret_cast<uint8_t *>(&status),sizeof(status),&size) ||
+       status.state!=(r[2]==3?PrimeG2::AppFileExchange::Writable:PrimeG2::AppFileExchange::Readable) ||
+       status.operation!=(r[2]==3?PrimeG2::AppFileExchange::Import:PrimeG2::AppFileExchange::Export) ||
+       status.offset || status.sequence!=r[4] || status.length!=r[3]) return false;
+    destination=sBulkStage;
+  }
+  if(!destination || !abortBulk()) return false;
+  PrimeG2::AppManagement::setBulkActive(true);
+  sBulkSequence++;sBulkTarget=r[2];sBulkLength=r[3];sBulkFileSequence=r[4];
+  sBulkReceived=sBulkApplied=sBulkError=sBulkCursor=0;sBulkData=destination;sBulkFileAttached=false;
+  if(sBulkTarget==4) {
+    if(!PrimeG2::AppManagement::bulkFileExport(sBulkFileSequence,sBulkData,sBulkLength)) {sBulkState=5;sBulkError=4;return false;}
+    sBulkState=3;return true;
+  }
+  return primeBulk();
+}
+void pollBulk() {
+  if(sBulkState==2 && Ion::Timing::millis()-sBulkProgressTime>30000) {
+    abortBulk();sBulkState=5;sBulkError=3;return;
+  }
+  if(sBulkState==1) {
+    // Inspect at most 64 dTDs per platform poll. Hardware follows the entire
+    // chain autonomously, without a UI/event-loop round trip per USB packet.
+    for(unsigned n=0;n<64 && sBulkCursor<sBulkCount;n++) {
+      auto &td=sBulkDescriptors[sBulkCursor];
+      PrimeG2::System::invalidateDataCacheRange(&td,sizeof(td));uint32_t token=td.token;
+      if(token&TransferActive) break;
+      if(token&0x7fff0068u) {abortBulk();sBulkState=5;sBulkError=2;return;}
+      sBulkCursor++;sBulkReceived=sBulkCursor*BulkDescriptorBytes;
+      if(sBulkReceived>sBulkLength) sBulkReceived=sBulkLength;
+      sBulkProgressTime=Ion::Timing::millis();
+      if(sBulkTarget==3) PrimeG2::AppManagement::bulkFileProgress(sBulkFileSequence);
+    }
+    if(sBulkCursor==sBulkCount) {
+      PrimeG2::System::invalidateDataCacheRange(sBulkData,sBulkLength);
+      reg32(ENDPTCOMPLETE)=sBulkTarget>=4?(1u<<17):2u;sBulkState=sBulkTarget>=4?4:2;
+      if(sBulkTarget>=4) {sBulkApplied=sBulkLength;PrimeG2::AppManagement::setBulkActive(false);}
+    } else if(Ion::Timing::millis()-sBulkProgressTime>30000) {
+      abortBulk();sBulkState=5;sBulkError=3;
+    }
+  } else if(sBulkState==3) {
+    bool ok=true;
+    if(sBulkTarget==4) {
+      PrimeG2::AppFileExchange::Status status{};size_t size=0;
+      if(!PrimeG2::AppManagement::response(0x70,0,reinterpret_cast<uint8_t *>(&status),sizeof(status),&size) ||
+         status.sequence!=sBulkFileSequence || (status.state!=1 && status.state!=2 && status.state!=4)) {
+        sBulkState=5;sBulkError=4;return;
+      }
+      sBulkApplied=status.offset;
+      if(status.state==4 && status.offset==sBulkLength) primeBulk();
+      return;
+    }
+    if(sBulkTarget==1) {sRecoveryReceived=sBulkLength;sBulkApplied=sBulkLength;}
+    else if(sBulkTarget==2) {ok=PrimeG2::AppManagement::bulkPackageReceived(sBulkLength);sBulkApplied=sBulkLength;}
+    else {
+      // A single attachment; subsequent polls only observe the existing session.
+      if(!sBulkFileAttached) {
+        ok=PrimeG2::AppManagement::bulkFile(sBulkFileSequence,sBulkData,sBulkLength);
+        if(ok) sBulkFileAttached=true;
+      }
+      PrimeG2::AppFileExchange::Status status{};size_t size=0;
+      ok=ok && PrimeG2::AppManagement::response(0x70,0,reinterpret_cast<uint8_t *>(&status),sizeof(status),&size) &&
+        status.sequence==sBulkFileSequence && (status.state==1 || status.state==3);
+      if(ok) {
+        sBulkApplied=status.offset;
+        if(status.offset!=sBulkLength || status.state!=3) return;
+      }
+    }
+    PrimeG2::AppManagement::setBulkActive(false);
+    sBulkState=ok?4:5;if(!ok) sBulkError=4;
+  }
+}
+
 uint16_t makeStringDescriptor(const char *text) {
   size_t length = strlen(text);
   if (length > 126) length = 126;
@@ -453,8 +614,9 @@ bool descriptor(const SetupPacket &setup) {
       controlIn(DeviceDescriptor, sizeof(DeviceDescriptor), setup.length);
       return true;
     case 2:
-      controlIn(ConfigurationDescriptor, sizeof(ConfigurationDescriptor),
-                setup.length);
+      memcpy(sControlBuffer,ConfigurationDescriptor,sizeof(ConfigurationDescriptor));
+      if(!(sStatus&StatusHighSpeed)) {sControlBuffer[22]=sControlBuffer[29]=64;sControlBuffer[23]=sControlBuffer[30]=0;}
+      controlIn(sControlBuffer,sizeof(ConfigurationDescriptor),setup.length);
       return true;
     case 3:
       if (index == 0) {
@@ -481,6 +643,7 @@ bool descriptor(const SetupPacket &setup) {
       memcpy(sControlBuffer, ConfigurationDescriptor,
              sizeof(ConfigurationDescriptor));
       sControlBuffer[1] = 7;
+      if(sStatus&StatusHighSpeed) {sControlBuffer[22]=sControlBuffer[29]=64;sControlBuffer[23]=sControlBuffer[30]=0;}
       controlIn(sControlBuffer, sizeof(ConfigurationDescriptor), setup.length);
       return true;
     }
@@ -513,7 +676,16 @@ bool standardRequest(const SetupPacket &setup) {
       return true;
     case 9: // SET_CONFIGURATION
       if (setup.value > 1) return false;
+      if(!abortBulk()) return false;
       sConfiguration = setup.value;
+      for(unsigned i=2;i<4;i++) {
+        sControllerMemory.queueHeads[i].capability=((sStatus&StatusHighSpeed?512u:64u)<<16)|(1u<<29);
+        sControllerMemory.queueHeads[i].overlayNext=TransferTerminate;
+        sControllerMemory.queueHeads[i].overlayToken=0;
+        PrimeG2::System::cleanDataCacheRange(&sControllerMemory.queueHeads[i],sizeof(QueueHead));
+      }
+      // ChipIdea ENDPTCTRL: bulk type, toggle reset and enable in each direction.
+      reg32(ENDPTCTRL1)=sConfiguration?0x00C800C8u:0;
       if (sConfiguration) sStatus |= StatusConfigured;
       else sStatus &= ~StatusConfigured;
       PrimeG2::Diagnostics::record(PrimeG2::Diagnostics::UsbConfigured,
@@ -534,13 +706,61 @@ bool standardRequest(const SetupPacket &setup) {
 }
 
 bool vendorRequest(const SetupPacket &setup) {
+  if(setup.request==0x57) {
+    if(setup.requestType!=0xc0 || setup.value || setup.index ||
+       setup.length!=sizeof(PrimeG2::NativeApp::RuntimeReport)) return false;
+    const auto report=PrimeG2::NativeApp::runtimeReport();
+    controlIn(&report,sizeof(report),setup.length);return true;
+  }
+  // Copies counters only: no NAND command, shared DMA buffer or state mutation.
+  // Available during installs so phase measurements need not interrupt them.
+  if(setup.request==0x56) {
+    if(setup.requestType!=0xc0 || setup.value || setup.index ||
+       setup.length!=sizeof(PrimeG2::StorageProfile::Report)) return false;
+    const auto report=PrimeG2::StorageProfile::snapshot();
+    controlIn(&report,sizeof(report),setup.length);return true;
+  }
+  if(setup.request>=0x58 && setup.request<=0x5b) {
+    if(PrimeG2::DevelopmentUpdate::busy()) return false;
+    if(setup.requestType==0xc0 && setup.request==0x58 && !setupValue32(setup) && setup.length==64) {
+      pollBulk();
+      uint32_t info[16]={0x3142464c,1,sBulkState,sBulkSequence,sBulkTarget,sBulkLength,
+        sBulkReceived,sBulkApplied,sBulkError,BulkCapacity,262144,1,1,
+        (sStatus&StatusHighSpeed)?1u:0u,0,0};
+      controlIn(info,sizeof(info),setup.length);return true;
+    }
+    if(setup.requestType!=0x40 || !(sStatus&StatusConfigured)) return false;
+    if(setup.request==0x59 && !bulkBusy() && !setupValue32(setup) && setup.length==24) {
+      controlOut(setup);return true;
+    }
+    if(setup.length || setupValue32(setup)!=sBulkSequence) return false;
+    if(setup.request==0x5b) {if(!abortBulk()) return false;statusIn();return true;}
+    if(setup.request==0x5a && sBulkState==2) {
+      sBulkApplyAfterStatus=true;statusIn();return true;
+    }
+    return false;
+  }
+  // The staged buffer and destination session are exclusively owned until
+  // applied or cancelled. Status reads remain available; mutations cannot race DMA.
+  if(bulkBusy() && !(setup.requestType&0x80)) return false;
   // The staged payload and shared NAND DMA buffers are immutable while the
   // native writer runs. USB status queries remain available, but no abort,
   // new upload, NAND probe/read, or recovery command can interrupt it.
   if (PrimeG2::DevelopmentUpdate::busy() &&
       !(setup.requestType == 0xc0 && setup.request == 0x53)) return false;
-  if (PrimeG2::AppManagement::busy() && !(setup.request >= 0x60 && setup.request <= 0x6d)) return false;
-  if (setup.request >= 0x60 && setup.request <= 0x6d) {
+  if(setup.request>=0x78 && setup.request<=0x7e) {
+    if(setup.requestType==0xc0) {
+      unsigned bytes=0;
+      if(!PrimeG2::AppChannel::usbResponse(setup.request,setupValue32(setup),sControlBuffer,
+          setup.length<sizeof(sControlBuffer)?setup.length:sizeof(sControlBuffer),&bytes)) return false;
+      controlIn(sControlBuffer,bytes,setup.length);return true;
+    }
+    if(setup.requestType!=0x40 || setup.length<32 || setup.length>sizeof(sControlBuffer) || setupValue32(setup)) return false;
+    controlOut(setup);return true;
+  }
+  bool appRequest=(setup.request>=0x60 && setup.request<=0x75) || (setup.request>=0x80 && setup.request<=0x88) || (setup.request>=0x90 && setup.request<=0x96);
+  if (PrimeG2::AppManagement::busy() && !appRequest) return false;
+  if (appRequest) {
     PrimeG2::Services::noteUserActivity();
     sLastManagementTime = Ion::Timing::millis(); sManagementSeen = true;
     if (setup.requestType == 0xc0) {
@@ -796,8 +1016,25 @@ bool vendorRequest(const SetupPacket &setup) {
 }
 
 void handleSetup() {
+  // Completion and the next SETUP can arrive after poll's completion read.
+  // First quiesce the old descriptors, then retire status against the OLD
+  // request. Sampling before the flush would leave another completion race.
+  // A pending bus reset takes priority, retaining its separate ACK handling.
+  if (reg32(USBSTS) & InterruptReset) return;
+  if (!flushEndpoint0()) return;
+  if (reg32(USBSTS) & InterruptReset) return;
+  uint32_t complete = reg32(ENDPTCOMPLETE) & Endpoint0Mask;
+  reg32(ENDPTCOMPLETE) = complete;
+  if (sControlState == ControlState::StatusIn && (complete & (1u << 16)))
+    handleComplete(1u << 16);
+  else if (sControlState == ControlState::StatusOut && (complete & 1u))
+    handleComplete(1u);
+  // A replacement SETUP abandons unfinished data. Its stale completion bits
+  // must not advance the next request when these descriptors are reused.
   PrimeG2::AppManagement::abandonSetup();
+  sControlState = ControlState::Idle;
   sInstallAfterStatus = false;
+  sBulkApplyAfterStatus = false;
   sRecoveryAfterStatus = false;
   sRebootAfterStatus = false;
   // A replacement SETUP aborts the previous request, including its address.
@@ -824,6 +1061,13 @@ void handleSetup() {
     if (captured) break;
   }
   if (!captured) { fail(14, USBCMD); return; }
+  // Only public app-management/channel requests enter this scheduling policy.
+  // Firmware/recovery traffic retains its existing bounded upload burst.
+  sAppControlTransfer = (setup.requestType == 0xc0 || setup.requestType == 0x40) &&
+    ((setup.request >= 0x60 && setup.request <= 0x75) ||
+     (setup.request >= 0x78 && setup.request <= 0x7e) ||
+     (setup.request >= 0x80 && setup.request <= 0x88) ||
+     (setup.request >= 0x90 && setup.request <= 0x96));
   sTraceCurrentRequest = !(setup.requestType == 0xC0 && setup.request == 0x4D);
   if (sTraceCurrentRequest) {
     memcpy(sLastSetupWords, &setup, sizeof(setup));
@@ -833,7 +1077,6 @@ void handleSetup() {
     sEnumeration.setups++;
     sEnumeration.phase = 1;
   }
-  if (!flushEndpoint0()) return;
   reg32(ENDPTCTRL0) &= ~((1u << 0) | (1u << 16));
 
   bool isVendorLogRead = (setup.requestType & 0x60) == 0x40 &&
@@ -853,7 +1096,23 @@ void handleSetup() {
 }
 
 void handleBusReset() {
+  abortBulk();
+  sAppControlTransfer = sAppUSBProgressSeen = false;
+  // Preserve an app COMMIT whose status completed just before the reset was
+  // observed. Reset can clear ENDPTCOMPLETE before software reads it. The
+  // status dTD was primed Active and only a completed zero-byte transfer has
+  // no Active/error/remaining bits. Inspect its DMA writeback before flushing
+  // or reinitializing it. Keep firmware/reboot reset behavior separate.
+  if (sControlState == ControlState::StatusIn) {
+    PrimeG2::System::invalidateDataCacheRange(&sControllerMemory,
+                                             sizeof(sControllerMemory));
+    if (!(sControllerMemory.descriptors[1].token & 0x7FFF00E8u))
+      PrimeG2::AppManagement::acknowledge();
+  }
+  PrimeG2::AppManagement::disconnect();
+  PrimeG2::AppChannel::finish();
   sInstallAfterStatus = false;
+  sBulkApplyAfterStatus = false;
   sRecoveryAfterStatus = false;
   sRebootAfterStatus = false;
   sPendingAddress = -1;
@@ -910,6 +1169,7 @@ void handleComplete(uint32_t complete) {
         sPendingAddress = -1;
       }
       sControlState = ControlState::Idle;
+      if(sBulkApplyAfterStatus) {sBulkApplyAfterStatus=false;sBulkState=3;}
       PrimeG2::AppManagement::acknowledge();
       if (sInstallAfterStatus) {
         sInstallAfterStatus = false;
@@ -934,7 +1194,16 @@ void handleComplete(uint32_t complete) {
                                                sizeof(sControlBuffer));
     uint16_t remaining = (sControllerMemory.descriptors[0].token >> 16) & 0x7FFF;
     uint16_t received = sPendingOut.length - remaining;
-    if (sPendingOut.request >= 0x60 && sPendingOut.request <= 0x6d) {
+    if(sPendingOut.request==0x59) {
+      if(received!=24 || (sControllerMemory.descriptors[0].token&0xE8u) || !beginBulk(sControlBuffer)) {
+        stallControl();return;
+      }
+    } else if(sPendingOut.request>=0x78 && sPendingOut.request<=0x7e) {
+      if(received!=sPendingOut.length || (sControllerMemory.descriptors[0].token&0xE8u) ||
+         !PrimeG2::AppChannel::usbRequest(sPendingOut.request,setupValue32(sPendingOut),sControlBuffer,received)) {
+        stallControl();return;
+      }
+    } else if ((sPendingOut.request >= 0x60 && sPendingOut.request <= 0x75) || (sPendingOut.request>=0x80 && sPendingOut.request<=0x88) || (sPendingOut.request>=0x90 && sPendingOut.request<=0x96)) {
       if (received != sPendingOut.length || (sControllerMemory.descriptors[0].token & 0xE8u) ||
           !PrimeG2::AppManagement::request(sPendingOut.request,setupValue32(sPendingOut),sControlBuffer,received)) {
         stallControl(); return;
@@ -966,6 +1235,7 @@ bool init() {
   if (sStatus & StatusController) return !(sStatus & StatusError);
   sStatus = 0;
   sManagementSeen = false;
+  sAppControlTransfer = sAppUSBProgressSeen = false;
   sFirstErrorStep = 0;
   sPendingAddress = -1;
   sEnumeration = {0x4c465554, 1, 0, 0, 0, 0, 0, 0};
@@ -1000,6 +1270,8 @@ void poll() {
     sStatus |= StatusHighSpeed;
   }
   if ((reg32(PORTSC1) & 1u) == 0) {
+    sAppControlTransfer = sAppUSBProgressSeen = false;
+    if(bulkBusy()) abortBulk();
     sConfiguration = 0;
     sStatus &= ~(StatusConfigured | StatusHighSpeed);
   }
@@ -1008,17 +1280,33 @@ void poll() {
   if (complete) {
     reg32(ENDPTCOMPLETE) = complete;
     handleComplete(complete);
+    if (sAppControlTransfer) {
+      sLastAppUSBProgress = Ion::Timing::millis(); sAppUSBProgressSeen = true;
+    }
   }
-  if (reg32(ENDPTSETUPSTAT) & 1u) handleSetup();
+  if (reg32(ENDPTSETUPSTAT) & 1u) {
+    handleSetup();
+    if (sAppControlTransfer) {
+      sLastAppUSBProgress = Ion::Timing::millis(); sAppUSBProgressSeen = true;
+    }
+  }
+  pollBulk();
   if (sRecoveryState != RecoveryState::Receiving ||
       !(reg32(PORTSC1) & 1u) || (sStatus & StatusError)) break;
   Ion::Timing::usleep(10);
   }
 }
 
+bool needsPolling() {
+  // A window is renewed only by real SETUP/completion progress, never by a
+  // query or by waiting for the host. This is scheduling, not a PHY delay.
+  return sAppUSBProgressSeen && (sStatus & StatusConfigured) && !(sStatus & StatusError) &&
+    Ion::Timing::millis() - sLastAppUSBProgress < 2;
+}
+
 uint32_t statusFlags() { return sStatus; }
 bool managementActive() {
-  return PrimeG2::AppManagement::busy() || externalPowerConnected() || (sManagementSeen && (sStatus & StatusConfigured) &&
+  return bulkBusy() || PrimeG2::AppManagement::busy() || externalPowerConnected() || (sManagementSeen && (sStatus & StatusConfigured) &&
     Ion::Timing::millis() - sLastManagementTime < 2000);
 }
 bool externalPowerConnected() {
@@ -1056,6 +1344,9 @@ DebugSnapshot debugSnapshot() {
 bool configured() { return (sStatus & StatusConfigured) != 0; }
 bool plugged() { return (reg32(PORTSC1) & 1u) != 0; }
 void shutdown() {
+  abortBulk();
+  sAppControlTransfer = sAppUSBProgressSeen = false;
+  PrimeG2::AppChannel::finish();
   sPendingAddress = -1;
   reg32(USBINTR) = 0;
   reg32(ENDPTFLUSH) = 0xFFFFFFFFu;

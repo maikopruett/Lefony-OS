@@ -1,5 +1,10 @@
 # Native app SDK and public store development plan
 
+> Historical architecture plan. The [SDK maturity roadmap](NATIVE-APP-SDK-MATURITY-PLAN.md)
+> supersedes its remaining-work priorities and server-validation assumptions.
+> The current direction keeps community app builds and tests on developers'
+> computers, with automatic publication and no routine manual approval.
+
 > Implementation has begun. See [current implementation status](NATIVE-APP-SDK-STATUS.md)
 > for shipped local code, qualification evidence and remaining gates. The
 > architecture below is the full target, not a claim that all milestones are complete.

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "profile": "foreground-newlib-1",
+  "version": "4.6.0.20260123",
+  "source_sha256": "6ff27e3bf022666f43f7802255be680eeff722ac181b1725d21e2e8318604ee3",
+  "target": "arm-none-eabi cortex-a7 arm hard-float neon-vfpv4",
+  "configure_options": [
+    "--target=arm-none-eabi", "--disable-multilib", "--disable-newlib-supplied-syscalls",
+    "--disable-libgloss", "--disable-newlib-multithread", "--disable-newlib-reent-small",
+    "--disable-newlib-atexit-dynamic-alloc", "--disable-nls",
+    "--enable-newlib-io-long-long", "--enable-newlib-io-c99-formats"
+  ],
+  "minimum_api": 3,
+  "required_capabilities": 16,
+  "heap_bytes": 8380416,
+  "source_adjustments": {
+    "stdio-descriptor-32-v1": {
+      "path": "newlib/libc/include/sys/reent.h",
+      "before_sha256": "44726a2edc83783ecaba3c83a6c7c71db3466ffd6d607c89b1f3ff74311510da",
+      "after_sha256": "fe68ba96ccf791c8d750b84a80111cbbcf29cc7504c0659ceaa59935ac57c913"
+    }
+  },
+  "qualification": "development candidate; newlib selected, full profile qualification pending"
+}

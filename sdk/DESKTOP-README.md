@@ -1,43 +1,83 @@
-# Lefony native SDK for macOS Apple Silicon
+# Lefony native desktop SDK candidate
 
-This development bundle contains the native C++ SDK, ARM compiler, Prime G2
-emulator and host dependencies. It is locally tested on macOS 26.6.2 (ARM64).
-It is not notarized; use macOS's normal security review for downloaded software.
-No Homebrew or separate Python installation is needed. Keep `_internal` beside
-`lefony-sdk` when moving the folder.
+This experimental bundle contains the C/C++ SDK, ARM compiler, newlib, ARM GDB,
+Prime G2 emulator, Python host runtime and USB dependencies. Keep `_internal`
+beside `lefony-sdk` when moving the folder. No separate Python, Homebrew, compiler
+or debugger installation is needed for the commands below. The bundled GDB has
+no embedded Python scripting. Native Windows support and physical qualification
+remain unqualified; inspect `candidate.json` for the actual host and artifact.
 
-Open Terminal in the extracted `lefony-sdk` folder, then run:
+From the extracted folder:
 
 ```sh
 ./lefony-sdk doctor
-./lefony-sdk new "$HOME/Documents/my-lefony-app"
+./lefony-sdk new "$HOME/Documents/my-lefony-app" --template notebook
 ./lefony-sdk --project "$HOME/Documents/my-lefony-app" build
-./lefony-sdk --project "$HOME/Documents/my-lefony-app" test
-./lefony-sdk --project "$HOME/Documents/my-lefony-app" run
-./lefony-sdk --project "$HOME/Documents/my-lefony-app" source
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" run --workspace development
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" test --headless
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" preview --once --scenario tests/edit.json
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" source --format 2
 ```
 
-Read `AGENTS.md` in the new project. Edit its `app.json` and `src/main.cpp`.
-`test` writes a frame and report under the project's `build` folder. `run` opens
-the emulator; close its window or press Ctrl-C to stop. The SDK API guide,
-examples and headers are in `_internal/sdk/`.
+For a Windows candidate, extract the entire ZIP and use `./lefony-sdk.exe`
+in PowerShell. Keep `_internal` beside the executable. Native Windows packaging
+and complete developer journeys still require validation; see `_internal/sdk/HOSTS.md`.
 
-Upload `build/app.lfsrc` through https://lefony.com/#developers once submissions
-are enabled. Provide the matching app name, description, icon and at least one
-screenshot. Passing apps publish automatically. GitHub is the account provider.
-A downloaded signed app can be tested with:
+Read `AGENTS.md` in the new project. `c-main` supplies ordinary C startup;
+`notebook`, `ui-gallery`, `forms-tables`, `graph-explorer`, `reference-cards` and
+`link-gallery` demonstrate other public APIs. The API guides, headers and
+examples live in `_internal/sdk/`. Preview captures the actual ARM app and layout
+records; it retains committed documents between successful runs. Workspace
+exports contain app data and are not public bug-report attachments by default.
+
+`run` opens a local browser panel with a 2× touchscreen and clickable Prime
+keypad underneath. Its Screen menu offers 1.5× and 3× as well. Screen clicks
+use touch input; the keypad and computer arrows, digits, Enter and Backspace
+use normal calculator keys. Save in the app, then choose **Stop emulator** to
+close normally. Closing the tab releases held keys and touch contacts; reopen
+the printed URL to reconnect. No external website or account is needed.
+Older bundles built before this panel keep their original native window.
+
+For source debugging, start `debug` in one terminal and `debugger` in another,
+using the same project directory:
 
 ```sh
-./lefony-sdk launch /path/to/downloaded.lfapp
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" debug
+./lefony-sdk --project "$HOME/Documents/my-lefony-app" debugger
 ```
 
-These SDK commands do not write to a calculator. The website provides USB app
-installation on compatible Lefony firmware. Physical storage setup requires
-explicit consent to retire part of the stock filesystem and a verified backup;
-it remains a development feature awaiting hardware qualification.
+`debugger` opens the generated matching-symbol script with bundled ARM GDB.
+The emulator and relay use private local sockets. Closing the emulator or
+pressing Ctrl-C ends the run. GDB pauses are excluded from timing measurements.
+CMake integration uses this executable when loaded from the bundle; installing
+CMake itself is a separate choice.
 
-`candidate.json` records the bundled firmware hash. `SHA256SUMS` covers the
-bundle files. `LICENSE.md`, `LICENSES/` and `THIRD_PARTY/` contain license notices.
-The three corresponding-source archives beside this download contain the
-compiler, dependencies, Lefony firmware and patched QEMU sources. Native apps
-use C++; Python is only a bundled host-tool dependency.
+`publish --dry-run` validates the project folder and prepares local evidence.
+GitHub `login` and explicit `publish` submit it to the configured store;
+`listing pull/push` handles metadata changes. See `_internal/sdk/PUBLISHING.md`
+for immutable versions, required media and interrupted-upload recovery. The
+`companion` command provides an explicit app-scoped USB/HTTPS connection; see
+`_internal/sdk/CHANNEL.md`. Account and physical-device journeys have separate
+qualification from offline emulator testing.
+
+Private app identities and signed packages can also be created with this executable:
+
+```sh
+./lefony-sdk keys generate --private-key /private/app.pem --public-key /private/app-public.pem
+./lefony-sdk sign ./build/my-app-1.0.0.lfapp --private-key /private/app.pem --output ./build/my-app-1.0.0-signed.lfapp
+```
+
+Keep the private key outside the project. These commands require new output paths
+and use bundled OpenSSL without USB access. See
+`_internal/sdk/KEYS.md` for enrollment, installation and recovery.
+
+The examples above do not write to a calculator. Explicit installation, file
+exchange and key commands require compatible Lefony firmware and normal device
+consent/recovery rules. Physical migration, power loss, recovery, endurance and
+input feel remain unqualified. Host signing/notarization and clean-host release
+trials also remain release gates.
+
+`candidate.json` identifies the bundled tools and firmware. `SHA256SUMS` covers
+bundle files. `LICENSE.md`, `LICENSES/` and `THIRD_PARTY/` retain component
+notices. Corresponding sources and build recipes must accompany distribution;
+local packaging does not publish this candidate or qualify SDK 1.0.

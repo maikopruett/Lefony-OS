@@ -8,6 +8,7 @@ from pathlib import Path
 import struct
 import time
 from signing import verify
+from lfapp import compatible, PackageError
 
 PROFILE=1
 FIRST_BLOCK=3456
@@ -40,6 +41,30 @@ class Client:
         if values[0]!=0x3141464c or values[1] not in (1,2) or values[8:10]!=(1,BACKUP_BYTES) or (values[1]==1 and values[6:8]!=(PROFILE,SLOTS)) or (values[1]==2 and (values[6]!=2 or values[7]>BLOCKS)):
             raise DeviceError('Unsupported app installation protocol or storage geometry')
         return dict(zip(('magic','protocol','state','error','received','length','profile','entries','abi','backup_bytes','backup_received','storage_state','progress','target','pending','reserved'),values))
+
+    def capabilities(self, status=None):
+        status = self.status() if status is None else status
+        if not status['reserved'] & 16:
+            return None  # Old firmware: no speculative request or write.
+        values = struct.unpack('<12I', self.read(0x6e, 48))
+        if (values[:5] != (0x4341464c, 48, 1, 0, 1) or not values[5] or
+                not values[7] & 1 or values[8] != status['profile'] or
+                values[9:12] != (2101664, 65536, 0)):
+            raise DeviceError('Invalid app capability response; no upload was started')
+        return dict(zip(('magic', 'size', 'version', 'reserved', 'abi', 'api', 'features',
+                         'package_schemas', 'storage_profile', 'maximum_package', 'private_data_bytes', 'reserved2'), values))
+
+    def require_compatible(self, metadata, status=None):
+        if not metadata.get('schema', 0):
+            return  # Original ABI 1 contract remains unchanged.
+        info = self.capabilities(status)
+        if info is None:
+            raise DeviceError('Update Lefony OS: this app requires package schema 1 capability negotiation')
+        try:
+            compatible(metadata, api=info['api'], features=info['features'],
+                       schemas=tuple(i for i in range(32) if info['package_schemas'] & (1 << i)))
+        except PackageError as exc:
+            raise DeviceError(str(exc)) from exc
 
     def wait(self,timeout=120):
         deadline=self.clock()+timeout
@@ -86,16 +111,23 @@ class Client:
         self.write(0x6a,argument=slot)
         if self.wait()['state']!=6:
             raise DeviceError('Package readback was not prepared')
+        from bulk_transfer import try_download
+        fast=try_download(self.transport,5,size)
+        if fast is not None:return fast
         return b''.join(self.read(0x6a,min(512,size-offset),offset) for offset in range(0,size,512))
 
-    def install(self,package,public_keys,*,progress=lambda done,total:None,cancelled=lambda:False):
+    def install(self,package,public_keys,*,progress=lambda done,total:None,cancelled=lambda:False,commit=None):
         metadata,_=verify(package,public_keys)
         if metadata['abi']!=1:
             raise DeviceError('Physical installation requires an ABI 1 app')
-        if self.status()['state'] not in (2,6):
+        status = self.status()
+        if status['state'] not in (2,6):
             raise DeviceError('App storage must be provisioned before installing')
+        self.require_compatible(metadata, status)
         self.write(0x63,argument=len(package))
-        for offset in range(0,len(package),512):
+        from bulk_transfer import try_upload
+        sent=try_upload(self.transport,2,package,progress=progress,cancelled=cancelled)
+        for offset in range(0 if not sent else len(package),len(package),512):
             if cancelled():
                 self.write(0x67)
                 raise DeviceError('Upload cancelled before installation')
@@ -103,7 +135,8 @@ class Client:
             progress(min(offset+512,len(package)),len(package))
         # No retry/automatic abort after this boundary: a lost status may follow
         # a successful commit. Resolve that ambiguity by reading the catalog.
-        self.write(0x65)
+        if commit is None:self.write(0x65)
+        else:commit(metadata)
         status=self.wait()
         if status['state']!=6:
             raise DeviceError('Installation did not commit')
@@ -156,7 +189,7 @@ class Client:
                 'raw_bytes':BACKUP_BYTES,'sha256':digest.hexdigest(),
                 'stock_filesystem_retired':True,'migration_committed':False}
         record_path=directory/'backup.json'
-        with os.fdopen(os.open(record_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as output:
+        with os.fdopen(os.open(record_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w',encoding='utf-8',newline='\n') as output:
             json.dump(record,output,indent=2);output.write('\n');output.flush();os.fsync(output.fileno())
         directory_fd=os.open(directory,os.O_RDONLY)
         try: os.fsync(directory_fd)
@@ -167,6 +200,6 @@ class Client:
         record['migration_committed']=True
         # Backup and pre-migration record are durable before any device erase.
         complete=directory/'migration-complete.json'
-        with os.fdopen(os.open(complete,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as output:
+        with os.fdopen(os.open(complete,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w',encoding='utf-8',newline='\n') as output:
             json.dump(record,output,indent=2);output.write('\n');output.flush();os.fsync(output.fileno())
         return record

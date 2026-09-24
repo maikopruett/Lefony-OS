@@ -32,6 +32,8 @@ private:
     void refresh() { m_view.invalidate(); }
     void closeInstalled();
     bool installed=false;
+    bool developerKeys=false;
+    bool archiveApproval=false;
     bool handleEvent(Ion::Events::Event event) override;
     bool handleTouch(const Ion::Touch::Event &event) override;
     bool acceptsMultitouch() const override { return true; }
@@ -40,6 +42,7 @@ private:
   };
   explicit App(Snapshot *snapshot);
   Controller m_controller;
+  bool m_pairingVisible=false;
 };
 }
 #endif

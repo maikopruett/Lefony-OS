@@ -15,6 +15,11 @@ DATA = 0x10201000
 DATA_END = 0x102EF000
 ABI = 1
 SUPPORTED_ABIS = (0, 1)
+SUPPORTED_SCHEMAS = (0, 1)
+API_REVISION = 12
+CAPABILITIES = 16383
+BASE_FIELDS = {"id", "name", "version", "abi", "license"}
+EXTENSION_FIELDS = {"schema", "required_capabilities", "optional_capabilities", "minimum_api", "data_schema"}
 
 
 class PackageError(ValueError):
@@ -32,14 +37,32 @@ def canonical(value):
 
 def manifest(value):
     require(isinstance(value, dict), "manifest must be an object")
-    require(set(value) == {"id", "name", "version", "abi", "license"}, "unknown or missing manifest field")
+    schema = value.get("schema", 0)
+    require(type(schema) is int and schema in SUPPORTED_SCHEMAS, "unsupported manifest schema")
+    require(set(value) == BASE_FIELDS | (EXTENSION_FIELDS if schema else set()), "unknown or missing manifest field")
     require(isinstance(value["id"], str) and re.fullmatch(r"[a-z][a-z0-9-]{0,47}", value["id"]), "invalid app id")
     require(type(value["abi"]) is int and value["abi"] in SUPPORTED_ABIS, "unsupported ABI")
     for key in ("name", "version", "license"):
         require(isinstance(value[key], str) and 0 < len(value[key]) <= 80 and value[key].strip() and
                 all(32 <= ord(c) < 127 for c in value[key]), f"invalid {key}")
     require(re.fullmatch(r"\d{1,6}\.\d{1,6}\.\d{1,6}", value["version"]), "version must be major.minor.patch")
+    if schema:
+        require(value["abi"] == 1, "manifest schema 1 requires ABI 1")
+        for key in EXTENSION_FIELDS - {"schema"}:
+            require(type(value[key]) is int and 0 <= value[key] <= 0xffffffff, f"invalid {key}: expected uint32")
+        require(value["minimum_api"] >= 1, "minimum_api must be at least 1")
+        require(not value["required_capabilities"] & value["optional_capabilities"], "required and optional capabilities overlap")
     return value
+
+
+def compatible(metadata, *, api=API_REVISION, features=CAPABILITIES, schemas=SUPPORTED_SCHEMAS):
+    """Structural validity is distinct from support by a particular device."""
+    manifest(metadata)
+    require(metadata.get("schema", 0) in schemas, "OS does not support this package schema; update Lefony OS")
+    require(metadata.get("minimum_api", 0) <= api, "app requires a newer OS API; update Lefony OS")
+    missing = metadata.get("required_capabilities", 0) & ~features
+    require(not missing, f"OS lacks required app capabilities 0x{missing:08x}; update Lefony OS")
+    return True
 
 
 def elf_segments(image):
@@ -78,13 +101,13 @@ def pack(metadata, image):
     require(len(encoded) <= MAX_MANIFEST, "manifest too large")
     elf_segments(image)
     body = encoded + image
-    return HEADER.pack(MAGIC, 0, len(encoded), len(image), metadata["abi"], hashlib.sha256(body).digest(), b"\0"*8) + body
+    return HEADER.pack(MAGIC, metadata.get("schema", 0), len(encoded), len(image), metadata["abi"], hashlib.sha256(body).digest(), b"\0"*8) + body
 
 
 def unpack(package):
     require(HEADER.size <= len(package) <= HEADER.size + MAX_MANIFEST + MAX_IMAGE, "invalid package size")
     magic, schema, meta_len, image_len, flags, digest, reserved = HEADER.unpack_from(package)
-    require(magic == MAGIC and schema == 0 and flags in SUPPORTED_ABIS and reserved == b"\0"*8, "unsupported package header")
+    require(magic == MAGIC and schema in SUPPORTED_SCHEMAS and flags in SUPPORTED_ABIS and reserved == b"\0"*8, "unsupported package header")
     require(0 < meta_len <= MAX_MANIFEST and 52 <= image_len <= MAX_IMAGE and
             len(package) == HEADER.size + meta_len + image_len, "invalid package lengths")
     body = package[HEADER.size:]
@@ -95,6 +118,7 @@ def unpack(package):
         raise PackageError(f"invalid manifest: {exc}") from exc
     require(canonical(metadata) == body[:meta_len], "manifest must be canonical JSON without duplicate keys")
     require(metadata["abi"] == flags, "ABI header does not match manifest")
+    require(metadata.get("schema", 0) == schema, "schema header does not match manifest")
     image = body[meta_len:]
     elf_segments(image)
     return metadata, image

@@ -1,4 +1,5 @@
 #include "nand_physical.h"
+#include "storage_profile.h"
 #include "app_storage.h"
 #include "registers.h"
 #include "system.h"
@@ -43,6 +44,7 @@ bool fail(Error error) {
   return false;
 }
 bool transfer(bool read, uint32_t commandLength = 2, uint8_t *destination = nullptr, uint32_t readLength = 8) {
+  StorageProfile::Scope profile(StorageProfile::Metric::CommandDMA,read?readLength:commandLength);
   if (readLength > 2112) return false;
   memset(&sDescriptor, 0, sizeof(sDescriptor));
   const uint32_t length = read ? readLength : commandLength;
@@ -67,7 +69,7 @@ bool transfer(bool read, uint32_t commandLength = 2, uint8_t *destination = null
     if (reg32(APBH + 0x20) & 1u) break;
     if ((reg32(APBH + 0x10) & 1u) && !(reg32(Semaphore) & 0xff0000u)) {
       System::invalidateDataCacheRange(readBuffer, destination ? readLength : sizeof(sData));
-      return true;
+      return profile.result(true);
     }
     Ion::Timing::usleep(10);
   }
@@ -115,11 +117,12 @@ bool writableGeometry() {
     !((sReport.apbhControl | sReport.gpmiControl | reg32(BCH)) & 0xc0000000u) &&
     !(sReport.semaphore & 0xff0000u) && !(sReport.gpmiControl & (1u << 29));
 }
-bool readyStatus() {
+bool readyStatus(StorageProfile::Metric metric=StorageProfile::Metric::OtherReady) {
+  StorageProfile::Scope profile(metric);
   for (unsigned i = 0; i < 50000; ++i) {
     if (reg32(GPMI + 0xb0) & (1u << 24)) {
       sCommand[0] = 0x70; // READSTATUS, require READY and write-protect released
-      return transfer(false, 1) && transfer(true) && (sData[0] & 0xc1) == 0xc0;
+      return profile.result(transfer(false, 1) && transfer(true) && (sData[0] & 0xc1) == 0xc0);
     }
     Ion::Timing::usleep(10);
   }
@@ -151,7 +154,7 @@ static bool eraseInRange(uint32_t block, bool app) {
   sCommand[2] = page >> 8; sCommand[3] = page >> 16;
   if (!transfer(false, 4)) return false;
   sCommand[0] = 0xd0;
-  return transfer(false, 1) && readyStatus();
+  return transfer(false, 1) && readyStatus(StorageProfile::Metric::EraseWait);
 }
 static bool programInRange(uint32_t page, const uint8_t *data, bool app) {
   if ((app ? !appBlock(page / 64) : (page < 2048 || page >= 6144)) || !data || !writableGeometry()) return false;
@@ -192,7 +195,7 @@ static bool programInRange(uint32_t page, const uint8_t *data, bool app) {
   }
   reg32(GPMI + 0x20) = 0; // disable ECC before command-mode traffic
   sCommand[0] = 0x10; // PAGEPROG
-  return transfer(false, 1) && readyStatus();
+  return transfer(false, 1) && readyStatus(StorageProfile::Metric::ProgramWait);
 }
 static bool readInRange(uint32_t page, bool app) {
   sPageReport = {0x3152504c, page, 0, 0, 0, 0}; // LPR1
@@ -277,15 +280,16 @@ static bool readInRange(uint32_t page, bool app) {
   sPageReport.ready = 1;
   return true;
 }
-bool blockUsable(uint32_t block) { return usableInRange(block,false); }
-bool eraseOSBlock(uint32_t block) { return eraseInRange(block,false); }
-bool programOSPage(uint32_t page,const uint8_t *data) { return programInRange(page,data,false); }
-bool readPage(uint32_t page) { return readInRange(page,false); }
-bool appBlockUsable(uint32_t block) { return usableInRange(block,true); }
-bool eraseAppBlock(uint32_t block) { return eraseInRange(block,true); }
-bool programAppPage(uint32_t page,const uint8_t *data) { return programInRange(page,data,true); }
-bool readAppPage(uint32_t page) { return readInRange(page,true); }
+bool blockUsable(uint32_t block) { return StorageProfile::measure(StorageProfile::Metric::Usable,0,[&] {return usableInRange(block,false);}); }
+bool eraseOSBlock(uint32_t block) { return StorageProfile::measure(StorageProfile::Metric::Erase,131072,[&] {return eraseInRange(block,false);}); }
+bool programOSPage(uint32_t page,const uint8_t *data) { return StorageProfile::measure(StorageProfile::Metric::Program,2048,[&] {return programInRange(page,data,false);}); }
+bool readPage(uint32_t page) { return StorageProfile::measure(StorageProfile::Metric::Read,2048,[&] {return readInRange(page,false);}); }
+bool appBlockUsable(uint32_t block) { return StorageProfile::measure(StorageProfile::Metric::Usable,0,[&] {return usableInRange(block,true);}); }
+bool eraseAppBlock(uint32_t block) { return StorageProfile::measure(StorageProfile::Metric::Erase,131072,[&] {return eraseInRange(block,true);}); }
+bool programAppPage(uint32_t page,const uint8_t *data) { return StorageProfile::measure(StorageProfile::Metric::Program,2048,[&] {return programInRange(page,data,true);}); }
+bool readAppPage(uint32_t page) { return StorageProfile::measure(StorageProfile::Metric::Read,2048,[&] {return readInRange(page,true);}); }
 bool readRawAppPage(uint32_t page,uint8_t *destination) {
+  StorageProfile::Scope profile(StorageProfile::Metric::RawRead,2112);
   if(!destination || !appBlock(page / 64) || !writableGeometry()) return false;
   sCommand[0]=0; sCommand[1]=sCommand[2]=0;
   sCommand[3]=page; sCommand[4]=page>>8; sCommand[5]=page>>16;
@@ -293,7 +297,7 @@ bool readRawAppPage(uint32_t page,uint8_t *destination) {
   sCommand[0]=0x30;
   if(!transfer(false,1)) return false;
   for(unsigned i=0;i<5000;i++) {
-    if(reg32(GPMI+0xb0)&(1u<<24)) return transfer(true,2,destination,2112);
+    if(reg32(GPMI+0xb0)&(1u<<24)) return profile.result(transfer(true,2,destination,2112));
     Ion::Timing::usleep(10);
   }
   return false;

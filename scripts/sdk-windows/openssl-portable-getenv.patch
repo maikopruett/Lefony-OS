@@ -1,0 +1,25 @@
+--- a/crypto/fips_mode.c
++++ b/crypto/fips_mode.c
+@@ -7,6 +7,7 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include "fips_mode.h"
++#include "internal/cryptlib.h"
+ 
+ #define FIPS_MODE_SWITCH_FILE "/proc/sys/crypto/fips_enabled"
+ 
+@@ -24,12 +25,12 @@
+     char c;
+     int fd;
+ 
+-    if ((v = secure_getenv("OPENSSL_FORCE_FIPS_MODE")) != NULL) {
++    if ((v = ossl_safe_getenv("OPENSSL_FORCE_FIPS_MODE")) != NULL) {
+         fips_mode = strcmp(v, "0") == 0 ? 0 : 1;
+         return;
+     }
+ 
+-    if ((v = secure_getenv("OPENSSL_FIPS_MODE_SWITCH_PATH")) != NULL) {
++    if ((v = ossl_safe_getenv("OPENSSL_FIPS_MODE_SWITCH_PATH")) != NULL) {
+         switch_path = v;
+     }
+ 

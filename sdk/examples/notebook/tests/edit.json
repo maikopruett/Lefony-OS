@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "name": "edit",
+  "steps": [
+    {"capture": "empty"},
+    {"key": "ok"},
+    {"capture": "editor"},
+    {"key": "ok"},
+    {"capture": "saved"},
+    {"different": ["empty", "saved"]},
+    {"touch": [[1, 160, 205]]},
+    {"touch": []},
+    {"capture": "dark"},
+    {"different": ["saved", "dark"]},
+    {"touch": [[1, 265, 205]]},
+    {"touch": []},
+    {"capture": "exported"},
+    {"touch": [[1, 60, 80]]},
+    {"touch": []},
+    {"capture": "reopened"}
+  ]
+}

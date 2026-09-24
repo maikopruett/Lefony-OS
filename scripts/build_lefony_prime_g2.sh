@@ -33,6 +33,7 @@ patch -d "$SOURCE" -p1 < "$PORT/patches/storage-rename-cache.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/physical-boot-progress.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/physical-event-progress.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/prime-g2-single-step-dpad.patch"
+patch -d "$SOURCE" -p1 < "$PORT/patches/prime-g2-key-edge-timeouts.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/native-memory-telemetry.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/lefony-branding.patch"
 patch -d "$SOURCE" -p1 < "$PORT/patches/prime-g2-dedicated-navigation.patch"
@@ -51,12 +52,24 @@ if [ -d "$PORT/themes" ]; then
 fi
 mkdir -p "$SOURCE/ion/src/prime_g2"
 cp -R "$PORT/ion/src/prime_g2/." "$SOURCE/ion/src/prime_g2/"
+# Public fixed-width input wire contract is shared with the privileged reader.
+cp "$REPO/sdk/include/lefony/input_wire.h" "$SOURCE/ion/src/prime_g2/native_app_input_wire.h"
+mkdir -p "$SOURCE/ion/src/prime_g2/lefony"
+cp "$REPO/sdk/include/lefony/files_wire.h" "$SOURCE/ion/src/prime_g2/lefony/files_wire.h"
+cp "$REPO/sdk/include/lefony/data_wire.h" "$SOURCE/ion/src/prime_g2/lefony/data_wire.h"
+cp "$REPO/sdk/include/lefony/text_wire.h" "$SOURCE/ion/src/prime_g2/lefony/text_wire.h"
+cp "$REPO/sdk/include/lefony/system_wire.h" "$SOURCE/ion/src/prime_g2/lefony/system_wire.h"
+cp "$REPO/sdk/include/lefony/channel_wire.h" "$SOURCE/ion/src/prime_g2/lefony/channel_wire.h"
+cp "$REPO/sdk/include/lefony/foreground_wire.h" "$SOURCE/ion/src/prime_g2/lefony/foreground_wire.h"
+cp "$REPO/sdk/include/lefony/input_stream_wire.h" "$SOURCE/ion/src/prime_g2/lefony/input_stream_wire.h"
 mkdir -p "$SOURCE/ion/src/prime_g2_vm"
 cp -R "$PORT/ion/src/prime_g2_vm/." "$SOURCE/ion/src/prime_g2_vm/"
 if [ -d "$PORT/apps" ]; then
     cp -R "$PORT/apps/." "$SOURCE/apps/"
 fi
 python3 "$REPO/scripts/prepare_prime_touch.py" "$SOURCE"
+python3 "$REPO/scripts/prepare_prime_native_scheduling.py" "$SOURCE"
+python3 "$REPO/scripts/prepare_prime_native_system.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_display.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_app_menu.py" "$SOURCE"
 
@@ -79,6 +92,11 @@ fi
 if [ -n "${LEFONY_APP_PUBLIC_KEYS:-}" ]; then
     python3 "$REPO/scripts/configure_native_app_keys.py" \
         "$LEFONY_APP_PUBLIC_KEYS" "$SOURCE/ion/src/prime_g2/app_trust_roots.h"
+fi
+if [ "$NATIVE_PLATFORM" = prime_g2_vm ]; then
+    python3 "$REPO/scripts/configure_native_app_keys.py" --emulator-fixture \
+        "$REPO/tests/fixtures/prime_g2_emulator_update_public.pem" \
+        "$SOURCE/ion/src/prime_g2/app_emulator_trust_root.h"
 fi
 
 python3 "$REPO/scripts/prepare_prime_settings.py" "$SOURCE"

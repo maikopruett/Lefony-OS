@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "case": "foreground",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": true
+    },
+    {
+      "case": "no-arguments",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": true
+    },
+    {
+      "case": "unknown-runtime",
+      "text": "{\"schema\":2,\"runtime\":\"posix\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "null-runtime",
+      "text": "{\"schema\":2,\"runtime\":null,\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "null-arguments",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":null}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "many-arguments",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\",\"a\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "long-argument",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "argument-control",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"a\\nb\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "argument-non-ascii",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"\\u00e9\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "argument-number",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[1]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "schema-one-runtime",
+      "text": "{\"schema\":1,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "schema-future",
+      "text": "{\"schema\":3,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "schema-bool",
+      "text": "{\"schema\":true,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "unknown-hooks",
+      "text": "{\"schema\":2,\"runtime\":\"foreground-newlib-1\",\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"],\"build\":\"run.sh\"}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    },
+    {
+      "case": "missing-runtime",
+      "text": "{\"schema\":2,\"sources\":[\"src/main.c\"],\"arguments\":[\"quoted \\\"value\\\"\",\"back\\\\slash\",\"\"]}",
+      "files": [
+        "src/main.c"
+      ],
+      "valid": false
+    }
+  ]
+}

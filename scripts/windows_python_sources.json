@@ -1,0 +1,1003 @@
+{
+  "schema": 1,
+  "platform": "windows-AMD64",
+  "python_version": "3.14",
+  "python_full_version": "3.14.7",
+  "environment": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.14.7",
+    "os_name": "nt",
+    "platform_machine": "AMD64",
+    "platform_release": "10",
+    "platform_system": "Windows",
+    "platform_version": "10.0",
+    "python_full_version": "3.14.7",
+    "platform_python_implementation": "CPython",
+    "python_version": "3.14",
+    "sys_platform": "win32",
+    "extra": ""
+  },
+  "requested": [
+    "pyinstaller==6.20.0",
+    "Pillow==12.3.0",
+    "keyring==25.7.0",
+    "truststore==0.10.4",
+    "pefile==2024.8.26"
+  ],
+  "wheel_rebuild_qualified": false,
+  "complete_desktop_sources": false,
+  "scope": "Reviewed Windows CPython 3.14 packaging wheels, Python sdists and embedded Pillow native sources. CPython, Microsoft runtime and native tool source/license inventories remain separate; upstream wheel rebuilds and Windows execution are unqualified.",
+  "distributions": [
+    {
+      "name": "altgraph",
+      "version": "0.17.5",
+      "wheel": {
+        "file": "altgraph-0.17.5-py2.py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/a9/ba/000a1996d4308bc65120167c21241a3b205464a2e0b58deda26ae8ac21d1/altgraph-0.17.5-py2.py3-none-any.whl",
+        "sha256": "f3a22400bce1b0c701683820ac4f3b159cd301acab067c51c653e06961600597",
+        "bytes": 21228
+      },
+      "sdist": {
+        "file": "altgraph-0.17.5.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/7e/f8/97fdf103f38fed6792a1601dbc16cc8aac56e7459a9fff08c812d8ae177a/altgraph-0.17.5.tar.gz",
+        "sha256": "c87b395dd12fabde9c99573a9749d67da8d29ef9de0125c7f536699b4a9bc9e7",
+        "bytes": 48428
+      },
+      "metadata_file": "altgraph-0.17.5.dist-info/METADATA",
+      "metadata_sha256": "dc60641dba229a3aef09f764f562c38d908b930c92615af2e626af31d6ff19b5",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "altgraph-0.17.5.dist-info/LICENSE": "6c194d6db0c64d45535d10c95142b9b0cda7b7dcc7f1ddee302b3d536f3dbe46"
+      },
+      "metadata_files": {
+        "altgraph-0.17.5.dist-info/LICENSE": "6c194d6db0c64d45535d10c95142b9b0cda7b7dcc7f1ddee302b3d536f3dbe46",
+        "altgraph-0.17.5.dist-info/METADATA": "dc60641dba229a3aef09f764f562c38d908b930c92615af2e626af31d6ff19b5",
+        "altgraph-0.17.5.dist-info/WHEEL": "89896fe5f5f7e7b3d0c914f6a3ab70d5b37e61c2851472aa07f2f01cee703fe8",
+        "altgraph-0.17.5.dist-info/top_level.txt": "1c405e4567f922d54f73b63d856ee11a5acb5d98cfa0be1bcba08084157f0700",
+        "altgraph-0.17.5.dist-info/zip-safe": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "altgraph-0.17.5.dist-info/RECORD": "f0d9f813b84710662cc315b16ac9c506969ad93e052ba98395aaadbdd0e27b9d"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "jaraco-classes",
+      "version": "3.4.0",
+      "wheel": {
+        "file": "jaraco.classes-3.4.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/7f/66/b15ce62552d84bbfcec9a4873ab79d993a1dd4edb922cbfccae192bd5b5f/jaraco.classes-3.4.0-py3-none-any.whl",
+        "sha256": "f662826b6bed8cace05e7ff873ce0f9283b5c924470fe664fff1c2f00f581790",
+        "bytes": 6777
+      },
+      "sdist": {
+        "file": "jaraco.classes-3.4.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/06/c0/ed4a27bc5571b99e3cff68f8a9fa5b56ff7df1c2251cc715a652ddd26402/jaraco.classes-3.4.0.tar.gz",
+        "sha256": "47a024b51d0239c0dd8c8540c6c7f484be3b8fcf0b2d85c13825780d3b3f3acd",
+        "bytes": 11780
+      },
+      "metadata_file": "jaraco.classes-3.4.0.dist-info/METADATA",
+      "metadata_sha256": "2e6b102232edd45ae1bb8a6b4091fd40cf3201a6bb6fd4bc97c5e8cd765a44b8",
+      "requires_dist": [
+        "more-itertools",
+        "sphinx >=3.5 ; extra == 'docs'",
+        "jaraco.packaging >=9.3 ; extra == 'docs'",
+        "rst.linker >=1.9 ; extra == 'docs'",
+        "furo ; extra == 'docs'",
+        "sphinx-lint ; extra == 'docs'",
+        "jaraco.tidelift >=1.4 ; extra == 'docs'",
+        "pytest >=6 ; extra == 'testing'",
+        "pytest-checkdocs >=2.4 ; extra == 'testing'",
+        "pytest-cov ; extra == 'testing'",
+        "pytest-mypy ; extra == 'testing'",
+        "pytest-enabler >=2.2 ; extra == 'testing'",
+        "pytest-ruff >=0.2.1 ; extra == 'testing'"
+      ],
+      "native_files": {},
+      "notice_files": {
+        "jaraco.classes-3.4.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+      },
+      "metadata_files": {
+        "jaraco.classes-3.4.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "jaraco.classes-3.4.0.dist-info/METADATA": "2e6b102232edd45ae1bb8a6b4091fd40cf3201a6bb6fd4bc97c5e8cd765a44b8",
+        "jaraco.classes-3.4.0.dist-info/WHEEL": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714",
+        "jaraco.classes-3.4.0.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "jaraco.classes-3.4.0.dist-info/RECORD": "7dd99b43a0bf99c30ca6d884b244dffe90785dbcd6c1a6222311e60f705274cc"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "jaraco-context",
+      "version": "6.1.2",
+      "wheel": {
+        "file": "jaraco_context-6.1.2-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/f2/58/bc8954bda5fcda97bd7c19be11b85f91973d67a706ed4a3aec33e7de22db/jaraco_context-6.1.2-py3-none-any.whl",
+        "sha256": "bf8150b79a2d5d91ae48629d8b427a8f7ba0e1097dd6202a9059f29a36379535",
+        "bytes": 7871
+      },
+      "sdist": {
+        "file": "jaraco_context-6.1.2.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/af/50/4763cd07e722bb6285316d390a164bc7e479db9d90daa769f22578f698b4/jaraco_context-6.1.2.tar.gz",
+        "sha256": "f1a6c9d391e661cc5b8d39861ff077a7dc24dc23833ccee564b234b81c82dfe3",
+        "bytes": 16801
+      },
+      "metadata_file": "jaraco_context-6.1.2.dist-info/METADATA",
+      "metadata_sha256": "f1b65b60aea229af54e09b17ae0036cf048fe4a6161fa2e7966a8ea5c2321491",
+      "requires_dist": [
+        "backports.tarfile; python_version < \"3.12\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "jaraco.test>=5.6.0; extra == \"test\"",
+        "portend; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pytest-checkdocs>=2.14; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=3.4; extra == \"enabler\"",
+        "pytest-mypy>=1.0.1; platform_python_implementation != \"PyPy\" and extra == \"type\""
+      ],
+      "native_files": {},
+      "notice_files": {
+        "jaraco_context-6.1.2.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683"
+      },
+      "metadata_files": {
+        "jaraco_context-6.1.2.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683",
+        "jaraco_context-6.1.2.dist-info/METADATA": "f1b65b60aea229af54e09b17ae0036cf048fe4a6161fa2e7966a8ea5c2321491",
+        "jaraco_context-6.1.2.dist-info/WHEEL": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9",
+        "jaraco_context-6.1.2.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "jaraco_context-6.1.2.dist-info/RECORD": "ccf52bc6c2fc692cfda1074184cf858dc0a0ff80e4f3bd905478d62247276915"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "jaraco-functools",
+      "version": "4.6.0",
+      "wheel": {
+        "file": "jaraco_functools-4.6.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/02/36/ecc85bc96c273dc8a11273ed4782272975e6338d4a3e9228621175edf0e3/jaraco_functools-4.6.0-py3-none-any.whl",
+        "sha256": "99e3dc0060c5cbe8fcd1cdb36258e2a65ca40f1566b2033b12abb1bb44dd3c30",
+        "bytes": 11677
+      },
+      "sdist": {
+        "file": "jaraco_functools-4.6.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/6c/1f/c23395957d41ccf27c4e535c3d334c4051e5395b3752057ba4cbaec35c56/jaraco_functools-4.6.0.tar.gz",
+        "sha256": "880c577ec9720b3a052d5bc611fb9f2269b3d87902ef42440df443b88e443280",
+        "bytes": 20837
+      },
+      "metadata_file": "jaraco_functools-4.6.0.dist-info/METADATA",
+      "metadata_sha256": "6ed3cae5b8eef084c3c7b2385a0a8ac4c8155ab7c729212bea099bee69d5bd6c",
+      "requires_dist": [
+        "more_itertools",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "jaraco.classes; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pytest-checkdocs>=2.14; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=3.4; extra == \"enabler\"",
+        "pytest-mypy>=1.0.1; platform_python_implementation != \"PyPy\" and extra == \"type\""
+      ],
+      "native_files": {},
+      "notice_files": {
+        "jaraco_functools-4.6.0.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683"
+      },
+      "metadata_files": {
+        "jaraco_functools-4.6.0.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683",
+        "jaraco_functools-4.6.0.dist-info/METADATA": "6ed3cae5b8eef084c3c7b2385a0a8ac4c8155ab7c729212bea099bee69d5bd6c",
+        "jaraco_functools-4.6.0.dist-info/WHEEL": "2b6eb4118ce7cd7b09601406aa623c553c4476265836f0d9c16f5c061f7efcc0",
+        "jaraco_functools-4.6.0.dist-info/scm_file_list.json": "5160f58cd78734c836ddbc90c3bdc5bd4b858f2faf2c2ff2a7c3b544e5b98dff",
+        "jaraco_functools-4.6.0.dist-info/scm_version.json": "615da69c49c73d114f0be7a6047fd101bf94a06e3abcaaddcb2358f6be75b878",
+        "jaraco_functools-4.6.0.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "jaraco_functools-4.6.0.dist-info/RECORD": "61979796a2732fffd72f6ed2c3d9700bf958d6e324a46e039740d0d47bffbada"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "keyring",
+      "version": "25.7.0",
+      "wheel": {
+        "file": "keyring-25.7.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/81/db/e655086b7f3a705df045bf0933bdd9c2f79bb3c97bfef1384598bb79a217/keyring-25.7.0-py3-none-any.whl",
+        "sha256": "be4a0b195f149690c166e850609a477c532ddbfbaed96a404d4e43f8d5e2689f",
+        "bytes": 39160
+      },
+      "sdist": {
+        "file": "keyring-25.7.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/43/4b/674af6ef2f97d56f0ab5153bf0bfa28ccb6c3ed4d1babf4305449668807b/keyring-25.7.0.tar.gz",
+        "sha256": "fe01bd85eb3f8fb3dd0405defdeac9a5b4f6f0439edbb3149577f244a2e8245b",
+        "bytes": 63516
+      },
+      "metadata_file": "keyring-25.7.0.dist-info/METADATA",
+      "metadata_sha256": "bd54de98fede6dc3e1f3cd89b4e37c95d8842a523bdbb9e52ab40edff1837163",
+      "requires_dist": [
+        "pywin32-ctypes>=0.2.0; sys_platform == \"win32\"",
+        "SecretStorage>=3.2; sys_platform == \"linux\"",
+        "jeepney>=0.4.2; sys_platform == \"linux\"",
+        "importlib_metadata>=4.11.4; python_version < \"3.12\"",
+        "jaraco.classes",
+        "jaraco.functools",
+        "jaraco.context",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pyfakefs; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=3.4; extra == \"enabler\"",
+        "pytest-mypy>=1.0.1; extra == \"type\"",
+        "pygobject-stubs; extra == \"type\"",
+        "shtab; extra == \"type\"",
+        "types-pywin32; extra == \"type\"",
+        "shtab>=1.1.0; extra == \"completion\""
+      ],
+      "native_files": {},
+      "notice_files": {
+        "keyring-25.7.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d"
+      },
+      "metadata_files": {
+        "keyring-25.7.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+        "keyring-25.7.0.dist-info/METADATA": "bd54de98fede6dc3e1f3cd89b4e37c95d8842a523bdbb9e52ab40edff1837163",
+        "keyring-25.7.0.dist-info/WHEEL": "ff309ddcdd65ebd02bc724dbf2bcc4a0ff53a5b61792a44548d383e4ebb19d3b",
+        "keyring-25.7.0.dist-info/entry_points.txt": "f226f273dcc7d924f52436475a54191c450fc7d9156977d5cbccf969fffa3949",
+        "keyring-25.7.0.dist-info/top_level.txt": "a218757647b6f3f35d48d919ea79154b020a90b2533b021f1309d72af6b7a648",
+        "keyring-25.7.0.dist-info/RECORD": "e35734123c4efcece1d6eb559b45ad7bb6e4fe92d152f22645f44396e071aa92"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "more-itertools",
+      "version": "11.1.0",
+      "wheel": {
+        "file": "more_itertools-11.1.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/e8/3d/1087453384dbde46a8c7f9356eead2c58be8a7bf156bca40243377c85715/more_itertools-11.1.0-py3-none-any.whl",
+        "sha256": "4b65538ae22f6fed0ce4874efd317463a7489796a0939fa66824dd542125a192",
+        "bytes": 72226
+      },
+      "sdist": {
+        "file": "more_itertools-11.1.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/de/1d/f4da6f02cdffe04d6362210b807146a26044c88d839208aec273bb0d9184/more_itertools-11.1.0.tar.gz",
+        "sha256": "48e8f4d9e7e5878571ecf6f2b4e57634f93cd474cc8cfbd2376f2d11b396e30d",
+        "bytes": 145772
+      },
+      "metadata_file": "more_itertools-11.1.0.dist-info/METADATA",
+      "metadata_sha256": "15588fd819d6d7f9d0ddc7b5283502d3512c5d1edadce573b78c1f0734055df0",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "more_itertools-11.1.0.dist-info/licenses/LICENSE": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46"
+      },
+      "metadata_files": {
+        "more_itertools-11.1.0.dist-info/licenses/LICENSE": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46",
+        "more_itertools-11.1.0.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "more_itertools-11.1.0.dist-info/METADATA": "15588fd819d6d7f9d0ddc7b5283502d3512c5d1edadce573b78c1f0734055df0",
+        "more_itertools-11.1.0.dist-info/RECORD": "8a52812646022d1d7d109a59e5fad16f99ca9ab759a18cc6039bf8b71b2eb3ad"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "wheel": {
+        "file": "packaging-26.3-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+        "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+        "bytes": 129956
+      },
+      "sdist": {
+        "file": "packaging-26.3.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz",
+        "sha256": "94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79",
+        "bytes": 313412
+      },
+      "metadata_file": "packaging-26.3.dist-info/METADATA",
+      "metadata_sha256": "70fdb89fc4d4a9a043bf7372b8972bcc883fddff34ab55e9cf80d73875384763",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "packaging-26.3.dist-info/licenses/LICENSE": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+        "packaging-26.3.dist-info/licenses/LICENSE.APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "packaging-26.3.dist-info/licenses/LICENSE.BSD": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+      },
+      "metadata_files": {
+        "packaging-26.3.dist-info/licenses/LICENSE": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+        "packaging-26.3.dist-info/licenses/LICENSE.APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "packaging-26.3.dist-info/licenses/LICENSE.BSD": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
+        "packaging-26.3.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "packaging-26.3.dist-info/METADATA": "70fdb89fc4d4a9a043bf7372b8972bcc883fddff34ab55e9cf80d73875384763",
+        "packaging-26.3.dist-info/RECORD": "49910a2cb1de4511589f678097f0fd771a2b4266f944806edb1b846f11af324c"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "pefile",
+      "version": "2024.8.26",
+      "wheel": {
+        "file": "pefile-2024.8.26-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/54/16/12b82f791c7f50ddec566873d5bdd245baa1491bac11d15ffb98aecc8f8b/pefile-2024.8.26-py3-none-any.whl",
+        "sha256": "76f8b485dcd3b1bb8166f1128d395fa3d87af26360c2358fb75b80019b957c6f",
+        "bytes": 74766
+      },
+      "sdist": {
+        "file": "pefile-2024.8.26.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/03/4f/2750f7f6f025a1507cd3b7218691671eecfd0bbebebe8b39aa0fe1d360b8/pefile-2024.8.26.tar.gz",
+        "sha256": "3ff6c5d8b43e8c37bb6e6dd5085658d658a7a0bdcd20b6a07b1fcfc1c4e9d632",
+        "bytes": 76008
+      },
+      "metadata_file": "pefile-2024.8.26.dist-info/METADATA",
+      "metadata_sha256": "8ad83a5f8659e8da6eeaabf2dafa0eebb8c05832a3def16a5db4dd0d52e72474",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "pefile-2024.8.26.dist-info/LICENSE": "b44409c067c6da52bfb54bb6624fb11a7b52157c3a13ae1400232f8196e86ad3"
+      },
+      "metadata_files": {
+        "pefile-2024.8.26.dist-info/LICENSE": "b44409c067c6da52bfb54bb6624fb11a7b52157c3a13ae1400232f8196e86ad3",
+        "pefile-2024.8.26.dist-info/METADATA": "8ad83a5f8659e8da6eeaabf2dafa0eebb8c05832a3def16a5db4dd0d52e72474",
+        "pefile-2024.8.26.dist-info/WHEEL": "678a585ea47fad307b3963436053a6d6a464d115fa1853f6a3c2e0bcfe39dc79",
+        "pefile-2024.8.26.dist-info/top_level.txt": "7bf125792b9950e40a7171c92ecdac49e1a4c46e0e6608542dc09cfefea441ba",
+        "pefile-2024.8.26.dist-info/RECORD": "8bbfd2bb82f780f2c1dea0d29a987916773d8ab196b5b24a02a9989b48b923ff"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "wheel": {
+        "file": "pillow-12.3.0-cp314-cp314-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/f1/e0/492879f69d94f91f60fc8cd05ba03650e9520afebb2fb7aa12777d7c7f38/pillow-12.3.0-cp314-cp314-win_amd64.whl",
+        "sha256": "fdafc9cce40277e0f7a0feabce0ee50dd2fa1800f3b38015e51296b5e814048d",
+        "bytes": 7237707
+      },
+      "sdist": {
+        "file": "pillow-12.3.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/1c/3d/bb7fca845737cf9d7dbde16ed1843984665ff2e0a518f5db43e77ec540b9/pillow-12.3.0.tar.gz",
+        "sha256": "3b8182a766685eaa002637e28b4ec8d6b18819a0c71f579bf0dbaa5830297cce",
+        "bytes": 47025035
+      },
+      "metadata_file": "pillow-12.3.0.dist-info/METADATA",
+      "metadata_sha256": "2c4378001803cfac65809a50722d46e0da4ce8061e717f103e5d52734bab30f5",
+      "requires_dist": [
+        "furo; extra == \"docs\"",
+        "olefile; extra == \"docs\"",
+        "sphinx>=8.2; extra == \"docs\"",
+        "sphinx-autobuild; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "sphinx-inline-tabs; extra == \"docs\"",
+        "sphinxext-opengraph; extra == \"docs\"",
+        "olefile; extra == \"fpx\"",
+        "olefile; extra == \"mic\"",
+        "arro3-compute; extra == \"test-arrow\"",
+        "arro3-core; extra == \"test-arrow\"",
+        "nanoarrow; extra == \"test-arrow\"",
+        "pyarrow; extra == \"test-arrow\"",
+        "coverage>=7.4.2; extra == \"tests\"",
+        "defusedxml; extra == \"tests\"",
+        "markdown2; extra == \"tests\"",
+        "olefile; extra == \"tests\"",
+        "packaging; extra == \"tests\"",
+        "pytest; extra == \"tests\"",
+        "pytest-cov; extra == \"tests\"",
+        "pytest-timeout; extra == \"tests\"",
+        "pytest-xdist; extra == \"tests\"",
+        "setuptools; extra == \"tests\"",
+        "trove-classifiers>=2024.10.12; extra == \"tests\"",
+        "defusedxml; extra == \"xmp\""
+      ],
+      "native_files": {
+        "PIL/_avif.cp314-win_amd64.pyd": "d8bd3032b72992a8166144a4063bae4a55c0f178d237454f17102301731e912a",
+        "PIL/_imaging.cp314-win_amd64.pyd": "d823c0e3b54035d08703bb427c553c956c2607b79395f2952e17a5447c5f1105",
+        "PIL/_imagingcms.cp314-win_amd64.pyd": "dff90929dbeb9d51eebf09f4454d0beb65775f7644145a63d66fa8ca9f5a96fd",
+        "PIL/_imagingft.cp314-win_amd64.pyd": "93c3ca5a3e7119897be9825a0a4228d485410fc8f1e42257edf7e89052c79bce",
+        "PIL/_imagingmath.cp314-win_amd64.pyd": "a7b3d6e462d338744694bc332f9f6f9c5717d532b7a74ad2762b3289521d0d9e",
+        "PIL/_imagingmorph.cp314-win_amd64.pyd": "591905867dd3da9bcf85bc1f84be66817d0399c5a5f25755322e4088c0d42c51",
+        "PIL/_imagingtk.cp314-win_amd64.pyd": "79208042672ff0b9e3669d5078ad35413470861e783feeaf1430458c41036593",
+        "PIL/_webp.cp314-win_amd64.pyd": "f4d851381d1bd937753ba78e951c96a85f3a6c5ac402beec23fc13fdb6d45198"
+      },
+      "notice_files": {
+        "pillow-12.3.0.dist-info/licenses/LICENSE": "4f7866a74802c6326f81faff59a56546b6aec2b10b91973e0e9308de95e79857"
+      },
+      "metadata_files": {
+        "pillow-12.3.0.dist-info/licenses/LICENSE": "4f7866a74802c6326f81faff59a56546b6aec2b10b91973e0e9308de95e79857",
+        "pillow-12.3.0.dist-info/METADATA": "2c4378001803cfac65809a50722d46e0da4ce8061e717f103e5d52734bab30f5",
+        "pillow-12.3.0.dist-info/WHEEL": "8e1c6b44fded7447e6eeda01d57edd979c7a7f46eee93bded9c5b021d91b2fc5",
+        "pillow-12.3.0.dist-info/top_level.txt": "ae266aae4fa1c99aa1e5fd59d19c228b774a7f112c07286ef5c53d20e0c5f8d6",
+        "pillow-12.3.0.dist-info/zip-safe": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "pillow-12.3.0.dist-info/RECORD": "02a5d5217463cba91845e6d71e246e1939a4768825ec3ee01ba796684dd2749f",
+        "pillow-12.3.0.dist-info/sboms/pillow-12.3.0.cdx.json": "40fa909b0f23405a7b97a6d91671a639a40acea7671b04387da22ba3e9fca50a"
+      },
+      "native_sources": {
+        "PIL/_avif.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build",
+          "avif",
+          "aom",
+          "dav1d",
+          "libyuv",
+          "sharpyuv-static"
+        ],
+        "PIL/_imaging.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build",
+          "jpeg",
+          "tiff",
+          "webp",
+          "xz",
+          "zlib-ng",
+          "openjpeg"
+        ],
+        "PIL/_imagingcms.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build",
+          "lcms"
+        ],
+        "PIL/_imagingft.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build",
+          "freetype",
+          "harfbuzz",
+          "brotli",
+          "libpng",
+          "zlib-ng"
+        ],
+        "PIL/_imagingmath.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build"
+        ],
+        "PIL/_imagingmorph.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build"
+        ],
+        "PIL/_imagingtk.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build"
+        ],
+        "PIL/_webp.cp314-win_amd64.pyd": [
+          "pillow-sdist",
+          "pillow-build",
+          "webp"
+        ]
+      }
+    },
+    {
+      "name": "pyinstaller",
+      "version": "6.20.0",
+      "wheel": {
+        "file": "pyinstaller-6.20.0-py3-none-win_amd64.whl",
+        "url": "https://files.pythonhosted.org/packages/76/8c/300f57578882cce259bfb5ae56fda3b69caa3fe9df40a176c719920ea6e2/pyinstaller-6.20.0-py3-none-win_amd64.whl",
+        "sha256": "d588844e890ee80c4365867f98146636e1849bbca8e4284bbf0c809aff0f161a",
+        "bytes": 1391851
+      },
+      "sdist": {
+        "file": "pyinstaller-6.20.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/46/60/d03d52e6690d4e9caf333dcd14550cde634ce6c118b3bc8fa3112c3186fd/pyinstaller-6.20.0.tar.gz",
+        "sha256": "95c5c7e03d5d61e9dfb8ef259c699cf492bb1041beb6dbe83696608cec07347a",
+        "bytes": 4048728
+      },
+      "metadata_file": "pyinstaller-6.20.0.dist-info/METADATA",
+      "metadata_sha256": "5a29cd9b42803d20f5ba800918fa526d0e4ab42dd0cbee34bd1986a2e7f5d5d9",
+      "requires_dist": [
+        "altgraph",
+        "importlib-metadata>=4.6; python_version < '3.10'",
+        "macholib>=1.8; sys_platform == 'darwin'",
+        "packaging>=22.0",
+        "pefile>=2022.5.30; sys_platform == 'win32'",
+        "pyinstaller-hooks-contrib>=2026.4",
+        "pywin32-ctypes>=0.2.1; sys_platform == 'win32'",
+        "setuptools>=42.0.0",
+        "argcomplete; extra == 'completion'",
+        "execnet>=1.5.0; extra == 'hook-testing'",
+        "psutil; extra == 'hook-testing'",
+        "pytest>=2.7.3; extra == 'hook-testing'"
+      ],
+      "native_files": {
+        "PyInstaller/bootloader/Windows-64bit-intel/run.exe": "6a9bca966dbf6c3f39ffa15c3adb9aed1ddcec2498284cf62969b247d72478e9",
+        "PyInstaller/bootloader/Windows-64bit-intel/run_d.exe": "6cde095b7d29eacf6837d045f6f46c983c7929d0fd5d54ee0333bdd827448556",
+        "PyInstaller/bootloader/Windows-64bit-intel/runw.exe": "1015b3391b8e45c2760d4f15f4089aa9cb043f8e56e4051e8234e0e3d2556c10",
+        "PyInstaller/bootloader/Windows-64bit-intel/runw_d.exe": "cb6dbb4a73b959c2779f1d423c7b3b0bcc5955856793e4139c2688cb5d0cfe38"
+      },
+      "notice_files": {
+        "pyinstaller-6.20.0.dist-info/licenses/COPYING.txt": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245"
+      },
+      "metadata_files": {
+        "pyinstaller-6.20.0.dist-info/METADATA": "5a29cd9b42803d20f5ba800918fa526d0e4ab42dd0cbee34bd1986a2e7f5d5d9",
+        "pyinstaller-6.20.0.dist-info/WHEEL": "cb7156c0f4453df45ec1d69a98d2764c0fbfa23e8c60cc2a25762073ed4dde76",
+        "pyinstaller-6.20.0.dist-info/entry_points.txt": "95a68a8d8162302dd8baab9d1cd371e36f9375507ecb86032cd0cead11609382",
+        "pyinstaller-6.20.0.dist-info/licenses/COPYING.txt": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245",
+        "pyinstaller-6.20.0.dist-info/RECORD": "d3f24b9940034f484545d90696f1a967662ab6d0f62548e7dc74033fb682affe"
+      },
+      "native_sources": {
+        "PyInstaller/bootloader/Windows-64bit-intel/run.exe": [
+          "pyinstaller-sdist"
+        ],
+        "PyInstaller/bootloader/Windows-64bit-intel/run_d.exe": [
+          "pyinstaller-sdist"
+        ],
+        "PyInstaller/bootloader/Windows-64bit-intel/runw.exe": [
+          "pyinstaller-sdist"
+        ],
+        "PyInstaller/bootloader/Windows-64bit-intel/runw_d.exe": [
+          "pyinstaller-sdist"
+        ]
+      }
+    },
+    {
+      "name": "pyinstaller-hooks-contrib",
+      "version": "2026.7",
+      "wheel": {
+        "file": "pyinstaller_hooks_contrib-2026.7-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/0a/67/350377af7b50416344ab8792756d414eef7629c618a73e9a0b13bb1552d9/pyinstaller_hooks_contrib-2026.7-py3-none-any.whl",
+        "sha256": "24257a04c7a5a7a034cf28e39dcee20fbeeb9f043076729480f2e1b69904408a",
+        "bytes": 459445
+      },
+      "sdist": {
+        "file": "pyinstaller_hooks_contrib-2026.7.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/26/60/d881fa1ba8c160c18d8e6f782bb16ec4640c08bc08fc50f704c368ad4f9e/pyinstaller_hooks_contrib-2026.7.tar.gz",
+        "sha256": "5fbcaacb22c4f4aac869a127dce283f67a4b4cfcc37d496f2446603e6d68aefa",
+        "bytes": 175992
+      },
+      "metadata_file": "pyinstaller_hooks_contrib-2026.7.dist-info/METADATA",
+      "metadata_sha256": "66f4b89882a0f846cb3f3cd6379d74b85cbf096a88b73689a557438a7ccf431e",
+      "requires_dist": [
+        "importlib_metadata>=4.6; python_version < \"3.10\"",
+        "packaging>=22.0"
+      ],
+      "native_files": {},
+      "notice_files": {
+        "pyinstaller_hooks_contrib-2026.7.dist-info/licenses/LICENSE": "91d0baaff00773038e72c0a1fc9d5d2d38706b7a2b9c04f34296608f931b9cd0"
+      },
+      "metadata_files": {
+        "pyinstaller_hooks_contrib-2026.7.dist-info/licenses/LICENSE": "91d0baaff00773038e72c0a1fc9d5d2d38706b7a2b9c04f34296608f931b9cd0",
+        "pyinstaller_hooks_contrib-2026.7.dist-info/METADATA": "66f4b89882a0f846cb3f3cd6379d74b85cbf096a88b73689a557438a7ccf431e",
+        "pyinstaller_hooks_contrib-2026.7.dist-info/WHEEL": "61532836a2b3111b7ec23519c09df7c41180c27165fb872a6d8913b566b88ad1",
+        "pyinstaller_hooks_contrib-2026.7.dist-info/entry_points.txt": "16c33d42d9a41c23e8f5bdb7b16af1556ec5bf86b0a2e8755a7043149a7124fb",
+        "pyinstaller_hooks_contrib-2026.7.dist-info/top_level.txt": "88b7ca82c81ae5b2d93129285a91f15adead0e370f542bc6b0982fc1f3187270",
+        "pyinstaller_hooks_contrib-2026.7.dist-info/RECORD": "c707048301f1ba5f6c9935b3e3e329e111c57525f59d7d552f9f4f666f09bc27"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "pywin32-ctypes",
+      "version": "0.2.3",
+      "wheel": {
+        "file": "pywin32_ctypes-0.2.3-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/de/3d/8161f7711c017e01ac9f008dfddd9410dff3674334c233bde66e7ba65bbf/pywin32_ctypes-0.2.3-py3-none-any.whl",
+        "sha256": "8a1513379d709975552d202d942d9837758905c8d01eb82b8bcc30918929e7b8",
+        "bytes": 30756
+      },
+      "sdist": {
+        "file": "pywin32-ctypes-0.2.3.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/85/9f/01a1a99704853cb63f253eea009390c88e7131c67e66a0a02099a8c917cb/pywin32-ctypes-0.2.3.tar.gz",
+        "sha256": "d162dc04946d704503b2edc4d55f3dba5c1d539ead017afa00142c38b9885755",
+        "bytes": 29471
+      },
+      "metadata_file": "pywin32_ctypes-0.2.3.dist-info/METADATA",
+      "metadata_sha256": "1e3767d3faff4d5b9c347160883831098d1f25acf4306b02c9acdcc6bfb5883b",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "pywin32_ctypes-0.2.3.dist-info/LICENSE.txt": "dfa83b3e2709adfcdb838d9ad55823ca674abb780e60563d9dd9544ccbf785e9"
+      },
+      "metadata_files": {
+        "pywin32_ctypes-0.2.3.dist-info/LICENSE.txt": "dfa83b3e2709adfcdb838d9ad55823ca674abb780e60563d9dd9544ccbf785e9",
+        "pywin32_ctypes-0.2.3.dist-info/METADATA": "1e3767d3faff4d5b9c347160883831098d1f25acf4306b02c9acdcc6bfb5883b",
+        "pywin32_ctypes-0.2.3.dist-info/WHEEL": "3aa464174798e461ecb0ca2b16395b4c8ab4ef6be91e917ad1f21003a952f710",
+        "pywin32_ctypes-0.2.3.dist-info/top_level.txt": "43aedaaf40bc821b075abf7aac9f2203498b0b16d840bc5e4b97c798c383c349",
+        "pywin32_ctypes-0.2.3.dist-info/RECORD": "a7466d033aa07ca2bd27a806017af8b3167fe9c9c85972ea09da18f25108bfaf"
+      },
+      "native_sources": {}
+    },
+    {
+      "name": "setuptools",
+      "version": "84.0.0",
+      "wheel": {
+        "file": "setuptools-84.0.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl",
+        "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+        "bytes": 818216
+      },
+      "sdist": {
+        "file": "setuptools-84.0.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/6d/44/f5da03a8ef95d369145c5bb53050e7877c9f3d312e128605fd9504829143/setuptools-84.0.0.tar.gz",
+        "sha256": "f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73",
+        "bytes": 1168449
+      },
+      "metadata_file": "setuptools-84.0.0.dist-info/METADATA",
+      "metadata_sha256": "3ef2975718dd31cabdd5829455e9b868ca14dbf79ed8fed2de0af4e87347006e",
+      "requires_dist": [
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "virtualenv>=13.0.0; extra == \"test\"",
+        "wheel>=0.44.0; extra == \"test\"",
+        "pip>=19.1; extra == \"test\"",
+        "packaging>=24.2; extra == \"test\"",
+        "jaraco.envs>=2.2; extra == \"test\"",
+        "pytest-xdist>=3; extra == \"test\"",
+        "jaraco.path>=3.7.2; extra == \"test\"",
+        "build[virtualenv]>=1.0.3; extra == \"test\"",
+        "filelock>=3.4.0; extra == \"test\"",
+        "ini2toml[lite]>=0.14; extra == \"test\"",
+        "tomli-w>=1.0.0; extra == \"test\"",
+        "pytest-timeout; extra == \"test\"",
+        "pytest-perf; sys_platform != \"cygwin\" and extra == \"test\"",
+        "jaraco.develop>=7.21; (python_version >= \"3.9\" and sys_platform != \"cygwin\") and extra == \"test\"",
+        "pytest-home>=0.5; extra == \"test\"",
+        "pytest-subprocess; extra == \"test\"",
+        "pyproject-hooks!=1.1; extra == \"test\"",
+        "jaraco.test>=5.5; extra == \"test\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "furo; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "pygments-github-lexers==0.0.5; extra == \"doc\"",
+        "sphinx-favicon; extra == \"doc\"",
+        "sphinx-inline-tabs; extra == \"doc\"",
+        "sphinx-reredirects; extra == \"doc\"",
+        "sphinxcontrib-towncrier; extra == \"doc\"",
+        "sphinx-notfound-page<2,>=1; extra == \"doc\"",
+        "pyproject-hooks!=1.1; extra == \"doc\"",
+        "towncrier<24.7; extra == \"doc\"",
+        "packaging>=24.2; extra == \"core\"",
+        "more_itertools>=8.8; extra == \"core\"",
+        "jaraco.text>=3.7; extra == \"core\"",
+        "importlib_metadata>=6; python_version < \"3.10\" and extra == \"core\"",
+        "tomli>=2.0.1; python_version < \"3.11\" and extra == \"core\"",
+        "wheel>=0.43.0; extra == \"core\"",
+        "jaraco.functools>=4; extra == \"core\"",
+        "more_itertools; extra == \"core\"",
+        "pytest-checkdocs>=2.14; extra == \"check\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "ruff>=0.13.0; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=3.4; extra == \"enabler\"",
+        "pytest-mypy>=1.0.1; platform_python_implementation != \"PyPy\" and extra == \"type\"",
+        "mypy==1.18.*; extra == \"type\"",
+        "importlib_metadata>=7.0.2; python_version < \"3.10\" and extra == \"type\"",
+        "jaraco.develop>=7.21; sys_platform != \"cygwin\" and extra == \"type\""
+      ],
+      "native_files": {
+        "setuptools/cli-32.exe": "32acc1bc543116cbe2cff10cb867772df2f254ff2634c870aef0b46c4b696fdb",
+        "setuptools/cli-64.exe": "bbb3de5707629e6a60a0c238cd477b28f07f0066982fda953fa6fcec39073a4a",
+        "setuptools/cli-arm64.exe": "b9a7d08da880dfac8bcf548eba4b06fb59b6f09b17d33148a0f6618328926c61",
+        "setuptools/cli.exe": "32acc1bc543116cbe2cff10cb867772df2f254ff2634c870aef0b46c4b696fdb",
+        "setuptools/gui-32.exe": "85dae1e95d77845f2cb59bcac3d4afe74bbe4c91a9bcc5bf4a71cd43104dbe7c",
+        "setuptools/gui-64.exe": "3471b6140eadc6412277dbbefe3fef8c345a0f1a59776086b80a3618c3a83e3b",
+        "setuptools/gui-arm64.exe": "e694f4743405c8b5926ff457db6fe7f1a12dec7c16a9c3864784d3f4e07ae097",
+        "setuptools/gui.exe": "85dae1e95d77845f2cb59bcac3d4afe74bbe4c91a9bcc5bf4a71cd43104dbe7c"
+      },
+      "notice_files": {
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE": "458502e12d97bbf64438606a20044aa85eb05fb0a8a807bb35dbec253fd1fc04",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.BSD": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt": "30c23618679108f3e8ea1d2a658c7ca417bdfc891c98ef1a89fa4ff0c9828654",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+        "setuptools/config/NOTICE": "2dddf08818297a3b89d43d95ff659d8da85741108c9136dfa3a4d856c0623bd8",
+        "setuptools/config/_validate_pyproject/NOTICE": "09c9bcea95ca086f8bc5bed174e40bc835b297d40fb5f86bbbb570fe0a5581a7",
+        "setuptools-84.0.0.dist-info/licenses/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE": "ade78d04982d69972d444a8e14a94f87a2334dd3855cc80348ea8e240aa0df2d",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+      },
+      "metadata_files": {
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE": "458502e12d97bbf64438606a20044aa85eb05fb0a8a807bb35dbec253fd1fc04",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.APACHE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.BSD": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt": "30c23618679108f3e8ea1d2a658c7ca417bdfc891c98ef1a89fa4ff0c9828654",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+        "setuptools-84.0.0.dist-info/licenses/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "setuptools-84.0.0.dist-info/METADATA": "3ef2975718dd31cabdd5829455e9b868ca14dbf79ed8fed2de0af4e87347006e",
+        "setuptools-84.0.0.dist-info/WHEEL": "61532836a2b3111b7ec23519c09df7c41180c27165fb872a6d8913b566b88ad1",
+        "setuptools-84.0.0.dist-info/entry_points.txt": "ce482d8697ff15af4d544f69e85293dd793d0d1d5f680711538728820b15ee30",
+        "setuptools-84.0.0.dist-info/top_level.txt": "5ac967fb03c175cf0d5cb357b27091c935d48468b4994c3f9746554e16a29be2",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE": "ade78d04982d69972d444a8e14a94f87a2334dd3855cc80348ea8e240aa0df2d",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/METADATA": "3800d9b91dceea2065a6ed6279383362e97ac38b8e56b9343f404ee531860099",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/RECORD": "2bee6072cbcec6390c57107c8dfcb0422918a98ecdb5a2cc362187f13d42e96f",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/WHEEL": "db07a93359e4e034b8785a58ad6d534ea3dca0635f1e184efe2e66e1c3a299ba",
+        "setuptools/_vendor/autocommand-2.2.2.dist-info/top_level.txt": "0337e180a292f04740c16513485f2681e5506d7398f64a241c1ea44aac30aaed",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/METADATA": "8215c54ead77d9dc5a108a25c6bdc72b5999aa6f62c9499a440359412afa5a51",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/RECORD": "0f69db719b54220d6a4adff8bfb04ac98affea3dc8b54054a1a787a17567f4d1",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/WHEEL": "189eedfe4581172c1b6a02b97a8f48a14c0b5baa3239e4ca990fbd8871553714",
+        "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/top_level.txt": "7068da2cc3a8051d452b4029a23b73595995893b49ec91882bf1f05e212cbed5",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/METADATA": "a3e38b9ee4326289d4864704f30e299ee769e2309ce9f4a75f0de1a50ad0a356",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/RECORD": "52a6b8ee0de15cf7fd99625f43b97cd2e3942ac86f16054ea90de48e66f29355",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/WHEEL": "ff309ddcdd65ebd02bc724dbf2bcc4a0ff53a5b61792a44548d383e4ebb19d3b",
+        "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/top_level.txt": "08eddf0fdcb29403625e4acca38a872d5fe6a972f6b02e4914a82dd725804fe0",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/METADATA": "5c2fd09012c954f139b10624978d5335a654c34014cd06f6f466ca683dbc9c56",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/RECORD": "63b936c308d0fcbe1390e824567cc007536c32a849adb02278e95f1d4c736c31",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/WHEEL": "5b287efe76740c9628947367d7f84c6b894ceee0de743fd1195c1b9938f222d9",
+        "setuptools/_vendor/jaraco.text-4.0.0.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/METADATA": "0435ebfc52055c5a9974ed20c171b6454383eaf9dbb1508814ba7ad97c59d712",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/RECORD": "4599d876ceb42b7eef03aa39e235c4ebeab6aea2409dbe634496852393d1f837",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/WHEEL": "ff309ddcdd65ebd02bc724dbf2bcc4a0ff53a5b61792a44548d383e4ebb19d3b",
+        "setuptools/_vendor/jaraco_context-6.1.0.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/METADATA": "2e79da8dc3469924abe3ac8b22a3feb5692a79bf9f47bbc86b6535d618641849",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/RECORD": "baafd2d6d94c1bde453e4c805ac05511dc53986e0a63b02f674ef0f788bec146",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/WHEEL": "ff309ddcdd65ebd02bc724dbf2bcc4a0ff53a5b61792a44548d383e4ebb19d3b",
+        "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/top_level.txt": "d099cddcb7d71f82c845f5cbf9014e18227341664edc42f1e11d5dfe5a2ea103",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/METADATA": "6ab3515145abe58b067f087c867631cf4cf5d653fed81b9642ee12086c3904b8",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/RECORD": "9ed1b134c0aa83722f36e99f3918aa9610ce3a0a514d793bbb74a368d441a01d",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/more_itertools-10.8.0.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "setuptools/_vendor/packaging-26.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/packaging-26.0.dist-info/METADATA": "3362bb7d6a26da2962ba8daaa4785cd0bacac21aba908a1195cc8f59580a265a",
+        "setuptools/_vendor/packaging-26.0.dist-info/RECORD": "f50503333aae9517807d2fb4d81fc27cb60aa644666f50176812626d6224ce5d",
+        "setuptools/_vendor/packaging-26.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/packaging-26.0.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/METADATA": "bbc5216d5f4c77bfbc57227264d52e66bccde71ccf79e75e1a6046d029d30223",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/RECORD": "3d0d2f1cc018593c4d8baa2395baf0b1c1c645bbd8c18cd064f49cb4e4c95ea0",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/platformdirs-4.4.0.dist-info/WHEEL": "aad0b0a12256807936d52d4a6f88a1773236ae527564a688bab4e3fe780e8724",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/METADATA": "f5ac0a1f8fba908b4646cd655309e91aad969b6787616ac571ca462a3832ffce",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/RECORD": "225430ce95640e8d4fcdb93cdae2fc38d685aec016d0e293d5fb99a695886fed",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/tomli-2.4.0.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/METADATA": "22910aa97ca89cbcc20a019e27fe31360b7929a4bd66ca0d310f99a44f6ccd35",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/RECORD": "b0297c3ada17b8727e15ddd6d1e38c8a90a997f779fcf978996f6fec62ecb702",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "setuptools/_vendor/wheel-0.46.3.dist-info/entry_points.txt": "24976d480193bcc2db2244d565400cbc628edfd16d59f09517c9a9fcd1fa7b88",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/INSTALLER": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/METADATA": "bdd67d4d16cf0bf3b893e7d18cd3d2d774adb82f37ed985bc7770c607226b35b",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/RECORD": "3bfab660a24704f84228e4bb1ce1f0e3fa9ff80e5c806352a626b2f460ead836",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/REQUESTED": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/WHEEL": "ff309ddcdd65ebd02bc724dbf2bcc4a0ff53a5b61792a44548d383e4ebb19d3b",
+        "setuptools/_vendor/zipp-3.23.0.dist-info/top_level.txt": "8806dda121df686a817d56f65ee47d26a4901c2a0eb0eb46eb2f42fcb4a9a85c",
+        "setuptools-84.0.0.dist-info/RECORD": "8e50621059df808724912520d74765c1384bdb36be51ec3a92342dbbea30d630"
+      },
+      "native_sources": {
+        "setuptools/cli-32.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/cli-64.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/cli-arm64.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/cli.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/gui-32.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/gui-64.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/gui-arm64.exe": [
+          "setuptools-sdist"
+        ],
+        "setuptools/gui.exe": [
+          "setuptools-sdist"
+        ]
+      }
+    },
+    {
+      "name": "truststore",
+      "version": "0.10.4",
+      "wheel": {
+        "file": "truststore-0.10.4-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/19/97/56608b2249fe206a67cd573bc93cd9896e1efb9e98bce9c163bcdc704b88/truststore-0.10.4-py3-none-any.whl",
+        "sha256": "adaeaecf1cbb5f4de3b1959b42d41f6fab57b2b1666adb59e89cb0b53361d981",
+        "bytes": 18660
+      },
+      "sdist": {
+        "file": "truststore-0.10.4.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/53/a3/1585216310e344e8102c22482f6060c7a6ea0322b63e026372e6dcefcfd6/truststore-0.10.4.tar.gz",
+        "sha256": "9d91bd436463ad5e4ee4aba766628dd6cd7010cf3e2461756b3303710eebc301",
+        "bytes": 26169
+      },
+      "metadata_file": "truststore-0.10.4.dist-info/METADATA",
+      "metadata_sha256": "509a7b67bff99f2d04f57251b5bdb761bd9429467e1cebc453b7f96be4108f5b",
+      "requires_dist": [],
+      "native_files": {},
+      "notice_files": {
+        "truststore-0.10.4.dist-info/licenses/LICENSE": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+      },
+      "metadata_files": {
+        "truststore-0.10.4.dist-info/licenses/LICENSE": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca",
+        "truststore-0.10.4.dist-info/WHEEL": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+        "truststore-0.10.4.dist-info/METADATA": "509a7b67bff99f2d04f57251b5bdb761bd9429467e1cebc453b7f96be4108f5b",
+        "truststore-0.10.4.dist-info/RECORD": "340dc4b762f4bfe249696ebf4c07a5c9e8ba67ec2a4471ef1434c8f8ba1e6d67"
+      },
+      "native_sources": {}
+    }
+  ],
+  "sources": [
+    {
+      "file": "libjpeg-turbo-3.1.4.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libjpeg-turbo-3.1.4.1.tar.gz",
+      "sha256": "ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022",
+      "bytes": 2528617,
+      "id": "jpeg",
+      "version": "3.1.4.1",
+      "role": "runtime"
+    },
+    {
+      "file": "tiff-4.7.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/tiff-4.7.1.tar.gz",
+      "sha256": "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69",
+      "bytes": 4000609,
+      "id": "tiff",
+      "version": "4.7.1+pillow-patch",
+      "role": "runtime"
+    },
+    {
+      "file": "libwebp-1.6.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libwebp-1.6.0.tar.gz",
+      "sha256": "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564",
+      "bytes": 4296070,
+      "id": "webp",
+      "version": "1.6.0",
+      "role": "runtime"
+    },
+    {
+      "file": "xz-5.8.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xz-5.8.3.tar.gz",
+      "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+      "bytes": 2771455,
+      "id": "xz",
+      "version": "5.8.3",
+      "role": "runtime"
+    },
+    {
+      "file": "zlib-ng-2.3.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/zlib-ng-2.3.3.tar.gz",
+      "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+      "bytes": 2447397,
+      "id": "zlib-ng",
+      "version": "2.3.3",
+      "role": "runtime"
+    },
+    {
+      "file": "libpng-1.6.58.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libpng-1.6.58.tar.gz",
+      "sha256": "a9d4df463d36a6e5f9c29bd6f4967312d17e996c1854f3511f833924eb1993cf",
+      "bytes": 1592190,
+      "id": "libpng",
+      "version": "1.6.58",
+      "role": "freetype-static-input"
+    },
+    {
+      "file": "pillow-bb1d8e8.tar.gz",
+      "url": "https://codeload.github.com/python-pillow/Pillow/tar.gz/bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+      "sha256": "3088957d53e64d5bc802dc043d64de2d76796c3f3b973113bdbb4c9ecd1b30a1",
+      "bytes": 47129949,
+      "id": "pillow-build",
+      "version": "12.3.0",
+      "role": "complete-build-recipes"
+    },
+    {
+      "file": "libavif-1.4.2.tar.gz",
+      "url": "https://codeload.github.com/AOMediaCodec/libavif/tar.gz/refs/tags/v1.4.2",
+      "sha256": "2b645287340ba5a631d268b551dc2d72bd73ac33335962dd36dcdb6d8366921d",
+      "bytes": 14665927,
+      "id": "avif",
+      "version": "1.4.2",
+      "role": "runtime"
+    },
+    {
+      "file": "lcms2-2.19.1.tar.gz",
+      "url": "https://downloads.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+      "sha256": "bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8",
+      "bytes": 5728743,
+      "id": "lcms",
+      "version": "2.19.1",
+      "role": "runtime"
+    },
+    {
+      "file": "openjpeg-2.5.4.tar.gz",
+      "url": "https://codeload.github.com/uclouvain/openjpeg/tar.gz/refs/tags/v2.5.4",
+      "sha256": "a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a",
+      "bytes": 2157028,
+      "id": "openjpeg",
+      "version": "2.5.4",
+      "role": "runtime"
+    },
+    {
+      "file": "aom-v3.14.1.tar.gz",
+      "url": "https://aomedia.googlesource.com/aom/+archive/refs/tags/v3.14.1.tar.gz",
+      "sha256": "bf71743d7c6b72236abb9fd0e911b86b5dc256af8275a8502690994443a519ef",
+      "bytes": 6437822,
+      "id": "aom",
+      "version": "3.14.1",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "dav1d-1.5.3.tar.gz",
+      "url": "https://code.videolan.org/videolan/dav1d/-/archive/1.5.3/dav1d-1.5.3.tar.gz",
+      "sha256": "cbe212b02faf8c6eed5b6d55ef8a6e363aaab83f15112e960701a9c3df813686",
+      "bytes": 1713950,
+      "id": "dav1d",
+      "version": "1.5.3",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libyuv-644251f.tar.gz",
+      "url": "https://chromium.googlesource.com/libyuv/libyuv/+archive/644251f252a84bf8ce91ff0aca86a9b16b069ab8.tar.gz",
+      "sha256": "7101e34504439be13be0c0dd14128ca620da62399df1f28aab36e3e43a8b0705",
+      "bytes": 598291,
+      "id": "libyuv",
+      "version": "644251f252a84bf8ce91ff0aca86a9b16b069ab8",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libwebp-git-v1.6.0.tar.gz",
+      "url": "https://chromium.googlesource.com/webm/libwebp/+archive/refs/tags/v1.6.0.tar.gz",
+      "sha256": "965ce15eb5cee3a53e66269bc603ce8b7dc8ba24de1e9080ad0f89410698d8ba",
+      "bytes": 3845497,
+      "id": "sharpyuv-static",
+      "version": "1.6.0",
+      "role": "avif-static-codec"
+    },
+    {
+      "id": "brotli",
+      "version": "1.2.0",
+      "file": "brotli-1.2.0.tar.gz",
+      "bytes": 646315,
+      "sha256": "816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec",
+      "role": "runtime",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/brotli-1.2.0.tar.gz"
+    },
+    {
+      "id": "freetype",
+      "version": "2.14.3",
+      "file": "freetype-2.14.3.tar.gz",
+      "bytes": 4134916,
+      "sha256": "e61b31ab26358b946e767ed7eb7f4bb2e507da1cfefeb7a8861ace7fd5c899a1",
+      "role": "runtime",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/freetype-2.14.3.tar.gz"
+    },
+    {
+      "id": "harfbuzz",
+      "version": "14.2.1",
+      "file": "harfbuzz-14.2.1.tar.xz",
+      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.2.1/harfbuzz-14.2.1.tar.xz",
+      "bytes": 19559952,
+      "sha256": "a54a5d8e9380a41fbb762ce367bcbf7704792dfca0d93f1bbca86c5a57902e0e",
+      "role": "runtime"
+    }
+  ]
+}

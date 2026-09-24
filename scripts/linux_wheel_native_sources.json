@@ -1,0 +1,759 @@
+{
+  "schema": 1,
+  "platform": "linux-x86_64",
+  "scope": "The 21 native wheel inputs in the reviewed Linux Python freeze; additional imports require a new source audit.",
+  "wheel_rebuild_qualified": false,
+  "sources": [
+    {
+      "file": "libjpeg-turbo-3.1.4.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libjpeg-turbo-3.1.4.1.tar.gz",
+      "sha256": "ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022",
+      "bytes": 2528617,
+      "id": "jpeg",
+      "version": "3.1.4.1",
+      "role": "runtime"
+    },
+    {
+      "file": "tiff-4.7.1.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/tiff-4.7.1.tar.gz",
+      "sha256": "f698d94f3103da8ca7438d84e0344e453fe0ba3b7486e04c5bf7a9a3fabe9b69",
+      "bytes": 4000609,
+      "id": "tiff",
+      "version": "4.7.1+pillow-patch",
+      "role": "runtime"
+    },
+    {
+      "file": "libwebp-1.6.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libwebp-1.6.0.tar.gz",
+      "sha256": "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564",
+      "bytes": 4296070,
+      "id": "webp",
+      "version": "1.6.0",
+      "role": "runtime"
+    },
+    {
+      "file": "libxcb-1.17.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/libxcb-1.17.0.tar.gz",
+      "sha256": "2c69287424c9e2128cb47ffe92171e10417041ec2963bceafb65cb3fcf8f0b85",
+      "bytes": 661593,
+      "id": "xcb",
+      "version": "1.17.0",
+      "role": "runtime"
+    },
+    {
+      "file": "xz-5.8.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xz-5.8.3.tar.gz",
+      "sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+      "bytes": 2771455,
+      "id": "xz",
+      "version": "5.8.3",
+      "role": "runtime"
+    },
+    {
+      "file": "zlib-ng-2.3.3.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/zlib-ng-2.3.3.tar.gz",
+      "sha256": "f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1",
+      "bytes": 2447397,
+      "id": "zlib-ng",
+      "version": "2.3.3",
+      "role": "runtime"
+    },
+    {
+      "file": "xcb-proto-1.17.0.tar.gz",
+      "url": "https://raw.githubusercontent.com/python-pillow/pillow-depends/8aa03253ae251784d8cbee25d783fefde7589a70/xcb-proto-1.17.0.tar.gz",
+      "sha256": "392d3c9690f8c8202a68fdb89c16fd55159ab8d65000a6da213f4a1576e97a16",
+      "bytes": 206094,
+      "id": "xcb-proto",
+      "version": "1.17.0",
+      "role": "build-input"
+    },
+    {
+      "file": "pillow-bb1d8e8.tar.gz",
+      "url": "https://codeload.github.com/python-pillow/Pillow/tar.gz/bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+      "sha256": "3088957d53e64d5bc802dc043d64de2d76796c3f3b973113bdbb4c9ecd1b30a1",
+      "bytes": 47129949,
+      "id": "pillow",
+      "version": "12.3.0",
+      "role": "source-recipes-and-tiff-patch"
+    },
+    {
+      "file": "multibuild-4546f4d.tar.gz",
+      "url": "https://codeload.github.com/multi-build/multibuild/tar.gz/4546f4d4820ffd0104b872c3b6187260b3e64edc",
+      "sha256": "e19297569173d647e2f7e3ddeb7a336789b4a3efad8180402a23b10da355076c",
+      "bytes": 822658,
+      "id": "multibuild",
+      "version": "4546f4d4820ffd0104b872c3b6187260b3e64edc",
+      "role": "build-recipes"
+    },
+    {
+      "file": "libavif-1.4.2.tar.gz",
+      "url": "https://codeload.github.com/AOMediaCodec/libavif/tar.gz/refs/tags/v1.4.2",
+      "sha256": "2b645287340ba5a631d268b551dc2d72bd73ac33335962dd36dcdb6d8366921d",
+      "bytes": 14665927,
+      "id": "avif",
+      "version": "1.4.2",
+      "role": "runtime"
+    },
+    {
+      "file": "lcms2-2.19.1.tar.gz",
+      "url": "https://downloads.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+      "sha256": "bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8",
+      "bytes": 5728743,
+      "id": "lcms",
+      "version": "2.19.1",
+      "role": "runtime"
+    },
+    {
+      "file": "openjpeg-2.5.4.tar.gz",
+      "url": "https://codeload.github.com/uclouvain/openjpeg/tar.gz/refs/tags/v2.5.4",
+      "sha256": "a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a",
+      "bytes": 2157028,
+      "id": "openjpeg",
+      "version": "2.5.4",
+      "role": "runtime"
+    },
+    {
+      "file": "aom-v3.14.1.tar.gz",
+      "url": "https://aomedia.googlesource.com/aom/+archive/refs/tags/v3.14.1.tar.gz",
+      "sha256": "bf71743d7c6b72236abb9fd0e911b86b5dc256af8275a8502690994443a519ef",
+      "bytes": 6437822,
+      "id": "aom",
+      "version": "3.14.1",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "dav1d-1.5.3.tar.gz",
+      "url": "https://code.videolan.org/videolan/dav1d/-/archive/1.5.3/dav1d-1.5.3.tar.gz",
+      "sha256": "cbe212b02faf8c6eed5b6d55ef8a6e363aaab83f15112e960701a9c3df813686",
+      "bytes": 1713950,
+      "id": "dav1d",
+      "version": "1.5.3",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libyuv-644251f.tar.gz",
+      "url": "https://chromium.googlesource.com/libyuv/libyuv/+archive/644251f252a84bf8ce91ff0aca86a9b16b069ab8.tar.gz",
+      "sha256": "7101e34504439be13be0c0dd14128ca620da62399df1f28aab36e3e43a8b0705",
+      "bytes": 598291,
+      "id": "libyuv",
+      "version": "644251f252a84bf8ce91ff0aca86a9b16b069ab8",
+      "role": "avif-static-codec"
+    },
+    {
+      "file": "libwebp-git-v1.6.0.tar.gz",
+      "url": "https://chromium.googlesource.com/webm/libwebp/+archive/refs/tags/v1.6.0.tar.gz",
+      "sha256": "965ce15eb5cee3a53e66269bc603ce8b7dc8ba24de1e9080ad0f89410698d8ba",
+      "bytes": 3845497,
+      "id": "sharpyuv-static",
+      "version": "1.6.0",
+      "role": "avif-static-codec"
+    },
+    {
+      "id": "libffi",
+      "version": "3.4.6",
+      "file": "libffi-v3.4.6.tar.gz",
+      "url": "https://codeload.github.com/libffi/libffi/tar.gz/refs/tags/v3.4.6",
+      "role": "cffi-static-libffi",
+      "sha256": "9ac790464c1eb2f5ab5809e978a1683e9393131aede72d1b0a0703771d3c6cda",
+      "bytes": 598175
+    },
+    {
+      "id": "zstd",
+      "version": "1.5.7",
+      "file": "zstd-1.5.7.tar.gz",
+      "url": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",
+      "role": "pillow-tiff-runtime",
+      "sha256": "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3",
+      "bytes": 2434947
+    },
+    {
+      "id": "xau",
+      "version": "1.0.9-3.el8",
+      "file": "libXau-1.0.9-3.el8.src.rpm",
+      "url": "https://repo.almalinux.org/vault/8.10/AppStream/Source/Packages/libXau-1.0.9-3.el8.src.rpm",
+      "sha256": "f9e5775417473caa6b5699171eec64253ef90473f36f0efe81d020b52a5de49a",
+      "bytes": 340502,
+      "role": "pillow-auditwheel-library-source"
+    },
+    {
+      "id": "cargo-asn1",
+      "version": "0.24.1",
+      "file": "asn1-0.24.1.crate",
+      "url": "https://static.crates.io/crates/asn1/asn1-0.24.1.crate",
+      "sha256": "c9795210620c0cb3f9a7ce4f882808c38e1ef7b347c90591dceae0886e031fb1",
+      "role": "wheel-cargo-input",
+      "bytes": 50502
+    },
+    {
+      "id": "cargo-asn1_derive",
+      "version": "0.24.1",
+      "file": "asn1_derive-0.24.1.crate",
+      "url": "https://static.crates.io/crates/asn1_derive/asn1_derive-0.24.1.crate",
+      "sha256": "909e307f1cc32bb8bccbd98f446e6d1bf03fa30f7b53a4337da7181ad30fa11a",
+      "role": "wheel-cargo-input",
+      "bytes": 9534
+    },
+    {
+      "id": "cargo-base64",
+      "version": "0.23.0",
+      "file": "base64-0.23.0.crate",
+      "url": "https://static.crates.io/crates/base64/base64-0.23.0.crate",
+      "sha256": "b25655df2c3cdd83c5e5b293b88acd880332b2ddadd7c30ac43144fdc0033da9",
+      "role": "wheel-cargo-input",
+      "bytes": 93578
+    },
+    {
+      "id": "cargo-bitflags",
+      "version": "2.13.1",
+      "file": "bitflags-2.13.1.crate",
+      "url": "https://static.crates.io/crates/bitflags/bitflags-2.13.1.crate",
+      "sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da",
+      "role": "wheel-cargo-input",
+      "bytes": 51395
+    },
+    {
+      "id": "cargo-cc",
+      "version": "1.4.0",
+      "file": "cc-1.4.0.crate",
+      "url": "https://static.crates.io/crates/cc/cc-1.4.0.crate",
+      "sha256": "5add81bb678e6cb321aff7fa0dc7689ad82b112dbc032cea19f91d6b8e3582b9",
+      "role": "wheel-cargo-input",
+      "bytes": 97878
+    },
+    {
+      "id": "cargo-cfg-if",
+      "version": "1.0.4",
+      "file": "cfg-if-1.0.4.crate",
+      "url": "https://static.crates.io/crates/cfg-if/cfg-if-1.0.4.crate",
+      "sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+      "role": "wheel-cargo-input",
+      "bytes": 9360
+    },
+    {
+      "id": "cargo-find-msvc-tools",
+      "version": "0.1.9",
+      "file": "find-msvc-tools-0.1.9.crate",
+      "url": "https://static.crates.io/crates/find-msvc-tools/find-msvc-tools-0.1.9.crate",
+      "sha256": "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582",
+      "role": "wheel-cargo-input",
+      "bytes": 31493
+    },
+    {
+      "id": "cargo-foreign-types-shared",
+      "version": "0.1.1",
+      "file": "foreign-types-shared-0.1.1.crate",
+      "url": "https://static.crates.io/crates/foreign-types-shared/foreign-types-shared-0.1.1.crate",
+      "sha256": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b",
+      "role": "wheel-cargo-input",
+      "bytes": 5672
+    },
+    {
+      "id": "cargo-foreign-types",
+      "version": "0.3.2",
+      "file": "foreign-types-0.3.2.crate",
+      "url": "https://static.crates.io/crates/foreign-types/foreign-types-0.3.2.crate",
+      "sha256": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1",
+      "role": "wheel-cargo-input",
+      "bytes": 7504
+    },
+    {
+      "id": "cargo-heck",
+      "version": "0.5.0",
+      "file": "heck-0.5.0.crate",
+      "url": "https://static.crates.io/crates/heck/heck-0.5.0.crate",
+      "sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea",
+      "role": "wheel-cargo-input",
+      "bytes": 11517
+    },
+    {
+      "id": "cargo-itoa",
+      "version": "1.0.18",
+      "file": "itoa-1.0.18.crate",
+      "url": "https://static.crates.io/crates/itoa/itoa-1.0.18.crate",
+      "sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "role": "wheel-cargo-input",
+      "bytes": 15935
+    },
+    {
+      "id": "cargo-libc",
+      "version": "0.2.189",
+      "file": "libc-0.2.189.crate",
+      "url": "https://static.crates.io/crates/libc/libc-0.2.189.crate",
+      "sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+      "role": "wheel-cargo-input",
+      "bytes": 851502
+    },
+    {
+      "id": "cargo-once_cell",
+      "version": "1.21.4",
+      "file": "once_cell-1.21.4.crate",
+      "url": "https://static.crates.io/crates/once_cell/once_cell-1.21.4.crate",
+      "sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+      "role": "wheel-cargo-input",
+      "bytes": 35010
+    },
+    {
+      "id": "cargo-openssl-macros",
+      "version": "0.1.1",
+      "file": "openssl-macros-0.1.1.crate",
+      "url": "https://static.crates.io/crates/openssl-macros/openssl-macros-0.1.1.crate",
+      "sha256": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c",
+      "role": "wheel-cargo-input",
+      "bytes": 5601
+    },
+    {
+      "id": "cargo-openssl-sys",
+      "version": "0.9.117",
+      "file": "openssl-sys-0.9.117.crate",
+      "url": "https://static.crates.io/crates/openssl-sys/openssl-sys-0.9.117.crate",
+      "sha256": "b47e7e6bb2c38cd930d25a23b40fa52e068c10e85f3e03a7f5ba5aaca5713695",
+      "role": "wheel-cargo-input",
+      "bytes": 76045
+    },
+    {
+      "id": "cargo-openssl",
+      "version": "0.10.81",
+      "file": "openssl-0.10.81.crate",
+      "url": "https://static.crates.io/crates/openssl/openssl-0.10.81.crate",
+      "sha256": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45",
+      "role": "wheel-cargo-input",
+      "bytes": 311187
+    },
+    {
+      "id": "cargo-pem",
+      "version": "4.0.0",
+      "file": "pem-4.0.0.crate",
+      "url": "https://static.crates.io/crates/pem/pem-4.0.0.crate",
+      "sha256": "d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120",
+      "role": "wheel-cargo-input",
+      "bytes": 18770
+    },
+    {
+      "id": "cargo-pkg-config",
+      "version": "0.3.33",
+      "file": "pkg-config-0.3.33.crate",
+      "url": "https://static.crates.io/crates/pkg-config/pkg-config-0.3.33.crate",
+      "sha256": "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e",
+      "role": "wheel-cargo-input",
+      "bytes": 21590
+    },
+    {
+      "id": "cargo-portable-atomic",
+      "version": "1.14.0",
+      "file": "portable-atomic-1.14.0.crate",
+      "url": "https://static.crates.io/crates/portable-atomic/portable-atomic-1.14.0.crate",
+      "sha256": "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3",
+      "role": "wheel-cargo-input",
+      "bytes": 200703
+    },
+    {
+      "id": "cargo-proc-macro2",
+      "version": "1.0.107",
+      "file": "proc-macro2-1.0.107.crate",
+      "url": "https://static.crates.io/crates/proc-macro2/proc-macro2-1.0.107.crate",
+      "sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9",
+      "role": "wheel-cargo-input",
+      "bytes": 59588
+    },
+    {
+      "id": "cargo-pyo3-build-config",
+      "version": "0.29.0",
+      "file": "pyo3-build-config-0.29.0.crate",
+      "url": "https://static.crates.io/crates/pyo3-build-config/pyo3-build-config-0.29.0.crate",
+      "sha256": "c5e2a7d2f0d013342f295c048ad19237add5154a55b1c5a254c0ec93d4109078",
+      "role": "wheel-cargo-input",
+      "bytes": 39616
+    },
+    {
+      "id": "cargo-pyo3-ffi",
+      "version": "0.29.0",
+      "file": "pyo3-ffi-0.29.0.crate",
+      "url": "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-0.29.0.crate",
+      "sha256": "ca85c467da1bbc8d866eea5deff9cf29ea5f7785054a17da36e65bda9c05845b",
+      "role": "wheel-cargo-input",
+      "bytes": 88184
+    },
+    {
+      "id": "cargo-pyo3-macros-backend",
+      "version": "0.29.0",
+      "file": "pyo3-macros-backend-0.29.0.crate",
+      "url": "https://static.crates.io/crates/pyo3-macros-backend/pyo3-macros-backend-0.29.0.crate",
+      "sha256": "4ca3a1557399783172dc5bf39cfca835157732532cba56b71d2292161e53b362",
+      "role": "wheel-cargo-input",
+      "bytes": 91943
+    },
+    {
+      "id": "cargo-pyo3-macros",
+      "version": "0.29.0",
+      "file": "pyo3-macros-0.29.0.crate",
+      "url": "https://static.crates.io/crates/pyo3-macros/pyo3-macros-0.29.0.crate",
+      "sha256": "9ac53762fd065daa3194dd09337a38bd793a188100fd1a9304c4ab312d901771",
+      "role": "wheel-cargo-input",
+      "bytes": 8915
+    },
+    {
+      "id": "cargo-pyo3",
+      "version": "0.29.0",
+      "file": "pyo3-0.29.0.crate",
+      "url": "https://static.crates.io/crates/pyo3/pyo3-0.29.0.crate",
+      "sha256": "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c",
+      "role": "wheel-cargo-input",
+      "bytes": 1241253
+    },
+    {
+      "id": "cargo-quote",
+      "version": "1.0.47",
+      "file": "quote-1.0.47.crate",
+      "url": "https://static.crates.io/crates/quote/quote-1.0.47.crate",
+      "sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001",
+      "role": "wheel-cargo-input",
+      "bytes": 31622
+    },
+    {
+      "id": "cargo-self_cell",
+      "version": "1.3.0",
+      "file": "self_cell-1.3.0.crate",
+      "url": "https://static.crates.io/crates/self_cell/self_cell-1.3.0.crate",
+      "sha256": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813",
+      "role": "wheel-cargo-input",
+      "bytes": 23869
+    },
+    {
+      "id": "cargo-shlex",
+      "version": "2.0.1",
+      "file": "shlex-2.0.1.crate",
+      "url": "https://static.crates.io/crates/shlex/shlex-2.0.1.crate",
+      "sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+      "role": "wheel-cargo-input",
+      "bytes": 19332
+    },
+    {
+      "id": "cargo-syn",
+      "version": "2.0.119",
+      "file": "syn-2.0.119.crate",
+      "url": "https://static.crates.io/crates/syn/syn-2.0.119.crate",
+      "sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+      "role": "wheel-cargo-input",
+      "bytes": 307407
+    },
+    {
+      "id": "cargo-target-lexicon",
+      "version": "0.13.5",
+      "file": "target-lexicon-0.13.5.crate",
+      "url": "https://static.crates.io/crates/target-lexicon/target-lexicon-0.13.5.crate",
+      "sha256": "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca",
+      "role": "wheel-cargo-input",
+      "bytes": 26928
+    },
+    {
+      "id": "cargo-unicode-ident",
+      "version": "1.0.24",
+      "file": "unicode-ident-1.0.24.crate",
+      "url": "https://static.crates.io/crates/unicode-ident/unicode-ident-1.0.24.crate",
+      "sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+      "role": "wheel-cargo-input",
+      "bytes": 49298
+    },
+    {
+      "id": "cargo-vcpkg",
+      "version": "0.2.15",
+      "file": "vcpkg-0.2.15.crate",
+      "url": "https://static.crates.io/crates/vcpkg/vcpkg-0.2.15.crate",
+      "sha256": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426",
+      "role": "wheel-cargo-input",
+      "bytes": 228735
+    },
+    {
+      "id": "openssl",
+      "version": "4.0.2",
+      "file": "openssl-4.0.2.tar.gz",
+      "url": "https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz",
+      "sha256": "736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8",
+      "role": "wheel-static-openssl",
+      "bytes": 55153883
+    },
+    {
+      "url": "https://static.rust-lang.org/dist/rustc-1.98.0-src.tar.xz",
+      "file": "rustc-1.98.0-src.tar.xz",
+      "sha256": "271fa73d8174f53d713c46a8310da7bf7cfdcfb8b7cfd1c2b74b84a83ae9fb1e",
+      "bytes": 244440040,
+      "version": "1.98.0",
+      "id": "rust-stdlib-source",
+      "role": "matching-rust-source-release",
+      "revision": "88d9e12ae178fab0fb5cc050a94da85685d449ea"
+    },
+    {
+      "id": "cryptography-sdist",
+      "version": "50.0.1",
+      "file": "cryptography-50.0.1.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/bb/ad/5d6702db60b1e40b41ef513b6967ff5848f307d50f8449baf1634f5908f1/cryptography-50.0.1.tar.gz",
+      "sha256": "5dd9bda1c12b4162f6ff568eeb5e0ff956c28d14406e875cfe8a63a2d414ff20",
+      "bytes": 880381,
+      "role": "python-extension-and-local-crates"
+    },
+    {
+      "id": "cffi-sdist",
+      "version": "2.1.1",
+      "file": "cffi-2.1.1.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz",
+      "sha256": "dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be",
+      "bytes": 530807,
+      "role": "python-extension-and-local-crates"
+    },
+    {
+      "id": "cffi-recipes",
+      "version": "2.1.1",
+      "revision": "fd33e7700f0ebafe6f30bd5053f13327221b77a2",
+      "file": "cffi-fd33e7700f0ebafe6f30bd5053f13327221b77a2.tar.gz",
+      "url": "https://codeload.github.com/python-cffi/cffi/tar.gz/fd33e7700f0ebafe6f30bd5053f13327221b77a2",
+      "sha256": "3c63006cdf332696a1e16b76e0c6aed38c17208e5de26737459ae6125c091482",
+      "bytes": 540132,
+      "role": "static-libffi-wheel-build-recipe"
+    }
+  ],
+  "wheels": {
+    "pillow": {
+      "version": "12.3.0",
+      "file": "pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/84/21/a35af28dcc61f37ed850a2d64c65c701321dfbf25085e469d5559360cbbf/pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "78cb2c6865a35ab8ff8b75fd122f6033b92a62c82801110e48ddd6c936a45d91",
+      "binaries": {
+        "PIL/_avif.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "c0c30b196f5e42fe990291eb0fb5aade70803399f6be4bc08da9fb7ced9957dd",
+          "source_ids": [
+            "pillow"
+          ]
+        },
+        "PIL/_imaging.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "94310f4a073e9773a067df88513804649f50a974f78bd85a52c52d21170783f2",
+          "source_ids": [
+            "pillow",
+            "zlib-ng"
+          ]
+        },
+        "PIL/_imagingcms.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "2d4600dbd8c29d7cb243560ddf6a7c6ce36d13e15cf359d14050623ad7d153ac",
+          "source_ids": [
+            "pillow"
+          ]
+        },
+        "PIL/_imagingmath.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "95bd69209560c9fd64e6665204f33207c7b61cccd4c29797f0f522561bc5c693",
+          "source_ids": [
+            "pillow"
+          ]
+        },
+        "PIL/_imagingtk.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "e8f9d96fbfa0ccfd816d82d3c880eb05872f4d1079e09d63dfd7b513c9af73ff",
+          "source_ids": [
+            "pillow"
+          ]
+        },
+        "PIL/_webp.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "54806394ca07d141f07663d6629108be51795e7371c3c13db94ba808fbf15fd8",
+          "source_ids": [
+            "pillow"
+          ]
+        },
+        "pillow.libs/libXau-154567c4.so.6.0.0": {
+          "sha256": "05484d24bf78cb8ed03169f1cb067204d829cb7af21de8820400d29d115e4320",
+          "source_ids": [
+            "xau"
+          ]
+        },
+        "pillow.libs/libavif-8a7f9d56.so.16.4.2": {
+          "sha256": "3a8819e60f0fd7c716ef14776085a81c941db354002a9f9a679da38447e5507f",
+          "source_ids": [
+            "avif",
+            "aom",
+            "dav1d",
+            "libyuv",
+            "sharpyuv-static"
+          ]
+        },
+        "pillow.libs/libjpeg-31e2ca52.so.62.4.0": {
+          "sha256": "6d7c754529b30aff22efaaf88ba02061714591702c03f297f00ccb32ee6d9d9a",
+          "source_ids": [
+            "jpeg"
+          ]
+        },
+        "pillow.libs/liblcms2-dade1fbf.so.2.0.19": {
+          "sha256": "2549d6886e7de9960792e10ac87acfb9895e2afae85b7aac02108080cc7d3a71",
+          "source_ids": [
+            "lcms"
+          ]
+        },
+        "pillow.libs/liblzma-2be87c3e.so.5.8.3": {
+          "sha256": "535737fa00b49f62d14d6d9bce76482440df700b33d2666d636894f751dd25f1",
+          "source_ids": [
+            "xz"
+          ]
+        },
+        "pillow.libs/libopenjp2-b07f72ad.so.2.5.4": {
+          "sha256": "185cb358047fd8b351c1d05b84a7e906c59d68d7f41222805f7042895ae266d8",
+          "source_ids": [
+            "openjpeg"
+          ]
+        },
+        "pillow.libs/libsharpyuv-0066295b.so.0.1.2": {
+          "sha256": "c2c5e89368b3bf9276a3cfea7e52ceb624db1c0c986c127169616219d5325807",
+          "source_ids": [
+            "webp"
+          ]
+        },
+        "pillow.libs/libtiff-fc87e79d.so.6.2.0": {
+          "sha256": "522bafb6812978fc53db6c32e5c57786186b551fc5fd6a7c61b857ca01261d16",
+          "source_ids": [
+            "tiff",
+            "pillow",
+            "zlib-ng",
+            "zstd"
+          ]
+        },
+        "pillow.libs/libwebp-51b0b3f7.so.7.2.0": {
+          "sha256": "7df9ad3680dd09d756511334791c8c896207863816eb2910840e5fc4ae10028a",
+          "source_ids": [
+            "webp"
+          ]
+        },
+        "pillow.libs/libwebpdemux-9fe2abcc.so.2.0.17": {
+          "sha256": "a7ccaaf4388d8ec212ca85be17907e8e021b7da113f7f48c47722c1ebe602f8e",
+          "source_ids": [
+            "webp"
+          ]
+        },
+        "pillow.libs/libwebpmux-8fb1c9f6.so.3.1.2": {
+          "sha256": "48ebf91c4d208901a48f851fb4c851d380fededd2a272104e3ca24c17499deba",
+          "source_ids": [
+            "webp"
+          ]
+        },
+        "pillow.libs/libxcb-ad31f5a3.so.1.1.0": {
+          "sha256": "633fe8df9f1bfc0ef60de6a3495a599ec56e56216491b90b79604cfecfb88000",
+          "source_ids": [
+            "xcb",
+            "xcb-proto"
+          ]
+        },
+        "pillow.libs/libzstd-44be1190.so.1.5.7": {
+          "sha256": "9501ab40e92a57491cadd2d02df46b596f24e74e6c0476b8500793f822fa0072",
+          "source_ids": [
+            "zstd"
+          ]
+        }
+      },
+      "metadata": {
+        "pillow-12.3.0.dist-info/METADATA": "8fc07146cab33ef7582361dab6eac596d340b03ec648f18217da7894f73838c8",
+        "pillow-12.3.0.dist-info/WHEEL": "b40ad1e4df54976de0a343902219f27fbed3bc20eb34efbef032b05c5a0f93e9",
+        "pillow-12.3.0.dist-info/top_level.txt": "ae266aae4fa1c99aa1e5fd59d19c228b774a7f112c07286ef5c53d20e0c5f8d6",
+        "pillow-12.3.0.dist-info/zip-safe": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "pillow-12.3.0.dist-info/RECORD": "f251576bea23c898de8d76183e0ecda635e78d889233e42aa52f59f6101d44b1",
+        "pillow-12.3.0.dist-info/licenses/LICENSE": "dda12a98c1979cf3d94df1cff45d27a4cb3f04a60c76f76902ac54cac03ec0ce",
+        "pillow-12.3.0.dist-info/sboms/auditwheel.cdx.json": "303b21ef5fdafd808394a3e28a4b17db8ebc92f47bf6be28a3e9ec02cd3173d5",
+        "pillow-12.3.0.dist-info/sboms/pillow-12.3.0.cdx.json": "40fa909b0f23405a7b97a6d91671a639a40acea7671b04387da22ba3e9fca50a"
+      },
+      "native_files_not_in_current_freeze": {
+        "PIL/_imagingft.cpython-312-x86_64-linux-gnu.so": "31e284b6b2a9fd39d09cc6ab26cf24d0f20fdbd992f9e6bac98f926e38d584cb",
+        "PIL/_imagingmorph.cpython-312-x86_64-linux-gnu.so": "c2f3731339aea5260810b6028f1c6940e54e9a8005bd119b1b9f8463f23fc089",
+        "pillow.libs/libbrotlicommon-53534446.so.1.2.0": "d0034d3c0dc0dc698266f9ce61ef1701402960eb0f18c0defadc61b91f793d88",
+        "pillow.libs/libbrotlidec-7e5462ba.so.1.2.0": "301d8f1b7365c0204485f7bdc89165936fa8212b36c4f78563fe4229df53863c",
+        "pillow.libs/libfreetype-9fc94c80.so.6.20.6": "994d650f4fe686013580524dd868d7001325fa3bbf408800eaa4778138a7e690",
+        "pillow.libs/libharfbuzz-172d1f63.so.0.61421.0": "7ff87422406706600619c8467a2daa42a8122207dcb95337273ae18419f7a220",
+        "pillow.libs/libpng16-abb096d5.so.16.58.0": "44f1d1d821c9b57cda2b32d4a278eeaa03bc9930ae9da0ec0f384c3daf165e12"
+      }
+    },
+    "cffi": {
+      "version": "2.1.1",
+      "file": "cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/b1/db/dceb9dd5b231e1da801793f8acc9f3c52a7e1afe40bb1aae37e02b0faad5/cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "sha256": "c1453022f490d2459a11819d83ad1d586e9ff65a12ac3e705ffebd46d3685dcf",
+      "binaries": {
+        "_cffi_backend.cpython-312-x86_64-linux-gnu.so": {
+          "sha256": "9bc1d08072255a5ec2db10fc75df1dd9e73097a75cd9150cfe875ebd6712f17c",
+          "source_ids": [
+            "cffi-sdist",
+            "cffi-recipes",
+            "libffi"
+          ]
+        }
+      },
+      "metadata": {
+        "cffi-2.1.1.dist-info/METADATA": "558bafb9093a8e790175d9ecff9688382981d744877dad86fd6770db0f4dc918",
+        "cffi-2.1.1.dist-info/WHEEL": "504ac80cc95190c99aea177550563d7939b8fca6b1431c01c0d435e74afbbd0e",
+        "cffi-2.1.1.dist-info/entry_points.txt": "a6b6108011f8e27050fe5269bba88c8051b414697880d3b0b6fbe3a03a0b001c",
+        "cffi-2.1.1.dist-info/top_level.txt": "ac4ed6477ad97cd2b1588f7e8e7ea1b0708097b303901f859ae41bc568c57a14",
+        "cffi-2.1.1.dist-info/RECORD": "44cf643c2a33f5797bb22a8b4fb5ce9024e7d7ae8281324ea948ec5fb21d8b03",
+        "cffi-2.1.1.dist-info/licenses/LICENSE": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63"
+      },
+      "native_files_not_in_current_freeze": {}
+    },
+    "cryptography": {
+      "version": "50.0.1",
+      "file": "cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/85/66/6ccca4722987ddedaa7fc9c3f4708af7431f5535666c174350830888c6b7/cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl",
+      "sha256": "51afcfceb15597cf2635068e4ac9a56b2abde622edde17f37d85fd7b5306497a",
+      "binaries": {
+        "cryptography/hazmat/bindings/_rust.abi3.so": {
+          "sha256": "3d6423664bffe926fd91d1913d1c5ddda5c31ee7ff1cae06fc8b71c47c9501a1",
+          "source_ids": [
+            "cryptography-sdist",
+            "rust-stdlib-source",
+            "cargo-asn1",
+            "cargo-asn1_derive",
+            "cargo-base64",
+            "cargo-bitflags",
+            "cargo-cc",
+            "cargo-cfg-if",
+            "cargo-find-msvc-tools",
+            "cargo-foreign-types-shared",
+            "cargo-foreign-types",
+            "cargo-heck",
+            "cargo-itoa",
+            "cargo-libc",
+            "cargo-once_cell",
+            "cargo-openssl-macros",
+            "cargo-openssl-sys",
+            "cargo-openssl",
+            "cargo-pem",
+            "cargo-pkg-config",
+            "cargo-portable-atomic",
+            "cargo-proc-macro2",
+            "cargo-pyo3-build-config",
+            "cargo-pyo3-ffi",
+            "cargo-pyo3-macros-backend",
+            "cargo-pyo3-macros",
+            "cargo-pyo3",
+            "cargo-quote",
+            "cargo-self_cell",
+            "cargo-shlex",
+            "cargo-syn",
+            "cargo-target-lexicon",
+            "cargo-unicode-ident",
+            "cargo-vcpkg",
+            "openssl"
+          ]
+        }
+      },
+      "metadata": {
+        "cryptography-50.0.1.dist-info/METADATA": "8e9b5570da4686848ee5c6bb83fffc224bcddf9793136731dd050ce0c05fffe2",
+        "cryptography-50.0.1.dist-info/WHEEL": "39b425ce6c898e83f8b8cdeeb65dae690d3ab9f2382ca9c3860e77bf6d34077a",
+        "cryptography-50.0.1.dist-info/RECORD": "6bc9222d2719f3d44ad3c6ec9e90306cf91ee7113b409a9a3c62684510c08ffa",
+        "cryptography-50.0.1.dist-info/licenses/LICENSE": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb",
+        "cryptography-50.0.1.dist-info/licenses/LICENSE.APACHE": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe",
+        "cryptography-50.0.1.dist-info/licenses/LICENSE.BSD": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb",
+        "cryptography-50.0.1.dist-info/sboms/cryptography-rust.cyclonedx.json": "9bdac29ee4d9bfdb4241e04f0fdbd12e5b62fe31706bd3a8bed28c8cafcb55a0",
+        "cryptography-50.0.1.dist-info/sboms/sbom.json": "4bd5cfec10cb95e3842dc5a52d63ab62e1b2dd1b6e697b4587903ec8de53f720"
+      },
+      "native_files_not_in_current_freeze": {}
+    }
+  },
+  "evidence": {
+    "pillow_revision": "bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+    "pillow_depends_revision": "8aa03253ae251784d8cbee25d783fefde7589a70",
+    "cryptography_cargo_lock": "All 39 SBOM components match the sdist Cargo.lock; eight local workspace crates including the root are supplied by the sdist.",
+    "cryptography_rust_runtime": "The ELF comment matches Rust source release 1.98.0 commit 88d9e12ae178fab0fb5cc050a94da85685d449ea.",
+    "cffi_static_ffi": "Release workflow at the recorded CFFI revision builds libffi v3.4.6 statically and renames ffi_call; the frozen binary defines cffistatic_ffi_call.",
+    "pillow_xau": "The exact wheel auditwheel SBOM identifies AlmaLinux libXau 1.0.9-3.el8. The retained source RPM spec and archive match this identity.",
+    "unbundled_pillow": "The upstream SBOM also lists optional libraries. This lock covers actual frozen native inputs; it does not add their seven unbundled wheel binaries or claim they were rebuilt."
+  }
+}

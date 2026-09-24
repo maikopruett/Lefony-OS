@@ -291,6 +291,12 @@ struct lfs_config {
     // to the most recent minor version when zero.
     uint32_t disk_version;
 #endif
+
+    // Lefony: optional coherent cache for filesystem-structure reads. Ordinary
+    // file-data reads still use read. Invalidate before every program/erase.
+    // NULL preserves upstream behavior; no on-disk format change.
+    int (*read_metadata)(const struct lfs_config *c, lfs_block_t block,
+            lfs_off_t off, void *buffer, lfs_size_t size);
 };
 
 // File info structure

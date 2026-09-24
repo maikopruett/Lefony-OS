@@ -9,6 +9,8 @@ namespace PrimeG2 {
 namespace Services {
 void init();
 void poll();
+// Only after bounded verification work; does not arm the watchdog or dispatch.
+void noteVerificationProgress();
 void noteUserActivity();
 bool advanceIdleForTest(uint32_t milliseconds);
 bool onKeyPressed();
@@ -21,6 +23,8 @@ uint16_t batteryMillivolts();
 uint16_t batteryRawADC();
 uint8_t batteryPercent();
 bool batteryEstimateIsCalibrated();
+uint32_t batteryEstimateAgeMillis();
+bool calendarSnapshot(Ion::RTC::DateTime *value, bool *setThisBoot);
 uint8_t chargerState();
 uint8_t batterySenseState();
 uint8_t vbusSense();

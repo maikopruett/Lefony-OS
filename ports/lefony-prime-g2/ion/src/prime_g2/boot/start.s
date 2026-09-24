@@ -90,13 +90,13 @@ fatal_exception exception_data_abort, 4
 fatal_exception exception_reserved, 5
 fatal_exception exception_fiq, 7
 
-/* Acknowledge/dispatch/EOI is performed in C. r4-r11 are ABI-preserved by
- * the dispatcher; the interrupted volatile register set and SPSR live on the
- * dedicated IRQ stack. */
+/* Acknowledge/dispatch/EOI is performed in C. Save every integer register so
+ * the optional foreground-task proof can retain the complete interrupted
+ * context. This frame matches exception_svc, including its VFP ordering. */
 .global exception_irq
 exception_irq:
   sub lr, lr, #4
-  stmdb sp!, {r0-r3, r12, lr}
+  stmdb sp!, {r0-r12, lr}
   mrs r0, spsr
   vmrs r1, fpscr
   push {r0,r1}
@@ -106,7 +106,7 @@ exception_irq:
   vmsr fpscr,r0
   bl prime_g2_irq_dispatch
   ldr r0, [sp,#256]
-  ldr r1, [sp,#284]
+  ldr r1, [sp,#316]
   bl prime_app_irq_expired
   cmp r0,#0
   bne 8f
@@ -115,7 +115,9 @@ exception_irq:
   pop {r0,r1}
   vmsr fpscr,r1
   msr spsr_cxsf, r0
-  ldmia sp!, {r0-r3, r12, pc}^
+  ldmia sp!, {r0-r12, pc}^
 8:
-  add sp,sp,#288
+  cmp r0,#2
+  beq prime_app_suspend
+  add sp,sp,#320
   b prime_app_leave

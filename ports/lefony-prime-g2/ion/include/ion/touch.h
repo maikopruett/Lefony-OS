@@ -14,6 +14,7 @@ struct Event {
   int x2 = 0, y2 = 0;
   // Rebase gesture geometry when a finger joins or leaves the contact set.
   bool contactsChanged = false;
+  unsigned id = 0, id2 = 0;
 };
 const Event & currentEvent();
 }}

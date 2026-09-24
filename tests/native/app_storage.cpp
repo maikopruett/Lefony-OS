@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <array>
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
 #include <cstring>
@@ -18,6 +19,7 @@ struct Flash {
   std::map<uint32_t, Page> pages;
   std::set<uint32_t> bad;
   int writes = 0, cut = -1;
+  uint64_t programmed = 0, reads = 0;
   bool torn = false;
   static void range(uint32_t block) {
     assert(block >= FirstBlock && block < FirstBlock + BlockCount);
@@ -29,6 +31,7 @@ struct Flash {
   static bool read(void *p, uint32_t page, uint8_t *data) {
     range(page / PagesPerBlock);
     auto &f = *static_cast<Flash *>(p);
+    f.reads++;
     if (f.bad.count(page / PagesPerBlock))
       return false;
     auto it = f.pages.find(page);
@@ -66,6 +69,7 @@ struct Flash {
     bytes.fill(255);
     memcpy(bytes.data(), data, cut ? 37 : PageBytes);
     f.pages.emplace(page, bytes);
+    f.programmed += cut ? 37 : PageBytes;
     if (cut)
       throw PowerCut{};
     return true;
@@ -102,7 +106,35 @@ static Entry check(Volume &v, const char *id, const std::vector<uint8_t> &packag
     assert(!memcmp(dataBuffer.data(), data.data(), data.size()));
   return e;
 }
+static void testHomeOrder() {
+  std::vector<uint8_t> original(280,0x31),replacement(4096,0x72),readback(Volume::MaximumHomeOrder);
+  Flash flash;
+  {
+    auto volume=std::make_unique<Volume>(flash.backend());assert(initialize(*volume));
+    assert(volume->readHomeOrder(readback.data(),readback.size())==0);
+    assert(!volume->beginHomeOrder(original.data(),7));
+    assert(!volume->beginHomeOrder(original.data(),Volume::MaximumHomeOrder+1));
+    assert(volume->beginHomeOrder(original.data(),original.size()));finish(*volume);
+    assert(volume->readHomeOrder(readback.data(),readback.size())==int(original.size()));
+    assert(!memcmp(readback.data(),original.data(),original.size()));
+  }
+  for(bool torn:{false,true}) for(int cut=0;cut<24;cut++) {
+    Flash candidate=flash;candidate.cut=candidate.writes+cut;candidate.torn=torn;
+    try {
+      auto volume=std::make_unique<Volume>(candidate.backend());assert(initialize(*volume));
+      assert(volume->beginHomeOrder(replacement.data(),replacement.size()));finish(*volume);
+    } catch(PowerCut &) {}
+    candidate.cut=-1;
+    auto restored=std::make_unique<Volume>(candidate.backend());assert(initialize(*restored));
+    int bytes=restored->readHomeOrder(readback.data(),readback.size());
+    assert((bytes==int(original.size()) && !memcmp(readback.data(),original.data(),original.size())) ||
+           (bytes==int(replacement.size()) && !memcmp(readback.data(),replacement.data(),replacement.size())));
+    int count=0;assert(restored->list([](void *p,const char *,const Entry &){++*static_cast<int *>(p);return true;},&count));
+    assert(count==0); // The OS preference must never appear as an installed app.
+  }
+}
 int main() {
+  testHomeOrder();
   uint8_t raw[2112];
   memset(raw, 0xff, sizeof(raw));
   assert(PrimeG2::NANDPhysical::erasedRawAppPage(raw));
@@ -114,7 +146,7 @@ int main() {
   }
   std::vector<uint8_t> old(17301, 0x23), next(31989, 0x61), oldData(17, 0x91), newData(4099, 0x85);
   Flash flash;
-  Volume v(flash.backend());
+  auto vOwner=std::make_unique<Volume>(flash.backend());Volume &v=*vOwner;
   assert(!v.mount());
   assert(initialize(v));
   Space empty;
@@ -133,7 +165,7 @@ int main() {
       f.cut = f.writes + cut;
       f.torn = torn;
       try {
-        Volume update(f.backend());
+        auto updateOwner=std::make_unique<Volume>(f.backend());Volume &update=*updateOwner;
         assert(update.mount());
         assert(
             update.begin("surface-3d", next.data(), next.size(), newData.data(), newData.size()));
@@ -141,7 +173,7 @@ int main() {
       } catch (PowerCut &) {
       }
       f.cut = -1;
-      Volume recovered(f.backend());
+      auto recoveredOwner=std::make_unique<Volume>(f.backend());Volume &recovered=*recoveredOwner;
       assert(initialize(recovered));
       Entry e;
       assert(recovered.entry("surface-3d", &e));
@@ -158,14 +190,14 @@ int main() {
       f.cut = f.writes + cut;
       f.torn = torn;
       try {
-        Volume update(f.backend());
+        auto updateOwner=std::make_unique<Volume>(f.backend());Volume &update=*updateOwner;
         assert(update.mount());
         assert(update.begin("surface-3d", nullptr, 0, nullptr, 0));
         finish(update);
       } catch (PowerCut &) {
       }
       f.cut = -1;
-      Volume recovered(f.backend());
+      auto recoveredOwner=std::make_unique<Volume>(f.backend());Volume &recovered=*recoveredOwner;
       assert(initialize(recovered));
       Entry e;
       if (recovered.entry("surface-3d", &e))
@@ -176,7 +208,7 @@ int main() {
   std::vector<uint8_t> icon(6576,0x53), changedIcon(6576,0x84), iconRead(6576);
   Flash withIcon=baseline;
   {
-    Volume icons(withIcon.backend()); assert(initialize(icons));
+    auto iconsOwner=std::make_unique<Volume>(withIcon.backend());Volume &icons=*iconsOwner; assert(initialize(icons));
     assert(!icons.begin("surface-3d",icon.data(),icon.size()-1,nullptr,0,true));
     assert(icons.begin("surface-3d",icon.data(),icon.size(),nullptr,0,true)); finish(icons);
     assert(check(icons,"surface-3d",old,oldData).generation==1);
@@ -184,10 +216,10 @@ int main() {
   for (bool first : {true,false}) for (bool torn : {false,true}) for(int cut=0;cut<30;cut++) {
     Flash f=first?baseline:withIcon; f.cut=f.writes+cut; f.torn=torn;
     try {
-      Volume update(f.backend()); assert(initialize(update));
+      auto updateOwner=std::make_unique<Volume>(f.backend());Volume &update=*updateOwner; assert(initialize(update));
       assert(update.begin("surface-3d",changedIcon.data(),changedIcon.size(),nullptr,0,true)); finish(update);
     } catch(PowerCut &) {}
-    f.cut=-1; Volume recovered(f.backend()); assert(initialize(recovered));
+    f.cut=-1; auto recoveredOwner=std::make_unique<Volume>(f.backend());Volume &recovered=*recoveredOwner; assert(initialize(recovered));
     assert(check(recovered,"surface-3d",old,oldData).generation==1);
     Entry e;
     if(recovered.entry("surface-3d",&e,true)) {
@@ -196,7 +228,7 @@ int main() {
     } else assert(first);
   }
   {
-    Volume icons(withIcon.backend()); assert(initialize(icons));
+    auto iconsOwner=std::make_unique<Volume>(withIcon.backend());Volume &icons=*iconsOwner; assert(initialize(icons));
     assert(icons.read("surface-3d",iconRead.data(),iconRead.size(),nullptr,0,true)); assert(iconRead==icon);
     unsigned count=0;
     assert(icons.list([](void *p,const char *,const Entry &){++*static_cast<unsigned *>(p);return true;},&count)); assert(count==1);
@@ -216,7 +248,7 @@ int main() {
   }
   Flash migrationComplete = legacy;
   {
-    Volume migrated(migrationComplete.backend());
+    auto migratedOwner=std::make_unique<Volume>(migrationComplete.backend());Volume &migrated=*migratedOwner;
     assert(initialize(migrated));
     check(migrated, "legacy-app", old, oldData);
   }
@@ -228,12 +260,12 @@ int main() {
       f.cut = f.writes + cut;
       f.torn = torn;
       try {
-        Volume migrated(f.backend());
+        auto migratedOwner=std::make_unique<Volume>(f.backend());Volume &migrated=*migratedOwner;
         initialize(migrated);
       } catch (PowerCut &) {
       }
       f.cut = -1;
-      Volume recovered(f.backend());
+      auto recoveredOwner=std::make_unique<Volume>(f.backend());Volume &recovered=*recoveredOwner;
       assert(initialize(recovered));
       check(recovered, "legacy-app", old, oldData);
     }
@@ -254,7 +286,7 @@ int main() {
     }
   }
   {
-    Volume migrated(allLegacy.backend());
+    auto migratedOwner=std::make_unique<Volume>(allLegacy.backend());Volume &migrated=*migratedOwner;
     assert(migrated.initialize(packageBuffer.data(), packageBuffer.size(), dataBuffer.data(),
                                dataBuffer.size(), numberedName));
     for (unsigned i = 0; i < 8; i++) {
@@ -269,13 +301,13 @@ int main() {
   Page garbage;
   garbage.fill(0x42);
   unknown.pages[FirstBlock * PagesPerBlock] = garbage;
-  Volume reject(unknown.backend());
+  auto rejectOwner=std::make_unique<Volume>(unknown.backend());Volume &reject=*rejectOwner;
   assert(!initialize(reject));
   assert(unknown.writes == 0);
   // Cancellation affects only the unpublished temporary file.
   {
     Flash f = baseline;
-    Volume update(f.backend());
+    auto updateOwner=std::make_unique<Volume>(f.backend());Volume &update=*updateOwner;
     assert(update.mount());
     assert(update.begin("surface-3d", next.data(), next.size(), nullptr, 0));
     update.step();
@@ -286,7 +318,7 @@ int main() {
   // More than eight files and more than 16 MiB of packages share the pool.
   std::vector<uint8_t> large(1500000, 0xa5);
   Flash pool;
-  Volume shared(pool.backend());
+  auto sharedOwner=std::make_unique<Volume>(pool.backend());Volume &shared=*sharedOwner;
   assert(initialize(shared));
   for (unsigned i = 0; i < 16; i++) {
     char id[49];
@@ -335,7 +367,7 @@ int main() {
   finish(shared);
   check(shared, "reclaimed-space", large, {});
   {
-    Volume reboot(pool.backend());
+    auto rebootOwner=std::make_unique<Volume>(pool.backend());Volume &reboot=*rebootOwner;
     assert(initialize(reboot));
     check(reboot, "app-0", large, {});
   }
@@ -348,14 +380,14 @@ int main() {
       damaged.pages[(FirstBlock + b) * PagesPerBlock + page] = invalid;
     }
   int before = damaged.writes;
-  Volume broken(damaged.backend());
+  auto brokenOwner=std::make_unique<Volume>(damaged.backend());Volume &broken=*brokenOwner;
   assert(!initialize(broken));
   assert(damaged.writes == before);
   // Factory bad payload blocks are excluded from capacity and allocation.
   Flash bad;
   bad.bad.insert(FirstBlock + 40);
   bad.bad.insert(FirstBlock + 80);
-  Volume b(bad.backend());
+  auto bOwner=std::make_unique<Volume>(bad.backend());Volume &b=*bOwner;
   assert(initialize(b));
   Space reduced;
   assert(b.space(&reduced));

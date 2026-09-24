@@ -24,7 +24,7 @@ def test_native_app_storage_power_loss(tmp_path):
                         '-c',str(PORT/f'littlefs/{name}.c'),'-o',str(obj)],check=True,timeout=60)
     subprocess.run([compiler,'-std=c++17','-Wall','-Wextra','-Werror','-fsanitize=address,undefined','-g',*flags,
                     '-I',str(PORT),str(ROOT/'tests/native/app_storage.cpp'),str(PORT/'app_storage.cpp'),
-                    str(PORT/'legacy_app_storage.cpp'),*objects,'-o',str(binary)],check=True,timeout=60)
+                    str(PORT/'legacy_app_storage.cpp'),str(PORT/'app_document_store.cpp'),str(PORT/'app_root_record.cpp'),str(PORT/'app_file_store.cpp'),*objects,'-o',str(binary)],check=True,timeout=60)
     subprocess.run([str(binary)],check=True,timeout=240)
 
 def test_app_layout_does_not_overlap_firmware_or_bad_block_table():

@@ -52,6 +52,7 @@ public:
       m_event.dragging |= contacts == 2 || changed || dx * dx + dy * dy >= 100;
     }
     m_id = id; m_id2 = id2;
+    m_event.id = id; m_event.id2 = id2;
     m_event.contacts = contacts;
     m_event.x2 = x2; m_event.y2 = y2;
     m_event.contactsChanged = changed;

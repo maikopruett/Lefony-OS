@@ -30,6 +30,7 @@
 
 extern "C" {
 bool __attribute__((weak)) prime_g2_launch_native_app() { return false; }
+bool __attribute__((weak)) prime_g2_launch_installed_native_app(unsigned) { return false; }
 void __attribute__((weak)) prime_g2_preferences_sync() {}
 void __attribute__((weak)) prime_g2_preferences_factory_reset() {}
 int __attribute__((weak)) prime_g2_preferences_get_for_test(const char *) { return -1; }
@@ -265,13 +266,43 @@ void processLine() {
     reply(PrimeG2::NativeApp::load(reinterpret_cast<const uint8_t *>(PrimeG2::NativeApp::StagingAddress),size)?"OK":"ERR app package");
     return;
   }
+  if(strcmp(cursor,"APP PROFILE VERSION")==0) {replyInteger("VALUE ",1);return;}
+  if(strcmp(cursor,"APP PROFILE HEAP VERSION")==0) {replyInteger("VALUE ",1);return;}
+  if(strcmp(cursor,"APP PROFILE HEAP SNAPSHOT")==0) {
+    const auto &profile=PrimeG2::NativeApp::heapResourceProfile();
+    replyData(&profile,sizeof(profile));return;
+  }
+  if(strncmp(cursor,"APP PROFILE HEAP ",17)==0) {
+    cursor+=17;unsigned address;
+    if(!takeUnsigned(cursor,address) || *cursor) {reply("ERR heap address");return;}
+    reply(PrimeG2::NativeApp::configureHeapResourceProfile(address)?"OK":"ERR heap profile");return;
+  }
+  if(strncmp(cursor,"APP PROFILE ARM ",16)==0) {
+    cursor+=16;uint8_t hash[32];
+    if(strlen(cursor)!=64) {reply("ERR profile hash");return;}
+    for(unsigned i=0;i<32;i++) {
+      int high=hexDigit(cursor[2*i]),low=hexDigit(cursor[2*i+1]);
+      if(high<0 || low<0) {reply("ERR profile hash");return;}
+      hash[i]=(high<<4)|low;
+    }
+    reply(PrimeG2::NativeApp::armResourceProfile(hash)?"OK":"ERR app loaded");return;
+  }
+  if(strcmp(cursor,"APP PROFILE SNAPSHOT")==0) {
+    const auto &profile=PrimeG2::NativeApp::resourceProfile();
+    replyData(&profile,sizeof(profile));return;
+  }
   if (strncmp(cursor, "APP DIAG ", 9) == 0) {
     cursor+=9; unsigned index;
-    if (!takeUnsigned(cursor,index) || *cursor || index>2) { reply("ERR app diagnostic"); return; }
+    if (!takeUnsigned(cursor,index) || *cursor || index>21) { reply("ERR app diagnostic"); return; }
     replyInteger("VALUE ",PrimeG2::NativeApp::diagnostic(index)); return;
   }
   if (strcmp(cursor,"APP LAUNCH")==0) {
     reply(prime_g2_launch_native_app()?"OK":"ERR app launcher"); return;
+  }
+  if (strncmp(cursor,"APP OPEN ",9)==0) {
+    cursor+=9;unsigned slot;
+    if(!takeUnsigned(cursor,slot) || *cursor) { reply("ERR app slot");return; }
+    reply(prime_g2_launch_installed_native_app(slot)?"OK":"ERR installed app launcher");return;
   }
   if (strncmp(cursor, "APP EVENT ", 10) == 0) {
     cursor += 10;
