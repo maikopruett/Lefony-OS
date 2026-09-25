@@ -110,3 +110,48 @@ protocol checks. Installation/update progress and Home drag/order captures were
 also inspected. Logs and synthetic emulator captures remain under ignored
 `build/publish-validation/` and `build/prime-g2-native-suite-*` directories.
 These results do not extend physical qualification beyond the limits above.
+
+## Touch selection feedback — local follow-up
+
+The Apps grid now starts without a highlighted app label. Directional-pad
+navigation (including modified arrows) and keypad app shortcuts show the
+selection. Touching the grid hides it immediately and keeps it hidden while
+scrolling, after release and after gesture cancellation. The next directional
+key restores the retained selection, including at the edge of the grid, and
+brings it back into view if a touch scroll moved it offscreen.
+
+This changes Home's visual feedback only. Logical selection, tap activation,
+long-press reordering and other apps' table highlights retain their existing
+behavior. The checked preparation scripts apply it to both built-in and
+installed app cells; no generated source edit is required.
+
+The expanded `vm/test-home-app-order.py` captures selection feedback through
+normal KPP and Goodix input before continuing the existing drag, tap, scroll,
+installed-app and cold-persistence journey. An initial candidate failed the
+clipped-arrow screenshot check: changing the visual mode without consuming
+that event did not redraw. The controller now handles that boundary event
+after preserving normal table navigation and row wrapping.
+
+Evidence for this local follow-up is retained under ignored
+`build/home-touch-selection-20260925/`. No calculator has been flashed and
+physical touch/keyboard acceptance remains separate.
+
+Both `prime_g2_vm` and physical `prime_g2` builds passed with
+`LEFONY_APP_PUBLIC_KEYS=ports/lefony-prime-g2/app-trust-roots.json`; the physical
+build also used `LEFONY_UPDATE_PUBLIC_KEY=ports/lefony-prime-g2/release-signing.pub`.
+The existing trust roots and prior local launch optimization are retained.
+
+| Follow-up target | SHA-256 |
+| --- | --- |
+| Physical `prime_g2` binary | `04c4dc5289b2c6bc5cc0a33a244e659775e4011a81329b97d9fe2b8484f75416` |
+| Emulator `prime_g2_vm` ELF | `a8bc6ec71237ec926c35a31fed80459345b8ffe4b54b1d0a638b73230200434f` |
+
+The expanded `vm/test-home-app-order.py` passed all ten checks, including the
+new label-pixel comparisons, with captures visually inspected. Eighteen focused
+host tests passed (`test_home_order.py`, `test_prime_coordinate_touch.py` and
+`test_prime_g2_keyboard_navigation.py`). Two repeated runs of
+`prepare_prime_app_menu.py` left the prepared Home sources byte-identical.
+`vm/test-prime-coordinate-touch.py --elf dist/lefony-os-prime-g2-vm-native.elf
+--calculation-history` passed the separate history touch/keyboard regression.
+`vm/test-native-comprehensive.sh smoke` passed all four selected cases.
+`make check-public` and `git diff --check` also passed.

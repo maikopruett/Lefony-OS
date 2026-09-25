@@ -16,6 +16,7 @@ from cli import package
 from device import Client, DeviceError
 from lfapp import API_REVISION, HEADER, MAGIC, pack, unpack
 from runner import exercise
+from signing import openssl, sign
 from workspace import opened
 
 
@@ -123,6 +124,32 @@ def main():
                 except RuntimeError as exc: assert 'guest rejected app' in str(exc)
                 else: raise AssertionError(name+' executed')
             results.append({'case':'loader-'+name,'passed':True})
+        # Feed invalid signed bytes to the real loader, bypassing only host
+        # preflight. The launch optimization must retain every trust/ELF check.
+        private = ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem'
+        public = ROOT / 'tests/fixtures/prime_g2_emulator_update_public.pem'
+        signed = sign(raw, private)
+        for name in ('signature', 'payload', 'signer', 'envelope-abi', 'elf-entry'):
+            invalid = bytearray(signed)
+            if name == 'signature': invalid[96] ^= 1
+            elif name == 'payload': invalid[-1] ^= 1
+            elif name == 'signer': invalid[24] ^= 1
+            elif name == 'envelope-abi':
+                # A correctly signed envelope declaring ABI 0 around ABI 1.
+                invalid[16:20] = bytes(4)
+                invalid[96:352] = openssl('dgst', '-sha256', '-sign', private, data=invalid[:96])
+            else:
+                offset = 352 + 64 + len(text) + 24
+                invalid[offset:offset+4] = (0x10201000).to_bytes(4, 'little')
+                invalid[352+24:352+56] = hashlib.sha256(invalid[352+64:]).digest()
+                invalid[56:88] = hashlib.sha256(invalid[352:]).digest()
+                invalid[96:352] = openssl('dgst', '-sha256', '-sign', private, data=invalid[:96])
+            bad = project / ('signed-' + name + '.lfapp');bad.write_bytes(invalid)
+            with patch('signing.verify', return_value=(metadata, image)):
+                try: exercise(bad, qemu, firmware, public_keys=[public])
+                except RuntimeError as exc: assert 'guest rejected app' in str(exc)
+                else: raise AssertionError('signed ' + name + ' executed')
+            results.append({'case':'signed-loader-' + name,'passed':True})
         with opened(project, 'installed') as (workspace, _):
             result = exercise(app, qemu, firmware, workspace=workspace)
             assert result['result'] == 1

@@ -6,6 +6,12 @@ of these build scripts.
 
 ## Firmware and applications
 
+Development release [`1.0.0+1790315562`](UI-STARTUP-RELEASE-20260925.md) publishes
+the installed-app launch optimization and touch-only Home highlight suppression.
+Both target builds, 1,981 host tests, emulator regressions, signed package checks
+and live website release discovery passed. Hardware timing/touch qualification
+remains open; no calculator was flashed for this release.
+
 The [one-shot U-Boot recovery implementation](UBOOT-ONESHOT-RECOVERY.md) replaces
 the unsuccessful native-to-ROM handoffs. Settings → About → Enter recovery mode
 confirms the restart and explains rear RESET or the three-minute timeout.
@@ -29,6 +35,12 @@ survives a cold emulator boot. Physical and VM builds, storage interruption
 checks and normal Goodix/USB integration tests pass; physical input and
 power-loss qualification remain open. See the
 [installation and Home ordering record](APP-INSTALL-AND-HOME-ORDER.md).
+
+The local Home feedback follow-up hides app-label highlighting during touch
+use, including scroll release and cancellation, and restores it for keypad
+navigation. Both targets compile and normal KPP/Goodix screenshot, drag, launch
+and cold-order checks pass. It is not installed or published; qualification is
+recorded in the same [Home record](APP-INSTALL-AND-HOME-ORDER.md#touch-selection-feedback--local-follow-up).
 
 The published storage-speed release `1.0.0+1790277950` has physical Prime G2 measurements:
 Doom installs in 105.6 s versus 735.1 s, the 1 MiB file test takes 44.8 s
@@ -62,6 +74,14 @@ SD-backed slots. Saving an expression in the UI is not yet a promise that it
 will survive a physical power cycle.
 
 ## Native SDK preview
+
+The local installed-app launch candidate reuses the executable loader's
+authenticated manifest, removing a duplicate signature check and two repeated
+package hashes per launch. Both firmware targets compile; signed-package
+rejection, saved-data/upgrade and OS smoke regressions pass in the emulator.
+Every launch still verifies the installed package. This candidate has not been
+installed on hardware or published; see the
+[launch performance record](APP-LAUNCH-PERFORMANCE.md) for measurements and scope.
 
 The published Doom startup fix (`1.0.0+1790281237`, app 0.2.3) is installed on the
 maintainer’s Prime G2 with firmware/package readback and retained-data checks.

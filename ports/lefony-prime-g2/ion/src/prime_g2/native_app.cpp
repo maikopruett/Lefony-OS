@@ -189,7 +189,7 @@ bool user(uint32_t psr) { return sActive && (psr&31)==16; }
 bool expired() { return PrimeG2::Timing::interruptTicks()>=sDeadline; }
 }
 namespace PrimeG2 { namespace NativeApp {
-bool load(const uint8_t *package,size_t size) {
+bool load(const uint8_t *package,size_t size,NativeAppManifest::Manifest *loadedManifest) {
   if (sActive) return false;
 #if PRIME_G2_EMULATOR
   profileFinish();
@@ -199,6 +199,7 @@ bool load(const uint8_t *package,size_t size) {
   System::mapNativeApp(nullptr,nullptr);
   if (!package) return false;
   const bool signedPackage=size>=8 && !memcmp(package,"LFAPP1\0\0",8);
+  uint32_t signedABI=0;
   uint8_t channelHash[32]={},channelSigner[32]={};
 #if !PRIME_G2_EMULATOR
   if (!signedPackage) return false;
@@ -206,10 +207,14 @@ bool load(const uint8_t *package,size_t size) {
   if (signedPackage) {
     const uint8_t *envelope=package;
     if (!AppManagement::unwrap(package,size,&package,&size)) return false;
+    signedABI=word(envelope+16);
     memcpy(channelHash,envelope+56,32);memcpy(channelSigner,envelope+24,32);
   }
   if (size<116 || size>MaximumPackage || memcmp(package,"LFAPP0\0\0",8) ||
       word(package+8)>1 || word(package+20)>1 || word(package+56) || word(package+60)) return false;
+  // Keep the envelope/inner ABI agreement formerly repeated by open()'s
+  // metadata parser, including the VM's signed ABI 0 compatibility path.
+  if (signedPackage && signedABI!=word(package+20)) return false;
 #if !PRIME_G2_EMULATOR
   if (word(package+20)!=1) return false;
 #endif
@@ -286,6 +291,7 @@ bool load(const uint8_t *package,size_t size) {
   sInput=Lefony::InputSnapshot{};sInputPrepared=false;sInputSequence=0;
   sNavigationDepth=0;
   sSurface.fillRect(KDRect(0,0,320,240),KDColorWhite);
+  if(loadedManifest) *loadedManifest=manifest;
   return true;
 }
 void prepareInput(const Lefony::InputSnapshot &input) {

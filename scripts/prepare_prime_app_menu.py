@@ -3,6 +3,7 @@
 from pathlib import Path
 import sys
 import prepare_prime_home_order
+import prepare_prime_home_selection
 
 
 def prepare(root: Path):
@@ -89,5 +90,6 @@ void AppCell::setAppDescriptor(::App::Descriptor * descriptor) {''')
     edit('apps/apps_container.cpp','switchTo(appSnapshotAtIndex(numberOfApps() - 1));','switchTo(appSnapshotAtIndex(numberOfApps() - 2));')
 
     prepare_prime_home_order.prepare(root,apps[0],edit)
+    prepare_prime_home_selection.prepare(edit)
 
 if __name__=='__main__':prepare(Path(sys.argv[1]))

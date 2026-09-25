@@ -31,7 +31,16 @@ def prepare(root,apps,edit):
     edit('apps/home/controller.h','    SelectableTableViewWithBackground m_selectableTableView;', '''    class HomeTable : public SelectableTableViewWithBackground {
     public:
       using SelectableTableViewWithBackground::SelectableTableViewWithBackground;
+      bool handleEvent(Ion::Events::Event event) override {
+        if(Controller::isHomeNavigationEvent(event)) {
+          static_cast<Controller *>(parentResponder())->setHomeSelectionVisible(true);
+        }
+        return SelectableTableViewWithBackground::handleEvent(event);
+      }
       bool handleTouch(const Ion::Touch::Event &touch) override {
+        // Preserve logical selection and ordinary tap/scroll/drag dispatch.
+        // Only the Home cells' visual feedback changes with input modality.
+        static_cast<Controller *>(parentResponder())->setHomeSelectionVisible(false);
         if(static_cast<Controller *>(parentResponder())->handleHomeTouch(touch)) return true;
         return SelectableTableViewWithBackground::handleTouch(touch);
       }

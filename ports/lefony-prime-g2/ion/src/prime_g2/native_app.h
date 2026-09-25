@@ -4,11 +4,15 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "native_app_input_wire.h"
-namespace PrimeG2 { namespace NativeApp {
+namespace PrimeG2 {
+namespace NativeAppManifest { struct Manifest; }
+namespace NativeApp {
 // Unsigned developer packages are only accepted by the VM target.
 constexpr uintptr_t StagingAddress = 0x86000000;
 constexpr size_t MaximumPackage = 352 + 64 + 4096 + 2 * 1024 * 1024;
-bool load(const uint8_t *package, size_t size);
+// Return authenticated metadata only after the complete executable is accepted.
+// This is a per-load result, never a verification cache or a bypass option.
+bool load(const uint8_t *package, size_t size, NativeAppManifest::Manifest *manifest = nullptr);
 int invoke(uint32_t event, uint32_t first = 0, uint32_t second = 0);
 // Internal foreground scheduling. Resume events never replace the last input
 // snapshot, and cannot execute a loaded app outside its active OS container.

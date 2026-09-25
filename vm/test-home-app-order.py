@@ -68,6 +68,29 @@ def main():
                     wait(600);ui.key('back');wait(600);app(0)
                     if round==0:
                         before=capture('before')
+                        # Home's labels should show selection only during keypad
+                        # navigation. Even a clipped arrow restores the feedback.
+                        label_strip=(0,98,312,124)
+                        labels=lambda image:image.crop(label_strip).tobytes()
+                        ui.key('left');wait(100)
+                        assert labels(capture('key-highlight'))!=labels(before)
+                        # Finger-down must hide both the old keypad selection
+                        # and the table's temporary pressed-cell highlight.
+                        touch('1 0 160 68',100)
+                        assert labels(capture('touch-no-highlight'))==labels(before)
+                        touch('2 0 160 68 1 240 68',100);touch('0',400)
+                        assert labels(capture('cancel-no-highlight'))==labels(before)
+                        ui.key('right');wait(100)
+                        assert labels(capture('key-highlight-restored'))!=labels(before)
+                        ui.key('left');wait(100)
+                        # Release after a swipe must not restore the old
+                        # selected label, including after cells are recycled.
+                        touch('1 0 280 210',100);touch('1 0 280 40',100);touch('0',400)
+                        app(0);capture('swipe-no-highlight')
+                        touch('1 0 280 40',100);touch('1 0 280 210',100);touch('0',400)
+                        assert labels(capture('swipe-return-no-highlight'))==labels(before)
+                        # Continue with the existing drag, tap and persistence
+                        # checks; selection visibility must not change them.
                         touch('1 0 160 68',1000);capture('held')
                         touch('1 0 52 68',400);capture('dragging')
                         touch('0',2000);app(0);after=capture('functions-first')
@@ -106,7 +129,8 @@ def main():
                 if process.stderr:process.stderr.close()
         run(0);run(1)
     report={'status':'passed','qualification':'emulator only','firmware_sha256':hashlib.sha256(args.firmware.read_bytes()).hexdigest(),
-            'checks':['long-press and drag built-in app','tap launches reordered identity','multitouch cancels preview','ordinary swipe scrolls',
+            'checks':['keypad-only selection feedback','touch down and cancellation hide highlights','swipe release keeps highlights hidden',
+                      'long-press and drag built-in app','tap launches reordered identity','multitouch cancels preview','ordinary swipe scrolls',
                       'drag installed app across rows with edge scrolling','drop does not launch','cold NAND persistence']}
     (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 

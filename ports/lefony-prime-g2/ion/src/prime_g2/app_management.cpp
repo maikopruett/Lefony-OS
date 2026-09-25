@@ -695,10 +695,16 @@ const CatalogEntry &entry(unsigned slot) { return sCatalog[slot<sCount?slot:0]; 
 bool open(unsigned slot) {
   if(busy() || slot>=sCount || !sCatalog[slot].bytes || sOpen>=0) return false;
   Entry e;if(!sVolume.entry(sCatalog[slot].metadata.id,&e)) return false;
-  if(!sVolume.read(sCatalog[slot].metadata.id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData)) || !NativeApp::load(sLoaded,e.packageBytes)) return false;
-  Metadata loaded;
-  uint32_t features=0;
-  if(!parseMetadata(sLoaded,e.packageBytes,&loaded,true,&sLoadedSchema,&features)) { NativeApp::unload();return false; }
+  NativeAppManifest::Manifest loaded;
+  // Installed apps require signatures even in the VM; unsigned packages are
+  // supported only by its separate developer-preview loader.
+  if(!sVolume.read(sCatalog[slot].metadata.id,sLoaded,sizeof(sLoaded),sUploadData,sizeof(sUploadData)) ||
+      e.packageBytes<8 || memcmp(sLoaded,"LFAPP1\0\0",8) ||
+      !NativeApp::load(sLoaded,e.packageBytes,&loaded)) return false;
+  // The loader already authenticated and parsed these exact bytes. Reusing
+  // its result avoids a second RSA verification and two package hash passes.
+  sLoadedSchema=loaded.dataSchema;
+  uint32_t features=loaded.required|loaded.optional;
   AppDocumentRoot::Root root;
   uint32_t savedSchema=sVolume.documentRoot(loaded.id,&root)?root.current.dataSchema:sLoadedSchema;
   uint32_t version[3];versionParts(loaded.version,version);
