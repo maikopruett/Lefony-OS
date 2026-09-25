@@ -15,6 +15,32 @@ ROOT = Path(__file__).resolve().parents[1]
 PORT = ROOT / "ports/lefony-prime-g2"
 
 
+def prepare_contributors(settings: Path):
+    replacements = {
+        "main_controller.h": [
+            ("s_contributorsChildren[18]", "s_contributorsChildren[19]"),
+        ],
+        "main_controller.cpp": [
+            ("s_contributorsChildren[18] = {", "s_contributorsChildren[19] = {SettingsMessageTree(I18n::Message::MaikoPruett), "),
+        ],
+        "sub_menu/contributors_controller.cpp": [
+            ("s_numberOfDevelopers = 18;", "s_numberOfDevelopers = 19;"),
+            ("s_developersUsernames[s_numberOfDevelopers] = {\n", "s_developersUsernames[s_numberOfDevelopers] = {\n  I18n::Message::PMaikoPruett,\n"),
+            ("if (index < s_numberOfUpsilonDevelopers) {", "if (index == 0) {\n    myTextCell->setTextColor(Palette::AccentText);\n  } else if (index <= s_numberOfUpsilonDevelopers) {"),
+        ],
+    }
+    for name, changes in replacements.items():
+        path = settings / name
+        text = path.read_text()
+        for old, new in changes:
+            if text.count(new) == 1:
+                continue
+            if text.count(old) != 1:
+                raise ValueError(f"Unexpected contributors context in {name}")
+            text = text.replace(old, new, 1)
+        path.write_text(text)
+
+
 def prepare(source: Path, stamp: str | None = None):
     # Durable native USB page and USB-powered display policy.
     if (source / "apps/apps_container.cpp").exists():
@@ -92,8 +118,11 @@ def prepare(source: Path, stamp: str | None = None):
         path.write_text(text)
     for path in (PORT / "apps/settings/sub_menu").iterdir():
         shutil.copy2(path, settings / "sub_menu" / path.name)
+    prepare_contributors(settings)
     translations = settings / "base.universal.i18n"
     messages = {
+        "MaikoPruett": "Maiko Pruett",
+        "PMaikoPruett": "@maikopruett",
         "LefonyBuildId": "Build ID",
         "LefonyUsbStatus": "USB status",
         "LefonyEnterRecovery": "Enter recovery mode",

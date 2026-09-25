@@ -35,7 +35,7 @@ def describe(path):
 
 
 def package(root, output, version, commit, private_key, recovery_directory=None,
-            working_tree=False, full_install=False):
+            working_tree=False, full_install=False, tests_run=True):
     parts = parse_version(version)
     if not re.fullmatch(r'[a-f0-9]{40}', commit):
         raise ValueError('Release needs a full source commit')
@@ -59,6 +59,8 @@ def package(root, output, version, commit, private_key, recovery_directory=None,
         'Host tests and physical/emulator compilation passed; this build has not been physically qualified.',
         'Recovery assets and a qualified bootloader baseline are not included. Website installation remains unavailable.',
     ]
+    if not tests_run:
+        notes[1] = 'Physical/emulator compilation passed. Tests were not run for this release; this build has not been physically qualified.'
     manifest = {
         'schema': 1, 'status': 'package', 'version': version, 'model': 'HPG2',
         'qualification': 'build-tested', 'commit': commit,
@@ -121,6 +123,7 @@ if __name__ == '__main__':
     parser.add_argument('--recovery-dir', type=Path, help='Directory containing the exact pinned public recovery files')
     parser.add_argument('--working-tree', action='store_true', help='Identify --commit as the base of the exact working-tree source archive, not a clean source revision')
     parser.add_argument('--full-install', action='store_true', help='Explicitly enable development browser protocol 2 bootloader/OS/device-tree provisioning; requires --recovery-dir')
+    parser.add_argument('--tests-not-run', action='store_true', help='Record that tests were skipped instead of claiming a host test pass')
     args = parser.parse_args()
     package(ROOT, args.output, args.version, args.commit, args.private_key, args.recovery_dir,
-            args.working_tree, args.full_install)
+            args.working_tree, args.full_install, tests_run=not args.tests_not_run)

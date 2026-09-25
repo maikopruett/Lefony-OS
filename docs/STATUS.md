@@ -6,6 +6,15 @@ of these build scripts.
 
 ## Firmware and applications
 
+Development release [`1.0.0+1790319519`](https://github.com/maikopruett/Lefony-OS/releases/tag/build-20260925-1790319519)
+adds Maiko Pruett (`@maikopruett`) first in Settings → About → Contributors.
+The name uses Lefony Light's green accent; the handle retains the common
+secondary-text color. Physical and VM compilation completed; tests were skipped
+at the user's request. The signed package and uploaded assets were verified,
+and the website's live manifest selected the new version. No calculator was
+flashed. Build/publication records are under ignored
+`build/contributors-release-20260925/`.
+
 Development release [`1.0.0+1790315562`](UI-STARTUP-RELEASE-20260925.md) publishes
 the installed-app launch optimization and touch-only Home highlight suppression.
 Both target builds, 1,981 host tests, emulator regressions, signed package checks

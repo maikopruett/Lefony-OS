@@ -159,6 +159,11 @@ the base revision, and the manifest's `sourceState` binds the exact distributed
 source archive by SHA-256. The package README and release notes distinguish the
 base commit from the shipped source. This does not commit or push local edits.
 
+When tests are explicitly skipped for a release, pass `--tests-not-run` so its
+manifest, package README and release notes report that accurately. This does
+not skip compilation, signing or package integrity checks, and does not claim
+physical qualification.
+
 Use `package_native_public_source.py` to audit and snapshot the public files,
 then include that snapshot and the prepared physical firmware source before
 preparing the emulator target. Retain the actual build version, compiler,
