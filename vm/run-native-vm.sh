@@ -13,23 +13,19 @@ STORAGE_OVERLAY=${NATIVE_STORAGE_OVERLAY:-"$NATIVE_VM_BUILD_DIR/native-state-v1.
 READONLY_OVERLAY="$NATIVE_VM_BUILD_DIR/native-readonly-v1.qcow2"
 QEMU_SYSTEM_ARM=${PRIME_G2_QEMU:-"$REPO_DIR/build/qemu-prime-g2/qemu-system-arm"}
 PANEL_FAULT=${PRIME_G2_PANEL_FAULT:-none}
-case "$(uname -s)" in
-  Darwin) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-desktop} ;;
-  *) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-browser} ;;
-esac
+DISPLAY_MODE=${LEFONY_VM_DISPLAY:-desktop}
 BOOT_MODE=direct
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --headless) DISPLAY_MODE=none ;;
-    --browser) DISPLAY_MODE=browser ;;
     --desktop) DISPLAY_MODE=desktop ;;
     --u-boot) BOOT_MODE=u-boot ;;
     --capsule) BOOT_MODE=capsule ;;
     --ab) BOOT_MODE=ab ;;
     --direct) BOOT_MODE=direct ;;
     *)
-      echo "Usage: $0 [--headless|--browser|--desktop] [--direct|--u-boot|--capsule|--ab]" >&2
+      echo "Usage: $0 [--headless|--desktop] [--direct|--u-boot|--capsule|--ab]" >&2
       exit 2
       ;;
   esac
@@ -37,7 +33,9 @@ while [ "$#" -gt 0 ]; do
 done
 PANEL_MODE=
 case "$DISPLAY_MODE" in
-  browser|desktop) PANEL_MODE=$DISPLAY_MODE; DISPLAY_MODE=none ;;
+  desktop) PANEL_MODE=$DISPLAY_MODE; DISPLAY_MODE=none ;;
+  none|cocoa|sdl) ;;
+  *) echo "LEFONY_VM_DISPLAY must be desktop, none, cocoa or sdl." >&2; exit 2 ;;
 esac
 PANEL_PYTHON=${PYTHON:-"$REPO_DIR/.venv/bin/python"}
 if [ -n "$PANEL_MODE" ] && [ ! -x "$PANEL_PYTHON" ]; then
@@ -257,7 +255,6 @@ fi
 QEMU_PID=$!
 if [ -n "$PANEL_MODE" ]; then
   set -- --input "$INPUT_SOCKET" --qmp "$QMP_SOCKET" --output "$NATIVE_VM_BUILD_DIR" --qemu-pid "$QEMU_PID"
-  if [ "$PANEL_MODE" = desktop ]; then set -- "$@" --desktop; fi
   "$PANEL_PYTHON" "$REPO_DIR/vm/emulator-panel.py" "$@" &
   PANEL_PID=$!
   wait "$PANEL_PID"

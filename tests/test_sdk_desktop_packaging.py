@@ -361,7 +361,7 @@ def test_packaging_requires_explicit_project_sources(monkeypatch, tmp_path, caps
     monkeypatch.setattr(desktop.platform, 'system', lambda: system)
     monkeypatch.setattr(desktop.platform, 'machine', lambda: machine)
     arguments=['package_native_desktop.py']
-    for name in ('toolchain','binutils','public-key','output','openssl','source-materials','newlib','gdb-runtime','libusb'):
+    for name in ('toolchain','binutils','public-key','output','openssl','source-materials','newlib','gdb-runtime','libusb','emulator-window'):
         arguments += ['--'+name,str(tmp_path/name)]
     if selected:arguments += ['--project-sources',str(tmp_path/'project-sources.json')]
     monkeypatch.setattr(sys, 'argv', arguments)

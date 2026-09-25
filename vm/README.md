@@ -20,17 +20,16 @@ make firmware-vm
 ./vm/run-native-vm.sh --direct
 ```
 
-The skinned calculator is the default: a native macOS window or a browser on
-Linux, both with the complete clickable keyboard. Install `requirements-dev.txt`
-in `.venv`; the macOS wrapper also requires Xcode command-line tools. Use
-`--headless` or `LEFONY_VM_DISPLAY=none` for unattended runs. `PRIME_G2_QEMU`
-can select a previously built custom QEMU. Source and build revisions are
-pinned in `build-prime-g2-qemu.sh`; checkout-specific short paths allow QEMU to
-build even when the repository path contains spaces.
+The shared desktop calculator is the default on macOS and Linux. Install
+`requirements-dev.txt` in `.venv`; the Qt window embeds the renderer and never
+opens a browser. Use `--headless` or `LEFONY_VM_DISPLAY=none` for unattended
+runs. `PRIME_G2_QEMU` can select a previously built custom QEMU. Source and
+build revisions are pinned in `build-prime-g2-qemu.sh`; checkout-specific short
+paths allow QEMU to build even when the repository path contains spaces.
 
-Use `--browser` to choose the browser on macOS, or `--desktop` for the native
-macOS window. The bundled artwork, layout selection, scaling and third-party
-license notice are described in [emulator skins](../docs/EMULATOR-SKINS.md).
+The SDK uses this same window, including on Windows. See
+[desktop setup and native wrapper builds](../docs/EMULATOR-DESKTOP.md) and
+[skin layouts and asset notices](../docs/EMULATOR-SKINS.md).
 
 Direct boot loads the native ELF. It needs no HP firmware, private NAND or
 U-Boot image, and provides no persistent SD storage. It does not qualify the

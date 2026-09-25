@@ -112,18 +112,23 @@ lefony-sdk run
 lefony-sdk source
 ```
 
-`run` opens a local browser emulator with the bundled HP Prime Medium skin,
+`run` opens the shared desktop emulator with the bundled HP Prime Medium skin,
 a 320 × 240 display and all 51 keys, including On/Off. The Layout and Scale
 selectors change the complete calculator together; the panel fits narrower
-windows. See [emulator skins](../docs/EMULATOR-SKINS.md) for the asset notice. Click the screen for touch input, click the keypad, or
+windows. See [emulator skins](../docs/EMULATOR-SKINS.md) for the asset notice.
+Click the screen for touch input, click the keypad, or
 use your computer's arrows, digits, Enter and Backspace. Shift and Alpha use
 the calculator's normal behavior. The panel's **Stop emulator** button or Ctrl-C
-closes the app and drains workspace saves. Closing the browser tab releases
-input; the terminal session stays available at the printed local URL.
+closes the app and drains workspace saves. Closing the desktop window performs
+the same cleanup. No browser is opened. Source SDK users must install
+`sdk/requirements-emulator.txt`; see [desktop setup](../docs/EMULATOR-DESKTOP.md).
 Use `run --workspace development` to keep saved app data between runs.
-New source and desktop SDK packages include the skin assets. Previously built
-bundles retain their existing interface. The legacy
-ARM64 Linux source installer retains its older window. `debug` retains its native window.
+New source kits include the shared renderer and skin assets. The desktop
+packager requires the native window bundle. Previously built bundles retain
+their existing interface. The legacy ARM64 Linux source installer retains its
+older window. `debug` retains its diagnostic native window.
+
+<p align="center"><img src="../docs/images/emulator-sdk.png" alt="Counter SDK app running in the shared desktop emulator" width="400"></p>
 
 `test`
 runs bounded JSON keypad/Goodix replays below `tests/` (including nested folders), stores frames under

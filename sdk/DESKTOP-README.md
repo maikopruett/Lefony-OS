@@ -30,13 +30,13 @@ examples live in `_internal/sdk/`. Preview captures the actual ARM app and layou
 records; it retains committed documents between successful runs. Workspace
 exports contain app data and are not public bug-report attachments by default.
 
-`run` opens a local browser panel with a 2× touchscreen and clickable Prime
-keypad underneath. Its Screen menu offers 1.5× and 3× as well. Screen clicks
-use touch input; the keypad and computer arrows, digits, Enter and Backspace
-use normal calculator keys. Save in the app, then choose **Stop emulator** to
-close normally. Closing the tab releases held keys and touch contacts; reopen
-the printed URL to reconnect. No external website or account is needed.
-Older bundles built before this panel keep their original native window.
+`run` opens the shared Lefony desktop emulator with the bundled Prime keyboard
+and touchscreen. Layout and Scale change the complete calculator together.
+Screen clicks use touch input; the keypad and computer arrows, digits, Enter
+and Backspace use normal calculator keys. Save in the app, then choose
+**Stop emulator**, close the window, or press Ctrl-C for normal save cleanup.
+The native window runtime is included; no browser or separate Python GUI
+installation is required. Older SDK bundles retain their previous interface.
 
 For source debugging, start `debug` in one terminal and `debugger` in another,
 using the same project directory:

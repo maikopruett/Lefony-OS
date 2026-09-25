@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Self-contained browser UI; no remote assets or calculator data uploads."""
+"""Shared embedded desktop renderer; no remote assets or calculator data uploads."""
 from html import escape
 import json
 
@@ -66,7 +66,7 @@ canvas{width:100%;height:auto;aspect-ratio:4/3;display:block;background:#fff;ima
 <header><div><h1>Lefony Emulator</h1><div class="subtitle">__TITLE__ · HP Prime G2</div></div><div class="toolbar"><label id="skin-label" for="skin" hidden>Layout</label><select id="skin" hidden></select><label for="zoom">Scale</label><select id="zoom"><option value="480">1.5×</option><option value="640" selected>2×</option><option value="960">3×</option></select><button id="stop">Stop emulator</button></div></header>
 <main><section class="calculator" aria-label="HP Prime emulator"><div class="screen-frame"><canvas id="screen" width="320" height="240" tabindex="0" aria-label="Calculator touchscreen"></canvas></div><div class="brand"><span>LEFONY</span><span>PRIME G2</span></div><div class="keypad" aria-label="HP Prime keypad">__KEYS__</div></section>
 <p class="hint"><span id="status" role="status">Connecting…</span><br>Click the screen to touch it. Use the keypad below or your keyboard’s arrows, numbers and Enter. Shift and Alpha work like calculator keys.</p>
-<details><summary>Keyboard shortcuts &amp; saving</summary><p>Enter = Enter · Escape = Esc · Backspace = ⌫ · Arrow keys = directions · Home = Home · F1–F6 = Symb, Plot, Num, Help, View, Menu. Use the calculator’s Alpha key for letters. Physical Shift = Shift; Alt = Alpha. Browser shortcuts with Command or Control remain available.</p><p>Save inside the app, then use <b>Stop emulator</b> to close normally. Closing this tab releases all keys; reopen the same local address to reconnect. A named workspace keeps its saved calculator data between runs.</p></details></main>
+<details><summary>Keyboard shortcuts &amp; saving</summary><p>Enter = Enter · Escape = Esc · Backspace = ⌫ · Arrow keys = directions · Home = Home · F1–F6 = Symb, Plot, Num, Help, View, Menu. Use the calculator’s Alpha key for letters. Physical Shift = Shift; Alt = Alpha. Command or Control shortcuts remain available.</p><p>Save inside the app, then use <b>Stop emulator</b> to close normally. Closing the window releases all keys and stops the emulator. A named workspace keeps its saved calculator data between runs.</p></details></main>
 <script>
 'use strict';
 const screen=document.querySelector('#screen'),ctx=screen.getContext('2d'),status=document.querySelector('#status');
@@ -119,7 +119,7 @@ if(skins.length){
  picker.addEventListener('change',()=>chooseSkin(skins.find(s=>String(s.id)===picker.value)));
 }
 zoom.addEventListener('change',e=>{if(activeSkin){release();skinScale()}else calculator.style.setProperty('--screen-width',e.target.value+'px');screen.focus()});
-document.querySelector('#stop').addEventListener('click',async()=>{release();await queue;try{await post('stop',{});stopped=true;status.textContent='Emulator stopped. You can close this tab.'}catch{fail()}});
-async function frame(){if(stopped)return;try{const r=await fetch('frame',{signal:AbortSignal.timeout(4000)});if(!r.ok)throw Error();const bitmap=await createImageBitmap(await r.blob());ctx.drawImage(bitmap,0,0);bitmap.close();status.textContent='Connected';}catch{fail()}if(!stopped)setTimeout(frame,100)}
+document.querySelector('#stop').addEventListener('click',async()=>{release();await queue;try{await post('stop',{});stopped=true;status.textContent='Emulator stopped.'}catch{fail()}});
+async function frame(){if(stopped)return;try{const r=await fetch('frame',{signal:AbortSignal.timeout(4000)});if(!r.ok)throw Error();const bitmap=await createImageBitmap(await r.blob());if(!stopped){ctx.drawImage(bitmap,0,0);status.textContent='Connected'}bitmap.close();}catch{fail()}if(!stopped)setTimeout(frame,100)}
 frame();screen.focus();
 </script></html>'''

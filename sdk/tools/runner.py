@@ -75,15 +75,15 @@ def exercise(package, qemu, firmware, *, headless=True, event=0, first=0, second
         control = folder / "control"
         qmp = folder / "qmp"
         qtest = folder / "qtest"
-        browser_panel = interactive and not headless and not debug_project
+        desktop_panel = interactive and not headless and not debug_project
         command = [str(qemu), "-machine", "mcimx6ul-evk", "-m", "256M",
-                   "-global", "imx6ul-lcdif.prime-g2-panel=on", "-display", "none" if headless or browser_panel else ("cocoa" if sys.platform == "darwin" else "sdl"),
+                   "-global", "imx6ul-lcdif.prime-g2-panel=on", "-display", "none" if headless or desktop_panel else ("cocoa" if sys.platform == "darwin" else "sdl"),
                    "-monitor", "none", "-serial", f"file:{uart}", "-serial", "null",
                    "-chardev", f"socket,id=appcontrol,path={qemu_path(control)},server=on,wait=off", "-serial", "chardev:appcontrol",
                    "-qtest", f"unix:{qemu_path(qtest)},server=on,wait=off", "-qtest-log", os.devnull,
                    "-qmp", f"unix:{qemu_path(qmp)},server=on,wait=off", "-kernel", str(firmware), "-no-reboot",
                    "-device", f"loader,file={qemu_path(payload)},addr=0x86000000,force-raw=on"]
-        if browser_panel:
+        if desktop_panel:
             # Interactive desktop sessions model a plugged-in calculator so
             # the guest's short battery idle timeout does not blank the preview.
             command += ['-global', 'prime-g2-pf1550.external-power=on']
@@ -114,6 +114,15 @@ def exercise(package, qemu, firmware, *, headless=True, event=0, first=0, second
             if measure_resources:
                 from resource_profile import arm
                 profile_target = arm(channel, content)
+            if desktop_panel:
+                from emulator_desktop import wait_for_boot_ui
+                wait_for_boot_ui(channel)
+            if desktop_panel and not workspace:
+                # External power can raise the guest USB status sheet. Dismiss
+                # it before a disposable app draws, or it intercepts app input.
+                from replay import Controls, control_session
+                with control_session(Controls(channel, folder)) as input_device:
+                    input_device.key('back')
             if workspace:
                 phase = 'workspace-install'
                 from emulator_usb import PrimeUSBHost, ManagementUSB
@@ -243,7 +252,7 @@ def exercise(package, qemu, firmware, *, headless=True, event=0, first=0, second
                 monitor.close()
                 monitor = None
             if interactive and result == 1:
-                if browser_panel:
+                if desktop_panel:
                     phase = 'interactive-panel'
                     from emulator_ui import run_panel
                     run_panel(channel, folder, process, metadata.get('name', metadata['id']))

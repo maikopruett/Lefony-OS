@@ -1,0 +1,46 @@
+name: Desktop emulator window
+on:
+  push:
+    paths:
+      - 'sdk/tools/emulator*.py'
+      - 'sdk/assets/prime/**'
+      - 'sdk/requirements-emulator.txt'
+      - 'scripts/build_emulator_window.py'
+      - 'vm/test-emulator-window.py'
+      - '.github/workflows/emulator-window.yml'
+  pull_request:
+    paths:
+      - 'sdk/tools/emulator*.py'
+      - 'sdk/requirements-emulator.txt'
+      - 'scripts/build_emulator_window.py'
+      - 'vm/test-emulator-window.py'
+      - '.github/workflows/emulator-window.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  window:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Linux display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libasound2t64 libegl1 libgl1
+      - run: python -m pip install -r sdk/requirements-emulator.txt pyinstaller==6.20.0 Pillow==12.3.0
+      - run: python scripts/build_emulator_window.py --output build/emulator-window-native
+      - name: Smoke embedded window on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python vm/test-emulator-window.py --window-bundle build/emulator-window-native
+      - name: Smoke embedded window on macOS and Windows
+        if: runner.os != 'Linux'
+        run: python vm/test-emulator-window.py --window-bundle build/emulator-window-native

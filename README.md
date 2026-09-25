@@ -17,7 +17,7 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 > separately. This is community firmware, not an HP-supported update. Prime G1
 > is not a supported target.
 
-## Latest updates — September 24, 2026
+## Latest updates — September 25, 2026
 
 - **Native C/C++ SDK:** conventional `main`/newlib support, ARM emulator
   preview, input replay, GDB debugging, UI components and reference apps.
@@ -35,9 +35,11 @@ Linux desktop and its obsolete deployment scripts are outside this project.
   an automatically dismissed progress screen and long-press app rearrangement
   with saved ordering. See the
   [implementation and validation record](docs/APP-INSTALL-AND-HOME-ORDER.md).
-- **Desktop SDK:** macOS ARM64 and Linux x86-64 bundles include a browser
-  emulator with clickable Prime keys and a zoomable touchscreen. See the
-  [download and qualification record](docs/SDK-EMULATOR-RELEASE.md).
+- **Shared desktop emulator:** the OS and SDK now use the same native window,
+  complete Prime keyboard and live touchscreen. The shared wrapper targets
+  macOS, Linux and Windows; no browser launch is used. See the
+  [desktop setup and build guide](docs/EMULATOR-DESKTOP.md). Existing downloadable
+  SDK bundles retain their previous interface until rebuilt.
 
 SDK 1.0 remains in development. Source changes, downloadable bundles and
 physical qualification have separate status; consult
@@ -137,8 +139,18 @@ and signed updates, see [the installer guide](docs/LEFONY-INSTALLER.md).
 
 ## Run the emulator
 
-The native UI needs this repository's Prime-specific QEMU models. An unmodified
-system QEMU cannot substitute for them.
+The OS launcher and SDK open the same desktop calculator window, with all 51
+Prime keys, five layouts, whole-calculator scaling and a live 320 × 240 display.
+The window embeds the renderer; it does not open a browser. It needs this
+repository's Prime-specific QEMU models, which run the actual ARM firmware.
+
+<p align="center">
+  <img src="docs/images/emulator-home.png" alt="Lefony OS home screen in the desktop Prime emulator" width="360">
+  <img src="docs/images/emulator-calculation.png" alt="The desktop emulator calculating 7 plus 8 with the Prime keyboard" width="360">
+</p>
+
+Actual desktop-window screenshots from QEMU on macOS. These show the OS home
+screen and a calculation entered with the clickable keypad.
 
 ```sh
 make emulator       # Build pinned QEMU with the Prime G2 models
@@ -149,8 +161,10 @@ make run            # Native ELF fast path; no HP firmware required
 QEMU build dependencies include Ninja, pkg-config, a C/C++ compiler, Python,
 GLib and pixman development packages. Install `requirements-dev.txt` in `.venv`
 for the emulator panel. Interactive launches include the HP Prime keyboard and
-live display by default: a macOS desktop window (Xcode command-line tools
-required) or a browser on Linux. See [vm/README.md](vm/README.md) for headless operation,
+live display by default in a Qt desktop window on macOS, Linux and Windows.
+Source installations need the pinned desktop dependencies; frozen SDK packages
+include a native window bundle. See [desktop setup](docs/EMULATOR-DESKTOP.md)
+for platform dependencies and [vm/README.md](vm/README.md) for headless operation,
 keyboard/touch controls, test suites, and U-Boot boot-media modes.
 
 The emulator's private-stock-fixture research tests are optional and clearly

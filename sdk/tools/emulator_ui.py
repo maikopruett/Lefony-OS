@@ -5,7 +5,6 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import secrets
 import time
-import webbrowser
 
 from PIL import Image
 from emulator_ui_page import page
@@ -54,7 +53,7 @@ class Panel:
     def input(self, value):
         names, contacts = validate_input(value, self.keys)
         now = time.monotonic()
-        # Very short browser clicks still need to cross guest key debouncing.
+        # Very short pointer clicks still need to cross guest key debouncing.
         released = set(self.pressed_at) - set(names)
         starts = [self.pressed_at[name] for name in released]
         if self.touch and not contacts:
@@ -209,19 +208,7 @@ def run_panel(channel, folder, process, title):
             controls.qtest.socket.settimeout(2)
             keys = set(KEYS) | {'onoff'}
             panel = Panel(controls, folder, keys)
-            with make_server(panel, title) as server:
-                print('Lefony Emulator: ' + server.url + '\nUse Stop emulator or Ctrl-C to finish.', flush=True)
-                try:
-                    webbrowser.open(server.url)
-                except webbrowser.Error:
-                    print('Open the local URL above in your browser.', flush=True)
-                try:
-                    while not panel.stopped and process.poll() is None:
-                        server.handle_request()
-                        panel.expire()
-                except KeyboardInterrupt:
-                    pass
-                if panel.failure:
-                    raise RuntimeError('interactive emulator connection failed') from panel.failure
+            from emulator_desktop import serve_desktop
+            serve_desktop(panel, title, lambda: process.poll() is None)
     finally:
         channel.socket.settimeout(timeout)

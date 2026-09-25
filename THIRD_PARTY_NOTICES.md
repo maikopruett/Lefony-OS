@@ -1,5 +1,15 @@
 # Third-party sources and notices
 
+- **Qt for Python / Qt WebEngine:** the desktop emulator wrapper uses PySide6
+  6.11.2 and the Qt/Chromium runtime supplied in its upstream wheels. These
+  retain their upstream LGPL/GPL and third-party licenses; see
+  <https://doc.qt.io/qtforpython-6/licenses.html> and
+  <https://doc.qt.io/qt-6/qtwebengine-licensing.html>. Native wrapper builds
+  preserve installed wheel metadata/notices. Corresponding Qt/Chromium source
+  collection is required before releasing new complete SDK binaries; the old
+  SDK source inventories do not cover this added runtime. See
+  [desktop builds](docs/EMULATOR-DESKTOP.md).
+
 - **HP Prime Virtual Calculator skins:** version 2.4.2 (2026-09-09), from
   Moravia Consulting. Original PNGs and XML definitions are in
   `sdk/assets/prime/`, together with provenance hashes and the original EULA.

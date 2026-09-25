@@ -163,6 +163,7 @@ def main():
     parser.add_argument('--runtime-library', type=Path, action='append', default=[], help='Explicit dynamically loaded libraries (QEMU process only on Windows), e.g. SDL3 used by SDL2 compatibility')
     parser.add_argument('--dll-directory', type=Path, action='append', default=[], help='Explicit Windows dependency directory; no ambient PATH search')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--emulator-window', type=Path, required=True, help='Native window bundle from build_emulator_window.py')
     parser.add_argument('--openssl',type=Path,required=True,help='Redistributable OpenSSL executable, not the macOS system binary')
     parser.add_argument('--openssl-runtime',type=Path,help='Required on Windows: complete candidate from build_sdk_windows_openssl.py')
     parser.add_argument('--cpython-runtime',type=Path,help='Required on Windows: original reviewed full CPython ZIP')
@@ -176,6 +177,7 @@ def main():
         settings = host_settings(platform.system(), platform.machine(), sys.version_info[:2])
     except ValueError as exc:
         parser.error(str(exc))
+    from build_emulator_window import verify as verify_window
     suffix = settings['suffix']
     if args.dll_directory and not suffix:
         parser.error('--dll-directory is only used for Windows candidates')
@@ -188,8 +190,12 @@ def main():
     args.output = args.output.resolve()
     if args.output.exists():
         parser.error('output already exists; use a new candidate directory')
-    for path in (args.qemu,args.firmware,args.openssl,args.libusb,args.source_materials/"manifest.json",args.gdb_runtime/'candidate.json',*args.public_key,*args.runtime_library):
+    for path in (args.qemu,args.firmware,args.openssl,args.libusb,args.source_materials/"manifest.json",args.gdb_runtime/'candidate.json',args.emulator_window/'window.json',*args.public_key,*args.runtime_library):
         if not path.is_file(): parser.error(f'missing input: {path}')
+    try:
+        verify_window(args.emulator_window)
+    except (OSError, ValueError, KeyError) as exc:
+        parser.error(f'invalid desktop window bundle: {exc}')
     if contains_home_path(args.qemu.read_bytes(), Path.home()):
         parser.error('QEMU embeds a private home path; rebuild from neutral source/build paths (see NATIVE-APP-SETUP.md)')
     sources=json.loads((args.source_materials/'manifest.json').read_text())
@@ -442,6 +448,9 @@ def main():
             linux_source_inputs['source_manifest_sha256'] = hashlib.sha256((args.source_materials/'manifest.json').read_bytes()).hexdigest()
             (bundle/'linux-native-source-inputs.json').write_text(
                 json.dumps(linux_source_inputs,indent=2)+'\n',encoding='utf-8',newline='\n')
+        window_target = bundle/'_internal/emulator-window'
+        shutil.copytree(args.emulator_window, window_target, symlinks=True)
+        verify_window(window_target)
         shutil.copyfile(ROOT/'sdk/DESKTOP-README.md',bundle/'README.md')
         for name in ('LICENSE.md','THIRD_PARTY_NOTICES.md'):
             shutil.copyfile(ROOT/name,bundle/name)
@@ -451,6 +460,8 @@ def main():
         shutil.copytree(ROOT/'LICENSES',bundle/'_internal/LICENSES')
         docs=bundle/'_internal/docs';docs.mkdir(exist_ok=True)
         for source in (ROOT/'docs').glob('NATIVE-APP-*.md'):
+            shutil.copyfile(source,docs/source.name)
+        for source in (ROOT/'docs').glob('EMULATOR-*.md'):
             shutil.copyfile(source,docs/source.name)
         for source in (ROOT/'docs').glob('SDK-*.md'):
             shutil.copyfile(source,docs/source.name)
@@ -497,6 +508,9 @@ def main():
                 'https_trust':{'default':'native-system','library':'truststore','version':trust_version,
                                'explicit_ca':'replaces-system-trust','network_qualified':False},
                 'firmware_sha256':hashlib.sha256(args.firmware.read_bytes()).hexdigest()}
+        report['desktop_window'] = {'qt_version': '6.11.2',
+            'manifest_sha256': hashlib.sha256((window_target/'window.json').read_bytes()).hexdigest(),
+            'corresponding_sources_qualified': False}
         if pillow_inputs:
             report['pillow_native_inputs_sha256'] = hashlib.sha256((bundle/'pillow-native-inputs.json').read_bytes()).hexdigest()
         if linux_wheel_lock:

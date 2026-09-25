@@ -4,3 +4,4 @@ mpmath==1.3.0
 keyring==25.7.0
 truststore==0.10.4
 pefile==2024.8.26
+-r sdk/requirements-emulator.txt

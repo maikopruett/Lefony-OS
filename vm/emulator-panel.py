@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Shared browser/desktop panel for the ordinary native QEMU launcher."""
+"""Shared desktop panel for the ordinary native QEMU launcher."""
 import argparse
 import importlib
 import json
 import os
 import signal
 from pathlib import Path
-import subprocess
 import sys
 import time
-import webbrowser
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'sdk/tools'))
-from emulator_ui import Panel, make_server
+from emulator_ui import Panel
+from emulator_desktop import serve_desktop, wait_for_boot_ui
 from local_transport import connect
 
 prime = importlib.import_module('prime-control')
@@ -67,24 +66,6 @@ class NativeControls:
             self.socket.close()
 
 
-def desktop(url):
-    if sys.platform != 'darwin':
-        raise RuntimeError('The desktop window currently requires macOS; use --browser on this host')
-    source = ROOT / 'vm/emulator-window.swift'
-    bundle = ROOT / 'build/emulator-window/Lefony Emulator.app'
-    executable = bundle / 'Contents/MacOS/Lefony Emulator'
-    executable.parent.mkdir(parents=True, exist_ok=True)
-    import plistlib
-    (bundle / 'Contents/Info.plist').write_bytes(plistlib.dumps({
-        'CFBundleExecutable': 'Lefony Emulator', 'CFBundleIdentifier': 'com.lefony.emulator.preview',
-        'CFBundleName': 'Lefony Emulator', 'CFBundlePackageType': 'APPL',
-        'NSHighResolutionCapable': True,
-    }))
-    if not executable.exists() or executable.stat().st_mtime < source.stat().st_mtime:
-        subprocess.run(['swiftc', str(source), '-o', str(executable)], check=True, timeout=120)
-    return subprocess.Popen([str(executable), url])
-
-
 def main():
     def interrupted(signum, frame):
         raise KeyboardInterrupt
@@ -94,9 +75,7 @@ def main():
     parser.add_argument('--qmp', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--qemu-pid', type=int, required=True)
-    parser.add_argument('--desktop', action='store_true')
     args = parser.parse_args()
-    window = None
     controls = NativeControls(args.input, args.qmp)
     try:
         deadline = time.monotonic()+30
@@ -109,36 +88,23 @@ def main():
             if time.monotonic() > deadline:
                 raise TimeoutError('Guest input did not become ready')
             time.sleep(.1)
+        # Interactive sessions model external power; dismiss its boot status sheet.
+        wait_for_boot_ui(controls)
+        controls.keys(['back'])
+        time.sleep(.25)
+        controls.keys([])
         panel = Panel(controls, args.output, prime.KEYS)
-        with make_server(panel, 'Lefony OS') as server:
-            (args.output / 'panel-url.txt').write_text(server.url+'\n')
-            print('Lefony Emulator: '+server.url, flush=True)
-            if args.desktop:
-                window = desktop(server.url)
-            else:
-                webbrowser.open(server.url)
-            while not panel.stopped and (window is None or window.poll() is None):
-                try:
-                    os.kill(args.qemu_pid, 0)
-                except ProcessLookupError:
-                    break
-                server.handle_request()
-                panel.expire()
-            if panel.failure:
-                raise RuntimeError('Emulator panel disconnected') from panel.failure
+        def alive():
+            try:
+                os.kill(args.qemu_pid, 0)
+                return True
+            except ProcessLookupError:
+                return False
+        serve_desktop(panel, 'Lefony OS', alive)
     except KeyboardInterrupt:
         pass
     finally:
-        try:
-            controls.close()
-        finally:
-            if window is not None and window.poll() is None:
-                window.terminate()
-                try:
-                    window.wait(timeout=3)
-                except subprocess.TimeoutExpired:
-                    window.kill()
-                    window.wait(timeout=3)
+        controls.close()
 
 
 if __name__ == '__main__':
