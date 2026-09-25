@@ -90,7 +90,7 @@ def test_repeated_same_key_has_a_visible_release_edge(tmp_path, monkeypatch):
 
 def test_local_http_origin_token_limits_and_stop(tmp_path):
     device = Device()
-    panel = Panel(device, tmp_path, KEYS)
+    panel = Panel(device, tmp_path, set(KEYS) | {'onoff'})
     with make_server(panel, 'Notebook') as server:
         worker = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': .02})
         worker.start()

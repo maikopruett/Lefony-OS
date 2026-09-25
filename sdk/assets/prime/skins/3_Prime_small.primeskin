@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<skin>
+	<picture file="prime_small.png"/>
+	<picture_hover file="prime_small_hover.png"/>
+	<picture_pressed file="prime_small_pressed.png"/>
+	<screen x="3" y="48" width="320" height="240"/>
+	<matrix width="320" height="240"/>
+	<maximized x="2" y="310" width="327" height="418"/>
+	<leds r="3" rx="20" ry="2" gx="35" gy="2" bx="50" by="2"/>
+	<trans lang="EN" id="Small"/>
+	<trans lang="CHS" id="小"/>
+	<trans lang="FRA" id="Petit"/>
+	<trans lang="DEU" id="Klein"/>
+	<trans lang="ESP" id="Pequeño"/>
+	<trans lang="NLD" id="Klein"/>
+	<trans lang="PTB" id="Pequeno"/>
+	<trans lang="JPN" id="小"/>
+	<trans lang="RUS" id="Маленький"/>
+    <keys xoffset="0" yoffset="0" show_all="0">
+		<key code="0" x="2" y="314" x2="50" y2="355" note="apps">
+			<main code="F1"/>
+		</key>
+		<key code="1" x="54" y="311" x2="104" y2="340" note="symb">
+			<main code="F2"/>
+		</key>
+		<key code="2" x="150" y="311" x2="177" y2="345" note="up">
+			<main code="Up"/>
+			<alpha code="PgUp" note="Qt::Key_PageUp"/>
+		</key>
+		<key code="3" x="218" y="311" x2="269" y2="340" note="help">
+		    <main code="F3"/>
+		    <main code="Help"/>	
+		</key>
+		<key code="4" x="274" y="314" x2="323" y2="355" note="esc">
+		    <main code="Esc"/>
+			<shift code="Clear" note="Qt::Key_Clear" />
+		</key>
+		<key code="5" x="2" y="360" x2="50" y2="398" note="home">
+		    <main code="Home"/>
+		    <main code="F4"/>
+		</key>
+		<key code="6" x="54" y="344" x2="104" y2="369" note="plot">
+			<main code="F5"/>
+		</key>
+		<key code="7" x="116" y="344" x2="153" y2="369" note="left">
+			<main code="Left"/>
+		</key>
+		<key code="8" x="173" y="344" x2="208" y2="369" note="right">
+			<main code="Right"/>
+		</key>
+		<key code="9" x="218" y="344" x2="269" y2="369" note="views">
+			<main code="F6"/>
+		</key>
+		<key code="10" x="274" y="361" x2="323" y2="398" note="cas">
+			<main code="F7"/>
+		</key>
+		<key code="11" x="54" y="373" x2="104" y2="400" note="num">
+			<main code="F8"/>
+		</key>
+		<key code="12" x="150" y="367" x2="177" y2="400" note="down">
+			<main code="Down"/>
+			<alpha code="PgDown" note="Qt::Key_PageDn"/>
+		</key>
+		<key code="13" x="218" y="373" x2="269" y2="400" note="menu">
+			<main code="F9"/>
+		</key>
+		<key code="14" x="2" y="415" x2="50" y2="455" note="vars">
+			<alpha code="0x41" note="Qt::Key_A"/>
+			<shalpha code="0x41" note="Qt::Key_A"/>
+		</key>
+		<key code="15" x="54" y="415" x2="104" y2="455" note="math">
+			<alpha code="0x42" note="Qt::Key_B"/>
+			<shalpha code="0x42" note="Qt::Key_B"/>
+		</key>
+		<key code="16" x="110" y="415" x2="159" y2="455" note="templ">
+			<alpha code="0x43" note="Qt::Key_C"/>
+			<shalpha code="0x43" note="Qt::Key_C"/>
+		</key>
+		<key code="17" x="163" y="415" x2="212" y2="455" note="xttn">
+			<alpha code="0x44" note="Qt::Key_D"/>
+			<shalpha code="0x44" note="Qt::Key_D"/>
+		</key>
+		<key code="18" x="218" y="415" x2="269" y2="455" note="frac">
+			<alpha code="0x45" note="Qt::Key_E"/>
+			<shalpha code="0x45" note="Qt::Key_E"/>
+		</key>
+		<key code="19" x="274" y="415" x2="323" y2="455" note="bksp">
+			<main code="Backspace"/>
+			<main code="Shift+Backspace"/>
+			<shift code="Del" note="Qt::Key_Delete"/>
+			<shift code="Shift+Del"/>
+		</key>
+		<key code="20" x="2" y="461" x2="50" y2="499" note="^">
+			<main code="^"/>
+			<main code="Shift+^"/>
+			<alpha code="0x46" note="Qt::Key_F"/>
+			<shalpha code="0x46" note="Qt::Key_F"/>
+		</key>
+		<key code="21" x="54" y="461" x2="104" y2="499" note="sin">
+			<alpha code="0x47" note="Qt::Key_G"/>
+			<shalpha code="0x47" note="Qt::Key_G"/>
+		</key>
+		<key code="22" x="110" y="461" x2="159" y2="499" note="cos">
+			<alpha code="0x48" note="Qt::Key_H"/>
+			<shalpha code="0x48" note="Qt::Key_H"/>
+		</key>
+		<key code="23" x="163" y="461" x2="212" y2="499" note="tan">
+			<alpha code="0x49" note="Qt::Key_I"/>
+			<shalpha code="0x49" note="Qt::Key_I"/>
+		</key>
+		<key code="24" x="218" y="461" x2="269" y2="499" note="ln">
+			<alpha code="0x4a" note="Qt::Key_J"/>
+			<shalpha code="0x4a" note="Qt::Key_J"/>
+		</key>
+		<key code="25" x="274" y="461" x2="323" y2="499" note="log">
+			<alpha code="0x4b" note="Qt::Key_K"/>
+			<shalpha code="0x4b" note="Qt::Key_K"/>
+		</key>
+		<key code="26" x="2" y="506" x2="50" y2="545" note="sq">
+			<main code="²"/>
+			<main code="Shift+²"/>
+			<alpha code="0x4c" note="Qt::Key_L"/>
+			<shalpha code="0x4c" note="Qt::Key_L"/>
+		</key>
+		<key code="27" x="54" y="506" x2="104" y2="545" note="chs">
+			<main code="±"/>
+			<main code="Shift+±"/>
+			<alpha code="0x4d" note="Qt::Key_M"/>
+			<shalpha code="0x4d" note="Qt::Key_M"/>
+		</key>
+		<key code="28" x="110" y="506" x2="159" y2="545" note="paren">
+			<alpha code="0x4e" note="Qt::Key_N"/>
+			<shalpha code="0x4e" note="Qt::Key_N"/>
+		</key>
+		<key code="29" x="163" y="506" x2="212" y2="545" note="comma)">
+			<main code=","/>
+			<alpha code="0x4f" note="Qt::Key_O"/>
+			<shalpha code="0x4f" note="Qt::Key_O"/>
+		</key>
+		<key code="30" x="218" y="506" x2="323" y2="545" note="enter">
+			<main code="Enter" note="Qt::Key_Return Qt::Key_Enter"/>
+			<main code="Shift+Enter"/>
+			<main code="Return" note="Qt::Key_Return Qt::Key_Enter"/>
+			<main code="Shift+Return"/>
+		</key>
+		<key code="31" x="2" y="551" x2="50" y2="590" note="eex">
+			<alpha code="0x50" note="Qt::Key_P"/>
+			<shalpha code="0x50" note="Qt::Key_P"/>
+		</key>
+		<key code="32" x="54" y="551" x2="120" y2="590" note="7">
+			<main code="7"/>
+			<alpha code="0x51" note="Qt::Key_Q"/>
+			<shalpha code="0x51" note="Qt::Key_Q"/>
+		</key>
+		<key code="33" x="129" y="551" x2="195" y2="590" note="8">
+			<main code="8"/>
+			<alpha code="0x52" note="Qt::Key_R"/>
+			<shalpha code="0x52" note="Qt::Key_R"/>
+		</key>
+		<key code="34" x="205" y="551" x2="269" y2="590" note="9">
+			<main code="9" note="Qt::Key_9"/>
+		</key>
+		<key code="35" x="274" y="551" x2="323" y2="590" note="div">
+			<main code="/"/>
+			<main code="Shift+/"/>
+			<main code="÷"/>
+			<main code="Shift+÷"/>
+			<alpha code="0x54" note="Qt::Key_T"/>
+			<shalpha code="0x54" note="Qt::Key_T"/>
+		</key>
+		<key code="36" x="2" y="597" x2="50" y2="635" note="alpha">
+			<main code="Tab"/>
+		</key>
+		<key code="37" x="54" y="597" x2="120" y2="635" note="4">
+			<main code="4"/>
+			<alpha code="0x53" note="Qt::Key_U"/>
+			<shalpha code="0x53" note="Qt::Key_U"/>
+		</key>
+		<key code="38" x="129" y="597" x2="195" y2="635" note="5">
+			<main code="5"/>
+			<alpha code="0x54" note="Qt::Key_V"/>
+			<shalpha code="0x54" note="Qt::Key_V"/>
+		</key>
+		<key code="39" x="205" y="597" x2="269" y2="635" note="6">
+			<main code="6"/>
+			<alpha code="0x55" note="Qt::Key_W"/>
+			<shalpha code="0x55" note="Qt::Key_W"/>
+		</key>
+		<key code="40" x="274" y="597" x2="323" y2="635" note="mult">
+			<main code="*"/>
+			<main code="Shift+*"/>
+			<main code="×"/>
+			<main code="Shift+×"/>
+			<alpha code="0x58" note="Qt::Key_X"/>
+			<shalpha code="0x58" note="Qt::Key_X"/>
+		</key>
+		<key code="41" x="2" y="640" x2="50" y2="683" note="shift">
+			<main code="Shift" />
+			<main codeHex="0x01000021" note="possible qt bug here? QTBUG-40030" />
+		</key>
+		<key code="42" x="54" y="640" x2="120" y2="683" note="1">
+			<main code="1"/>
+			<alpha code="0x59" note="Qt::Key_Y"/>
+			<shalpha code="0x59" note="Qt::Key_Y"/>
+		</key>
+		<key code="43" x="129" y="640" x2="195" y2="683" note="2">
+			<main code="2"/>
+			<alpha code="0x5a" note="Qt::Key_Z"/>
+			<shalpha code="0x5a" note="Qt::Key_Z"/>
+		</key>
+		<key code="44" x="205" y="640" x2="269" y2="683" note="3">
+			<main code="3"/>
+			<alpha code="0x23" note="Qt::Key_NumberSign"/>
+			<shalpha code="0x23" note="Qt::Key_NumberSign"/>
+		</key>
+		<key code="45" x="274" y="640" x2="323" y2="683" note="minus">
+			<main code="-"/>
+			<alpha code="0x3a" note="Qt::Key_Colon"/>
+			<shalpha code="0x3a" note="Qt::Key_Colon"/>
+		</key>
+		<key code="46" x="2" y="688" x2="50" y2="725" note="on">
+			<shift code="Cancel" note="Qt::Key_Cancel"/>
+		</key>
+		<key code="47" x="54" y="688" x2="119" y2="725" note="0">
+			<main code="0"/>
+			<alpha code="0x22" note="Qt::Key_QuoteDbl"/>
+			<shalpha code="0x22" note="Qt::Key_QuoteDbl"/>
+		</key>
+		<key code="48" x="129" y="688" x2="195" y2="725" note="dot">
+			<main code="."/>
+			<shift code="=" note=" Qt::Key_Equal"/>
+			<shift code="Shift+=" note=" Qt::Key_Equal"/>
+		</key>
+		<key code="49" x="205" y="688" x2="269" y2="725" note="space">
+			<main code="Space"/>
+			<shift code="_" note=" Qt::Key_Underscore"/>
+			<shift code="Shift+_" note=" Qt::Key_Underscore"/>
+		</key>
+		<key code="50" x="274" y="688" x2="323" y2="725" note="plus">
+			<main code="+"/>
+			<main code="Shift++"/>
+			<alpha code="0x3b" note="Qt::Key_Semicolon"/>
+			<shalpha code="0x3b" note="Qt::Key_Semicolon"/>
+		</key>
+	</keys>
+</skin>

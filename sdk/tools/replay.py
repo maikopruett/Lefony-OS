@@ -134,6 +134,14 @@ class Controls:
             return response
 
     def key_edge(self, name, down):
+        if name == 'onoff':
+            # Emulator suspend returns to its control loop; there is no physical
+            # SNVS wake edge. Resume through the existing VM-only power control.
+            command = ('POWER RESUME' if down and self.channel.command('POWER STATE') == 'VALUE 1'
+                       else f'KEY 116 {int(down)}')
+            if self.channel.command(command) != 'OK':
+                raise RuntimeError('On/Off injection failed')
+            return
         row, col = KEYS[name]
         self.qtest.file.write(f'writew 0x020b8008 {(row << 8) | col | (0x8000 if down else 0):#x}\n'.encode())
         while True:

@@ -147,8 +147,10 @@ make run            # Native ELF fast path; no HP firmware required
 ```
 
 QEMU build dependencies include Ninja, pkg-config, a C/C++ compiler, Python,
-GLib and pixman development packages. Linux desktop display also needs SDL2;
-macOS uses Cocoa. See [vm/README.md](vm/README.md) for headless operation,
+GLib and pixman development packages. Install `requirements-dev.txt` in `.venv`
+for the emulator panel. Interactive launches include the HP Prime keyboard and
+live display by default: a macOS desktop window (Xcode command-line tools
+required) or a browser on Linux. See [vm/README.md](vm/README.md) for headless operation,
 keyboard/touch controls, test suites, and U-Boot boot-media modes.
 
 The emulator's private-stock-fixture research tests are optional and clearly

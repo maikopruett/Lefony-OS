@@ -14,25 +14,36 @@ READONLY_OVERLAY="$NATIVE_VM_BUILD_DIR/native-readonly-v1.qcow2"
 QEMU_SYSTEM_ARM=${PRIME_G2_QEMU:-"$REPO_DIR/build/qemu-prime-g2/qemu-system-arm"}
 PANEL_FAULT=${PRIME_G2_PANEL_FAULT:-none}
 case "$(uname -s)" in
-  Darwin) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-cocoa} ;;
-  *) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-sdl} ;;
+  Darwin) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-desktop} ;;
+  *) DISPLAY_MODE=${LEFONY_VM_DISPLAY:-browser} ;;
 esac
 BOOT_MODE=direct
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --headless) DISPLAY_MODE=none ;;
+    --browser) DISPLAY_MODE=browser ;;
+    --desktop) DISPLAY_MODE=desktop ;;
     --u-boot) BOOT_MODE=u-boot ;;
     --capsule) BOOT_MODE=capsule ;;
     --ab) BOOT_MODE=ab ;;
     --direct) BOOT_MODE=direct ;;
     *)
-      echo "Usage: $0 [--headless] [--direct|--u-boot|--capsule|--ab]" >&2
+      echo "Usage: $0 [--headless|--browser|--desktop] [--direct|--u-boot|--capsule|--ab]" >&2
       exit 2
       ;;
   esac
   shift
 done
+PANEL_MODE=
+case "$DISPLAY_MODE" in
+  browser|desktop) PANEL_MODE=$DISPLAY_MODE; DISPLAY_MODE=none ;;
+esac
+PANEL_PYTHON=${PYTHON:-"$REPO_DIR/.venv/bin/python"}
+if [ -n "$PANEL_MODE" ] && [ ! -x "$PANEL_PYTHON" ]; then
+  echo "Create the project virtualenv and install requirements-dev.txt for the emulator panel." >&2
+  exit 2
+fi
 if [ ! -x "$QEMU_SYSTEM_ARM" ]; then
   "$REPO_DIR/vm/build-prime-g2-qemu.sh"
 fi
@@ -167,8 +178,12 @@ python3 "$REPO_DIR/vm/input-proxy.py" "$INPUT_UART_SOCKET" "$INPUT_SOCKET" \
   "$QTEST_SOCKET" &
 PROXY_PID=$!
 QEMU_PID=
+PANEL_PID=
 
 cleanup() {
+  if [ -n "$PANEL_PID" ]; then
+    kill "$PANEL_PID" 2>/dev/null || true
+  fi
   if [ -n "$QEMU_PID" ]; then
     kill "$QEMU_PID" 2>/dev/null || true
   fi
@@ -187,6 +202,11 @@ set -- \
   -global imx6ul-lcdif.prime-g2-panel=on \
   -cpu cortex-a7 \
   -m 256M
+if [ -n "$PANEL_MODE" ]; then
+  # Interactive previews model external power; battery/suspend qualification
+  # keeps the existing headless and plain Cocoa/SDL defaults.
+  set -- "$@" -global prime-g2-pf1550.external-power=on
+fi
 case "$PANEL_FAULT" in
   none) ;;
   spi)
@@ -235,4 +255,12 @@ fi
 
 "$QEMU_SYSTEM_ARM" "$@" &
 QEMU_PID=$!
+if [ -n "$PANEL_MODE" ]; then
+  set -- --input "$INPUT_SOCKET" --qmp "$QMP_SOCKET" --output "$NATIVE_VM_BUILD_DIR" --qemu-pid "$QEMU_PID"
+  if [ "$PANEL_MODE" = desktop ]; then set -- "$@" --desktop; fi
+  "$PANEL_PYTHON" "$REPO_DIR/vm/emulator-panel.py" "$@" &
+  PANEL_PID=$!
+  wait "$PANEL_PID"
+  exit $?
+fi
 wait "$QEMU_PID"

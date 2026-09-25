@@ -1,5 +1,12 @@
 # Third-party sources and notices
 
+- **HP Prime Virtual Calculator skins:** version 2.4.2 (2026-09-09), from
+  Moravia Consulting. Original PNGs and XML definitions are in
+  `sdk/assets/prime/`, together with provenance hashes and the original EULA.
+  These proprietary assets are not relicensed by Lefony. The EULA prohibits
+  distribution; no separate redistribution grant was identified. See the
+  [asset notice](sdk/assets/prime/README.md).
+
 - **Upsilon / NumWorks Epsilon lineage:** calculator UI, applications, Poincare
   and Ion interfaces. Pinned Upsilon commit:
   `f36520e0ed5faabbfea8a2b9f4e1309edc077927` at

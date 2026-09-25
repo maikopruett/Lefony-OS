@@ -15,15 +15,16 @@ sys.path.insert(0, str(ROOT / 'sdk/tools'))
 
 def package(output, newlib=None):
     files={}
-    for directory in ('tools','include','lib','cmake','templates','examples','publisher','contracts'):
+    for directory in ('tools','include','lib','cmake','templates','examples','publisher','contracts','assets'):
         for path in sorted((ROOT/'sdk'/directory).rglob('*')):
             if not path.is_file() or path.is_symlink() or path.name in ('compile_commands.json','sdk.lock.json') or any(part in ('build','__pycache__','.lefony') for part in path.relative_to(ROOT/'sdk').parts):
                 continue
             example_asset = directory == 'examples' and 'assets' in path.relative_to(ROOT/'sdk/examples').parts and path.suffix in ('.png','.rgb565','.bin')
-            if not example_asset and path.suffix not in ('.py','.h','.s','.ld','.c','.cpp','.json','.md','.service','.timer','.txt','.cmake') and path.name not in ('lefony-sdk','Dockerfile','Dockerfile.toolchain'):
+            skin_asset = directory == 'assets' and path.relative_to(ROOT/'sdk/assets').parts[0] == 'prime' and path.suffix in ('.png', '.primeskin')
+            if not (example_asset or skin_asset) and path.suffix not in ('.py','.h','.s','.ld','.c','.cpp','.json','.md','.service','.timer','.txt','.cmake') and path.name not in ('lefony-sdk','Dockerfile','Dockerfile.toolchain'):
                 continue
             files['sdk/'+path.relative_to(ROOT/'sdk').as_posix()]=(path.read_bytes(),0o755 if path.name=='lefony-sdk' else 0o644)
-    for name in ('.dockerignore','scripts/package_native_sdk.py','scripts/vendor_sdk_math.py','LICENSE.md','THIRD_PARTY_NOTICES.md','sdk/README.md','sdk/API.md','sdk/FILE-EXCHANGE.md','docs/NATIVE-APP-FILE-EXCHANGE.md','sdk/TESTING.md','sdk/contract.json','sdk/publisher/README.md','docs/NATIVE-APP-SDK-STATUS.md','docs/NATIVE-APP-SDK-PLAN.md','docs/NATIVE-APP-SDK-MATURITY-PLAN.md','docs/NATIVE-APP-CAPABILITIES.md','docs/NATIVE-APP-PACKAGE-FORMAT.md','docs/NATIVE-APP-SETUP.md','docs/NATIVE-APP-SETUP-LEGACY.md','docs/NATIVE-APP-STORAGE.md','sdk/requirements-desktop.txt','sdk/DESKTOP-README.md',
+    for name in ('.dockerignore','scripts/package_native_sdk.py','scripts/vendor_sdk_math.py','LICENSE.md','THIRD_PARTY_NOTICES.md','sdk/README.md','sdk/API.md','sdk/FILE-EXCHANGE.md','docs/NATIVE-APP-FILE-EXCHANGE.md','docs/EMULATOR-SKINS.md','sdk/TESTING.md','sdk/contract.json','sdk/publisher/README.md','docs/NATIVE-APP-SDK-STATUS.md','docs/NATIVE-APP-SDK-PLAN.md','docs/NATIVE-APP-SDK-MATURITY-PLAN.md','docs/NATIVE-APP-CAPABILITIES.md','docs/NATIVE-APP-PACKAGE-FORMAT.md','docs/NATIVE-APP-SETUP.md','docs/NATIVE-APP-SETUP-LEGACY.md','docs/NATIVE-APP-STORAGE.md','sdk/requirements-desktop.txt','sdk/DESKTOP-README.md',
                  'docs/NATIVE-APP-MATURITY-EVIDENCE.md','docs/NATIVE-APP-ARCHITECTURE.md','docs/NATIVE-APP-CONTRACT-EXTENSIONS.md',
                  'tests/fixtures/prime_g2_emulator_update_private.pem','tests/fixtures/prime_g2_emulator_update_public.pem'):
         files[name]=((ROOT/name).read_bytes(),0o644)

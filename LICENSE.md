@@ -12,6 +12,7 @@ notices take precedence over the directory defaults below.
 | U-Boot integrations, U-Boot patches and their adaptations | GPL-2.0-or-later, retaining individual upstream notices |
 | Original Lefony boot capsule/recovery assembly and native layout tools without another notice | GPL-3.0-or-later |
 | Original Lefony documentation and artwork | CC-BY-NC-SA-4.0 |
+| HP Prime simulator skins under `sdk/assets/prime/` | Proprietary; see [asset notice](sdk/assets/prime/README.md) and original EULA; no redistribution grant identified |
 
 For the original Lefony material listed as GPL-3.0-or-later, permission is
 granted to redistribute and/or modify it under the GNU General Public License

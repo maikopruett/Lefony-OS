@@ -1,0 +1,3 @@
+# Preserve the original vendor bytes and provenance hashes across platforms.
+EULA_en.txt -text whitespace=cr-at-eol,-blank-at-eof
+skins/*.primeskin -text whitespace=-blank-at-eol

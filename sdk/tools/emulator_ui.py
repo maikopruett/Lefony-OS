@@ -9,6 +9,7 @@ import webbrowser
 
 from PIL import Image
 from emulator_ui_page import page
+from emulator_skin import load_skins
 
 
 def validate_input(value, keys):
@@ -112,7 +113,12 @@ class Server(HTTPServer):
 def make_server(panel, title):
     token = secrets.token_urlsafe(32)
     root = '/' + token + '/'
-    document = page(title).encode('utf-8')
+    skins, assets = load_skins()
+    if skins:
+        expected = set(panel.keys)
+        if any({key['name'] for key in skin['keys']} != expected for skin in skins):
+            raise ValueError('Skin keys do not match emulator input capabilities')
+    document = page(title, skins).encode('utf-8')
 
     class Handler(BaseHTTPRequestHandler):
         # HTTP/1.0 closes connections, so idle keepalives cannot own the loop.
@@ -144,6 +150,8 @@ def make_server(panel, title):
                     self.respond(200, document, 'text/html; charset=utf-8')
                 elif self.path == root + 'frame':
                     self.respond(200, panel.frame(), 'image/png')
+                elif self.path[len(root):] in assets:
+                    self.respond(200, assets[self.path[len(root):]], 'image/png')
                 else:
                     self.respond(404)
             except (BrokenPipeError, ConnectionResetError):
@@ -199,7 +207,8 @@ def run_panel(channel, folder, process, title):
         with control_session(Controls(channel, folder)) as controls:
             controls.qmp.socket.settimeout(2)
             controls.qtest.socket.settimeout(2)
-            panel = Panel(controls, folder, KEYS)
+            keys = set(KEYS) | {'onoff'}
+            panel = Panel(controls, folder, keys)
             with make_server(panel, title) as server:
                 print('Lefony Emulator: ' + server.url + '\nUse Stop emulator or Ctrl-C to finish.', flush=True)
                 try:

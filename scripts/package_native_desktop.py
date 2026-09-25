@@ -298,7 +298,8 @@ def main():
             relative=source.relative_to(ROOT/'sdk')
             if not source.is_file() or source.is_symlink() or source.name in ('compile_commands.json','sdk.lock.json') or any(part in ('build','__pycache__','trust','.lefony','runtime') for part in relative.parts): continue
             example_asset = relative.parts[0]=='examples' and 'assets' in relative.parts and source.suffix in ('.png','.rgb565','.bin')
-            if not example_asset and source.suffix not in allowed and source.name not in ('lefony-sdk','Dockerfile','Dockerfile.toolchain'): continue
+            skin_asset = relative.parts[:2] == ('assets', 'prime') and source.suffix in ('.png', '.primeskin')
+            if not (example_asset or skin_asset) and source.suffix not in allowed and source.name not in ('lefony-sdk','Dockerfile','Dockerfile.toolchain'): continue
             target=sdk/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(source,target)
         if args.newlib:

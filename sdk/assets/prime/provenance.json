@@ -1,0 +1,28 @@
+{
+  "source_url": "https://updates.moravia-consulting.com/HP_Prime_Virtual_Calculator_2026_09_09.dmg",
+  "version": "2.4.2",
+  "source_sha256": "8b4dfcee7ac564b7ce8fa989d69b6768f9238c4a3033237b7d8d664ab1fb604e",
+  "files": {
+    "EULA_en.txt": "fd3fa8a314c72759675709b9293289be653205df5692cf9917606b9a9af8ac5f",
+    "images/prime_compact.png": "1e662cf5fca230a6e73634407146360d37a1e696b6ebcf44c55d7aa26d99f232",
+    "images/prime_compact_L.png": "d44e01ba3da46db308bbb565989aafaba56e2274a006334dc5f211bb5b5ee90e",
+    "images/prime_compact_L_hover.png": "4e8007b3e045f84f45087b452242b2b37c71437e6d22b3dfb0574c4a7b09a436",
+    "images/prime_compact_L_pressed.png": "f9b170c9312ff08afe921fbf82b8f57bc051a121b102a3e647710723af32c208",
+    "images/prime_compact_hover.png": "9d4d1c202e312ce93c08339d65ff4838c681abeebc1aaebf219e0d2a78a0918a",
+    "images/prime_compact_pressed.png": "c9444be95d8b5e990c8b351f56fc6c07ef9c3719898573fa371c56c30d6d45ae",
+    "images/prime_large_L.png": "6b1d10200fe54a2be98dc7a2142448480c0a6445b341446cd6c307161bb84657",
+    "images/prime_large_L_hover.png": "0c6a834e5c6ac14b7a5cb778a4aacb2cccdcfb47f7d79dd2257e25fd3aba07fa",
+    "images/prime_large_L_pressed.png": "8f94e4ce687aae7b2bab7b6e196316311f92866c5d97804f5313034802202255",
+    "images/prime_med.png": "5bbe2f786c06f5d20c287d25c68fb634000917eb8fcfb14055164bc12b96481b",
+    "images/prime_med_hover.png": "e7b7fb099dfd73332a5b5fcfbac8eac45941ec285a4110a595ff4207d952ded7",
+    "images/prime_med_pressed.png": "1e707c54b29742d61ff98518c0a2b3468c029d67ba4f2bcf8f16d8b6ecb44270",
+    "images/prime_small.png": "aafb545bce23012c6efcc492a6aea489dc891d127f362976e917a4c9ab04c9ac",
+    "images/prime_small_hover.png": "f845705c157d8282c02e5ab2c5653a820ddc5099011ef8ebb1c16a1749873365",
+    "images/prime_small_pressed.png": "79cf31254daa0e1d52f2800e8f525ca30fc59835477c98c9ed8820c77823882d",
+    "skins/1_Prime_compact.primeskin": "8ecc39de50e66f852bf314b5b5cccc989dc2a61df4fc94fd401f451ae24acd1c",
+    "skins/2_Prime_compact_L.primeskin": "aa9a66c7efa75a6fd43d52fb956f2e9b4fb689f4bb6396bbd7f7d776f5540bb8",
+    "skins/3_Prime_small.primeskin": "e35824c04fab255d2ba90635ae029289aa8d5997d3a1ee3856a37217a67812e6",
+    "skins/4_Prime_med.primeskin": "448cd9d87c01d2884ee1cb41fccc0a566c4e530115edfde740188742c413f797",
+    "skins/5_Prime_large_L.primeskin": "0afbf399b62a37afea580296210d887e5c128ac66d1a53264920083c8a3cefa7"
+  }
+}

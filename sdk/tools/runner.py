@@ -83,6 +83,10 @@ def exercise(package, qemu, firmware, *, headless=True, event=0, first=0, second
                    "-qtest", f"unix:{qemu_path(qtest)},server=on,wait=off", "-qtest-log", os.devnull,
                    "-qmp", f"unix:{qemu_path(qmp)},server=on,wait=off", "-kernel", str(firmware), "-no-reboot",
                    "-device", f"loader,file={qemu_path(payload)},addr=0x86000000,force-raw=on"]
+        if browser_panel:
+            # Interactive desktop sessions model a plugged-in calculator so
+            # the guest's short battery idle timeout does not blank the preview.
+            command += ['-global', 'prime-g2-pf1550.external-power=on']
         if workspace:
             command += ['-global', f'prime-g2-gpmi-bch.stock-overlay={workspace / "nand.overlay"}',
                         '-chardev', f'socket,id=usbhost,path={qemu_path(folder / "usb")},server=on,wait=off',
