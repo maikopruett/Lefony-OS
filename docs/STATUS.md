@@ -112,15 +112,17 @@ source CLI. Physical startup has the limited measurements above; full hardware
 gameplay/storage qualification remains open. See the
 [Doom release record](DOOM-STORE-RELEASE.md).
 
-The public macOS ARM64 and Linux x86-64 SDK bundles now include the browser
-emulator with all 50 clickable Prime keys below a larger, zoomable touchscreen.
-Frozen CLI tests pass normal KPP/Goodix input and saved/cold Notebook behavior.
-Both archives, matching source groups and the standalone SDK source kit passed
-full R2 checksum verification. Public binary/source-kit downloads and all
-catalogue routes also verify. The public installer selects
-these refreshed candidates. See the [browser emulator release record](SDK-EMULATOR-RELEASE.md)
-for exact hashes, commands, cleanup receipts and limits, and the
-[macOS trial guide](SDK-MACOS-TRIAL.md) for the hands-on workflow.
+The public macOS ARM64 and Linux x86-64 SDK bundles include the shared Qt
+desktop QEMU emulator, all 51 Prime keys and the original 320 × 240 display.
+The keyboard assets and window are bundled and enabled by default. Frozen
+SDK checks pass touch/keyboard input, clean Stop and Notebook edit replay;
+Linux validation runs under CPU emulation, with native Linux/WSL acceptance
+still pending. Binary archives, per-platform sources, shared Qt/PySide sources
+and the refreshed source kit passed full checksum verification. The website
+installer selects these candidates and no longer falls back to the obsolete
+ARM64 browser source snapshot. See the
+[desktop SDK release record](DESKTOP-SDK-RELEASE-20260925.md) for exact hashes
+and limits, and the [macOS trial guide](SDK-MACOS-TRIAL.md) for the workflow.
 
 Current trials are scoped to maintainer macOS feedback. Independent feedback,
 clean hosts, Developer ID/notarization, native Linux/Windows and physical

@@ -62,9 +62,20 @@ before and after copying it. It remains independent of the CLI's Python runtime.
 Window bundles include wrapper source and upstream wheel notices. Qt/PySide and
 Qt WebEngine/Chromium retain their own licenses; see the Qt licensing and
 third-party notices supplied in those distributions. Existing SDK corresponding
-source inventories predate Qt: a release must add the matching Qt/PySide/
-Chromium source and notices before distributing a new complete binary bundle.
-A successful window build is not a complete SDK release qualification.
+source downloads include matching Qt/PySide/Chromium source and notices as a
+shared desktop-window archive, alongside each platform’s compiler, runtime and
+Lefony/QEMU archives. A successful window build alone is not a complete SDK
+release qualification.
+
+For a release, inventory the frozen window in its build environment with
+`scripts/emulator_window_sources.py --toc <Analysis-00.toc> --window <bundle>
+--output <inventory>`. Collect the exact native dependency sources identified
+by that inventory. Pass both `--emulator-window-inputs <inventory>/inputs.json`
+and `--emulator-qt-sources <upstream-source-directory>` to the full SDK packager.
+It checks the native source versions, file hashes and pinned Qt/PySide archives,
+then includes public input and source-verification reports in the SDK. The
+private Debian collection input is build evidence and is not distributed.
+This source verification does not claim byte-identical upstream wheel rebuilds.
 
 The desktop-window CI job builds and smoke-checks the native wrapper on all
 three operating systems. Its smoke uses a synthetic frame and checks that the

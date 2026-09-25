@@ -7,22 +7,21 @@ endurance require a separate, explicitly authorized hardware session.
 
 ## Candidate
 
-The updated [public macOS bundle](https://lefony.com/#developers) includes the
-browser emulator with all 50 clickable Prime matrix keys, a default 2×
-touchscreen and selectable 1.5×/3× zoom. Frozen browser checks pass touch editing
-at all three zoom levels, clickable and physical keys, normal Stop and cold
-restoration of a saved Notebook expression. The maintainer found the new panel
-much better; further workflow feedback remains part of this trial.
+The public macOS ARM64 SDK includes the shared desktop QEMU emulator, the
+complete 51-key Prime keyboard and a 320 × 240 touchscreen. Layout and Scale
+controls resize the calculator together. Frozen desktop checks pass touch and
+keyboard counter input, clean Stop, and Notebook edit replay.
 
-The SDK **0.2.0-dev**, ABI 1 candidate was built on macOS 26.6.2 ARM64.
-Its archive is `build/sdk-emulator-bundles-v1/macos/lefony-sdk-darwin-arm64.tar.gz`:
+The SDK **0.2.0-dev**, ABI 1 candidate requires macOS 26+ on Apple Silicon.
+Its archive SHA-256 is:
 
 ```text
-fd885d62d2b404a32d962abafc0f01273e2ebadac826a1250cfda7612b5f4eba
+181aee86153bc6cda200ba23416f519a88d58f1ed191c72f32cc0a0cff3e3136
 ```
 
-The previous distribution was retired after verification. Exact source hashes
-and public rollout evidence are in the [release record](SDK-EMULATOR-RELEASE.md).
+Download it from [lefony.com](https://lefony.com/#developers). Exact source hashes
+and public rollout evidence are in the
+[desktop SDK release record](DESKTOP-SDK-RELEASE-20260925.md).
 Existing projects retain their SDK lock; use `lock --update` explicitly when
 choosing to adopt this revision. Their saved workspaces remain independent.
 
@@ -33,7 +32,7 @@ The bundled `candidate.json` and `SHA256SUMS` identify its exact inputs/files.
 
 ## Try the developer workflow
 
-Extract the archive into a fresh directory with room for about 750 MB of SDK
+Extract the archive into a fresh directory with room for about 2 GB of SDK
 files and separate projects. In Terminal, enter the extracted `lefony-sdk`
 directory. Keep `_internal` beside the executable. Then run:
 
@@ -46,14 +45,14 @@ open ../Trial-Notebook/build/preview/frame.png
 ./lefony-sdk --project ../Trial-Notebook run --workspace trial
 ```
 
-The last command opens the browser panel described above.
+The last command opens the desktop window described above.
 Review the Notebook's
 labels, controls and text; save a change through its own UI, then quit and run
 that same command again. Record whether the saved document reappears. The
 `trial` workspace contains synthetic calculator storage and is separate from a
-physical calculator. In the browser panel, use **Stop emulator** after saving
-to close the app and drain storage. Closing the browser tab releases input but
-keeps the terminal run alive; the printed local URL reconnects to that session.
+physical calculator. Use **Stop emulator** after saving to close the app and
+drain storage. Closing the desktop window performs the same cleanup and ends
+the terminal session. No browser or reconnect URL is used.
 
 Edit the project's C/C++ source and run `preview` without `--once` to watch
 saves. It writes the current captured ARM frame and layout report beneath

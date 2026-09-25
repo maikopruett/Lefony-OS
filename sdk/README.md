@@ -123,10 +123,12 @@ closes the app and drains workspace saves. Closing the desktop window performs
 the same cleanup. No browser is opened. Source SDK users must install
 `sdk/requirements-emulator.txt`; see [desktop setup](../docs/EMULATOR-DESKTOP.md).
 Use `run --workspace development` to keep saved app data between runs.
-New source kits include the shared renderer and skin assets. The desktop
-packager requires the native window bundle. Previously built bundles retain
-their existing interface. The legacy ARM64 Linux source installer retains its
-older window. `debug` retains its diagnostic native window.
+The website’s macOS ARM64 and Linux x86-64 SDK downloads include the native
+window, shared renderer and keyboard assets. New source kits include the same
+launcher and assets. The desktop packager requires a native window bundle.
+The installer rejects ARM64 Linux until a current bundle is available; it no
+longer falls back to an older browser-based source snapshot. `debug` retains
+its diagnostic native window.
 
 <p align="center"><img src="../docs/images/emulator-sdk.png" alt="Counter SDK app running in the shared desktop emulator" width="400"></p>
 

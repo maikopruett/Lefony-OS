@@ -1,11 +1,11 @@
 # Native host tooling candidate
 
 The current public macOS ARM64 and Linux x86-64 SDK candidates include the
-browser emulator, all 50 clickable Prime keys and larger selectable touchscreen.
+shared Qt desktop emulator, all 51 Prime keys and a 320 × 240 touchscreen.
 Frozen commands, normal KPP/Goodix input, saved/cold Notebook, complete archive
 and matching source checks, R2 readback, public binary/source-kit hashes and
 corresponding-source route checks pass. See the
-[current release record](../docs/SDK-EMULATOR-RELEASE.md) for exact artifacts and evidence.
+[desktop setup guide](../docs/EMULATOR-DESKTOP.md) for launch and packaging details.
 Current developer trials are scoped to maintainer macOS feedback; clean hosts,
 Developer ID/notarization, native Linux/Windows, independent feedback and
 physical qualification remain open. Windows source inputs are refreshed locally;

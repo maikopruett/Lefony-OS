@@ -164,6 +164,8 @@ def main():
     parser.add_argument('--dll-directory', type=Path, action='append', default=[], help='Explicit Windows dependency directory; no ambient PATH search')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--emulator-window', type=Path, required=True, help='Native window bundle from build_emulator_window.py')
+    parser.add_argument('--emulator-window-inputs', type=Path, help='Native window input inventory for source verification')
+    parser.add_argument('--emulator-qt-sources', type=Path, help='Pinned Qt/PySide source archives supplied alongside runtime sources')
     parser.add_argument('--openssl',type=Path,required=True,help='Redistributable OpenSSL executable, not the macOS system binary')
     parser.add_argument('--openssl-runtime',type=Path,help='Required on Windows: complete candidate from build_sdk_windows_openssl.py')
     parser.add_argument('--cpython-runtime',type=Path,help='Required on Windows: original reviewed full CPython ZIP')
@@ -178,6 +180,8 @@ def main():
     except ValueError as exc:
         parser.error(str(exc))
     from build_emulator_window import verify as verify_window
+    if bool(args.emulator_window_inputs) != bool(args.emulator_qt_sources):
+        parser.error('Supply both --emulator-window-inputs and --emulator-qt-sources')
     suffix = settings['suffix']
     if args.dll_directory and not suffix:
         parser.error('--dll-directory is only used for Windows candidates')
@@ -448,6 +452,13 @@ def main():
             linux_source_inputs['source_manifest_sha256'] = hashlib.sha256((args.source_materials/'manifest.json').read_bytes()).hexdigest()
             (bundle/'linux-native-source-inputs.json').write_text(
                 json.dumps(linux_source_inputs,indent=2)+'\n',encoding='utf-8',newline='\n')
+        window_sources = None
+        if args.emulator_window_inputs:
+            from emulator_window_sources import verify_sources
+            window_sources = verify_sources(args.emulator_window, args.emulator_window_inputs,
+                                            args.source_materials, args.emulator_qt_sources)
+            shutil.copyfile(args.emulator_window_inputs, bundle/'emulator-window-inputs.json')
+            (bundle/'emulator-window-sources.json').write_text(json.dumps(window_sources, indent=2)+'\n')
         window_target = bundle/'_internal/emulator-window'
         shutil.copytree(args.emulator_window, window_target, symlinks=True)
         verify_window(window_target)
@@ -510,7 +521,7 @@ def main():
                 'firmware_sha256':hashlib.sha256(args.firmware.read_bytes()).hexdigest()}
         report['desktop_window'] = {'qt_version': '6.11.2',
             'manifest_sha256': hashlib.sha256((window_target/'window.json').read_bytes()).hexdigest(),
-            'corresponding_sources_qualified': False}
+            'corresponding_sources_verified': bool(window_sources), 'source_rebuild_qualified': False}
         if pillow_inputs:
             report['pillow_native_inputs_sha256'] = hashlib.sha256((bundle/'pillow-native-inputs.json').read_bytes()).hexdigest()
         if linux_wheel_lock:

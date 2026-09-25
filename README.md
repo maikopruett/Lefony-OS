@@ -38,8 +38,9 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 - **Shared desktop emulator:** the OS and SDK now use the same native window,
   complete Prime keyboard and live touchscreen. The shared wrapper targets
   macOS, Linux and Windows; no browser launch is used. See the
-  [desktop setup and build guide](docs/EMULATOR-DESKTOP.md). Existing downloadable
-  SDK bundles retain their previous interface until rebuilt.
+  [desktop setup and build guide](docs/EMULATOR-DESKTOP.md). The website’s macOS
+  and Linux SDK downloads include this window and keyboard by default; see the
+  [download release record](docs/DESKTOP-SDK-RELEASE-20260925.md).
 
 SDK 1.0 remains in development. Source changes, downloadable bundles and
 physical qualification have separate status; consult

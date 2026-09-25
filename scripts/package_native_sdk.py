@@ -39,7 +39,7 @@ def package(output, newlib=None):
                  'scripts/build_sdk_windows_libusb.py',
                  'scripts/build_sdk_windows_openssl.py','scripts/sdk-windows/openssl-mingw-avx512.patch',
                  'scripts/sdk-windows/openssl-portable-getenv.patch','scripts/native_desktop_openssl.py',
-                 'scripts/package_native_desktop.py','scripts/package_native_desktop_sources.py','scripts/build_emulator_window.py',
+                 'scripts/package_native_desktop.py','scripts/package_native_desktop_sources.py','scripts/build_emulator_window.py','scripts/emulator_window_sources.py',
                  'sdk/requirements-emulator.txt','docs/EMULATOR-DESKTOP.md','vm/test-emulator-window.py',
                  'docs/images/emulator-sdk.png',
                  'scripts/windows_python_sources.py','scripts/windows_python_sources.json',
