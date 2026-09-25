@@ -1404,6 +1404,7 @@ static uint64_t prime_usb_read(void *opaque, hwaddr offset, unsigned size)
 {
     PrimeUSBOTGState *s = opaque;
     switch (offset) {
+    case 0x100: return 0x01000040;                /* EHCI 1.0, CAPLENGTH=0x40 */
     case 0x120: return 1;                         /* DCIVERSION */
     case 0x124: return BIT(7) | 8;                /* DC + 8 endpoints */
     case USB_USBCMD: return s->usbcmd;

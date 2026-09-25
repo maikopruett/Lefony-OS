@@ -392,7 +392,7 @@ def development_capabilities(device: LibUSB) -> dict[str, int]:
     if len(data) != 16:
         raise USBError("invalid development USB capabilities length")
     magic, version, flags, capacity = struct.unpack("<4I", data)
-    if magic != 0x3156444c or version != 1 or not flags & 1:
+    if magic != 0x3156444c or version != 1 or not flags & 15:
         raise USBError("unsupported development USB handoff protocol")
     return {"version": version, "flags": flags, "capacity": capacity}
 
@@ -434,8 +434,10 @@ def install_native_capsule(device: LibUSB, path: Path, progress=None) -> dict[st
 def request_development_recovery(device: LibUSB, staged: dict[str, int]) -> None:
     if staged["state"] != 2 or staged["received"] != staged["length"]:
         raise USBError("development handoff requires a fully CRC-verified image")
+    if not development_capabilities(device)["flags"] & 4:
+        raise USBError("Update the bootloader before requesting one-shot recovery")
     checksum = staged["crc32"]
-    device.write(REQUEST_DEVELOPMENT_RECOVERY, value=checksum & 0xFFFF,
+    device.write(0x5C, value=checksum & 0xFFFF,
                  index=checksum >> 16, timeout_ms=10000)
 
 

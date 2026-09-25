@@ -73,40 +73,18 @@ class DetectionTests(unittest.TestCase):
         app._native_development_update.assert_called_once_with(device)
         app.prepare_operation.assert_not_called()
 
-    def test_development_update_requires_handoff_before_writer(self):
-        for mode in ("disconnected", "recovery-sdp", "recovery-fastboot"):
-            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                app = installer.LefonyOSPrimeInstaller.__new__(installer.LefonyOSPrimeInstaller)
-                app.validation_errors = mock.Mock(return_value=[])
-                stage_dir = root / "stage"
-                stage_dir.mkdir()
-                operation = installer.PreparedOperation("install", stage_dir,
-                    stage_dir / "install.uu", "test", uboot_entry=SimpleNamespace(size=389120))
-                app.prepare_operation = mock.Mock(return_value=operation)
-                app.log_path = root / "log"
-                app.detector = mock.Mock()
-                app.detector.probe.return_value = installer.DeviceStatus(mode, mode, "", None, 0)
-                app._execute_recovery_operation = mock.Mock(return_value=0)
-                device = mock.MagicMock()
-                device.__enter__.return_value = device
-                ready = {"state": 2, "received": installer.MIN_IMAGE_BYTES,
-                         "length": installer.MIN_IMAGE_BYTES, "crc32": 123}
-                with mock.patch.object(installer.usb_update, "LibUSB", return_value=device), \
-                     mock.patch.object(installer.usb_update, "development_capabilities", return_value={"flags": 1}), \
-                     mock.patch.object(installer.usb_update, "stage_capsule", return_value=ready), \
-                     mock.patch.object(installer.usb_update, "request_development_recovery") as handoff, \
-                     mock.patch.object(installer.time, "monotonic", side_effect=[0, 31]):
-                    if mode == "disconnected":
-                        with self.assertRaisesRegex(RuntimeError, "NAND untouched"):
-                            app._legacy_development_update()
-                        app._execute_recovery_operation.assert_not_called()
-                    else:
-                        self.assertEqual(app._legacy_development_update(), 0)
-                        app._execute_recovery_operation.assert_called_once_with("install", operation)
-                        self.assertEqual(app.active_bootstrap, mode == "recovery-sdp")
-                    handoff.assert_called_once_with(device, ready)
-                self.assertFalse(stage_dir.exists())
+    def test_old_development_handoff_is_rejected_without_recovery_or_writes(self):
+        app = installer.LefonyOSPrimeInstaller.__new__(installer.LefonyOSPrimeInstaller)
+        app.validation_errors = mock.Mock(return_value=[])
+        app.prepare_operation = mock.Mock(side_effect=AssertionError("recovery was prepared"))
+        app._native_development_update = mock.Mock()
+        device = mock.MagicMock()
+        with mock.patch.object(installer.usb_update, "LibUSB", return_value=device), \
+             mock.patch.object(installer.usb_update, "development_capabilities", return_value={"flags": 1}):
+            with self.assertRaisesRegex(RuntimeError, "NAND untouched"):
+                app._development_update()
+        app.prepare_operation.assert_not_called()
+        app._native_development_update.assert_not_called()
 
     def test_verified_write_with_missing_boot_is_warning_not_write_failure(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -13,6 +13,7 @@
 #include "registers.h"
 #include "services.h"
 #include "system.h"
+#include "display.h"
 #include "watchdog.h"
 
 #include <ion.h>
@@ -151,7 +152,7 @@ uint32_t sRecoveryReceived = 0;
 uint32_t sRecoveryCRC = 0;
 SetupPacket sPendingOut = {};
 bool sRebootAfterStatus = false;
-bool sRecoveryAfterStatus = false;
+uint8_t sUBootAfterStatus = 0; // 1 = one-shot reset, 2 = RAM-only bootstrap
 int sPendingAddress = -1; // -1 means none; USB address zero is valid
 uint32_t sAddressWaitPolls = 0;
 uint32_t sFastAddressCompletions = 0;
@@ -782,7 +783,25 @@ bool vendorRequest(const SetupPacket &setup) {
   sManagementSeen = true;
   if ((setup.requestType & 0x80) == 0) {
     switch (setup.request) {
+      case 0x5C: // one-shot U-Boot SDP, installed capability required
+      case 0x5D: // CRC-gated fixed-address RAM U-Boot bootstrap, no NAND writes
+        if (setup.requestType != 0x40 || setup.length ||
+            sRecoveryState != RecoveryState::Ready ||
+            setupValue32(setup) != sRecoveryCRC ||
+            !PrimeG2::Watchdog::canRequestUBootRecovery()) return false;
+        if (setup.request == 0x5C) {
+          if (PrimeG2::System::bootloaderRecoveryVersion() != 1) return false;
+          sUBootAfterStatus = 1;
+        } else {
+          if (!PrimeG2::System::validBootloaderRAMCapsule(sRecoveryImage, sRecoveryLength))
+            return false;
+          sUBootAfterStatus = 2;
+        }
+        statusIn();
+        return true;
       case 0x53:
+        if (PrimeG2::System::validBootloaderRAMCapsule(sRecoveryImage, sRecoveryLength))
+          return false; // RAM wrapper is never an installable OS.
         if (setup.requestType != 0x40 || setup.length ||
             sRecoveryState != RecoveryState::Ready ||
             setupValue32(setup) != sRecoveryCRC) return false;
@@ -850,7 +869,10 @@ bool vendorRequest(const SetupPacket &setup) {
         statusIn();
         return true;
       case 0x4B: // reboot only after a verified pending commit
-        if (setup.length != 0 || PrimeG2::NANDUpdate::status().state !=
+        if (setup.requestType != 0x40 || setup.length != 0 ||
+            PrimeG2::System::bootloaderRecoveryVersion() != 1 ||
+            !PrimeG2::Watchdog::canRequestUBootRecovery() ||
+            PrimeG2::NANDUpdate::status().state !=
               static_cast<uint32_t>(PrimeG2::NANDUpdate::State::PendingReboot))
           return false;
         sRebootAfterStatus = true;
@@ -869,19 +891,15 @@ bool vendorRequest(const SetupPacket &setup) {
         PrimeG2::NANDPhysical::probe();
         statusIn();
         return true;
-      case 0x4E: // explicit development handoff; no native NAND programming
-        if (setup.requestType != 0x40 || setup.length != 0 ||
-            sRecoveryState != RecoveryState::Ready ||
-            setupValue32(setup) != sRecoveryCRC) return false;
-        sRecoveryAfterStatus = true;
-        statusIn();
-        return true;
-      case 0x4C: // authenticated physical update handoff to ROM recovery
+      case 0x4C: // authenticated handoff to installed one-shot U-Boot SDP
 #if !PRIME_G2_EMULATOR
-        if (setup.length != 0 || PrimeG2::NANDUpdate::status().state !=
+        if (setup.requestType != 0x40 || setup.length != 0 ||
+            PrimeG2::System::bootloaderRecoveryVersion() != 1 ||
+            !PrimeG2::Watchdog::canRequestUBootRecovery() ||
+            PrimeG2::NANDUpdate::status().state !=
               static_cast<uint32_t>(PrimeG2::NANDUpdate::State::CapsuleReady))
           return false;
-        sRecoveryAfterStatus = true;
+        sUBootAfterStatus = 1;
         statusIn();
         return true;
 #else
@@ -955,8 +973,19 @@ bool vendorRequest(const SetupPacket &setup) {
       return true;
     }
     case 0x4E: { // development protocol capabilities, independent of signed A/B
-      if (setup.requestType != 0xC0) return false;
-      const uint32_t capabilities[] = {0x3156444c, 1, 3, RecoveryCapacity};
+      if (setup.requestType != 0xC0 || setup.index) return false;
+      if (setup.value == 3) {
+        const uint32_t bootloader[] = {0x3142554c, 1,
+          PrimeG2::System::bootloaderRecoveryVersion(),
+          reg32(PrimeG2::SNVS + 0x68),
+          reg32(PrimeG2::SNVS), reg32(PrimeG2::SNVS + 0x34),
+          reg32(PrimeG2::SNVS + 4), reg32(PrimeG2::SNVS + 0x4c)};
+        controlIn(bootloader, sizeof(bootloader), setup.length);
+        return true;
+      }
+      if (setup.value) return false;
+      const uint32_t capabilities[] = {0x3156444c, 1,
+        2u | 8u | (PrimeG2::System::bootloaderRecoveryVersion() == 1 ? 4u : 0u), RecoveryCapacity};
       controlIn(capabilities, sizeof(capabilities), setup.length);
       return true;
     }
@@ -1035,7 +1064,7 @@ void handleSetup() {
   sControlState = ControlState::Idle;
   sInstallAfterStatus = false;
   sBulkApplyAfterStatus = false;
-  sRecoveryAfterStatus = false;
+  sUBootAfterStatus = 0;
   sRebootAfterStatus = false;
   // A replacement SETUP aborts the previous request, including its address.
   sPendingAddress = -1;
@@ -1113,7 +1142,7 @@ void handleBusReset() {
   PrimeG2::AppChannel::finish();
   sInstallAfterStatus = false;
   sBulkApplyAfterStatus = false;
-  sRecoveryAfterStatus = false;
+  sUBootAfterStatus = 0;
   sRebootAfterStatus = false;
   sPendingAddress = -1;
   sEnumeration.resets++;
@@ -1157,7 +1186,7 @@ void handleComplete(uint32_t complete) {
       if (sControllerMemory.descriptors[1].token & 0xE8u) {
         sInstallAfterStatus = false;
         sPendingAddress = -1;
-        sRecoveryAfterStatus = false;
+        sUBootAfterStatus = 0;
         sRebootAfterStatus = false;
         if (sTraceCurrentRequest) sEnumeration.phase = 7;
         fail(9, ENDPTCOMPLETE);
@@ -1180,10 +1209,23 @@ void handleComplete(uint32_t complete) {
         sRebootAfterStatus = false;
         PrimeG2::Watchdog::rebootForUpdate();
       }
-      if (sRecoveryAfterStatus) {
-        sRecoveryAfterStatus = false;
-        PrimeG2::Watchdog::rebootToROMRecovery();
+      if (sUBootAfterStatus) {
+        uint8_t action = sUBootAfterStatus;
+        sUBootAfterStatus = 0;
+        if (action == 1) {
+          PrimeG2::Watchdog::rebootToUBootRecovery();
+          return; // Mailbox failure leaves the OS available.
+        }
+        if (!PrimeG2::Watchdog::requestUBootRecovery()) {
+          return; // Keep USB and the OS alive if the mailbox write fails.
+        }
+        PrimeG2::Display::shutdown();
+        PrimeG2::USBDiagnostics::shutdownForBootloader();
+        Ion::Timing::msleep(1000);
+        asm volatile("cpsid if" ::: "memory");
+        PrimeG2::System::launchBootloaderRAM(sRecoveryImage, sRecoveryLength);
       }
+
     }
   }
   if ((complete & 1u) && sControlState == ControlState::StatusOut) {
@@ -1244,7 +1286,7 @@ bool init() {
   sConfiguration = 0;
   sLastSetupWords[0] = sLastSetupWords[1] = 0;
   sRebootAfterStatus = false;
-  sRecoveryAfterStatus = false;
+  sUBootAfterStatus = 0;
   PrimeG2::NANDUpdate::init();
   if (!initClockAndPhy()) return false;
   Ion::Timing::usleep(1000);
@@ -1354,6 +1396,20 @@ void shutdown() {
   reg32(USBCMD) &= ~1u;
   sConfiguration = 0;
   sStatus &= ~(StatusConfigured | StatusController);
+}
+
+void shutdownForBootloader() {
+  shutdown();
+  /* Match the MXS PHY shutdown sequence in Linux drivers/usb/phy/phy-mxs-usb.c.
+   * A stopped ChipIdea controller alone leaves these analog wake controls
+   * active. Keep shared PLLs/supplies owned by the clock/power drivers intact. */
+  constexpr uint32_t WakeAndAutomaticPower = (1u << 26) | (1u << 25) |
+    (1u << 23) | (1u << 22) | (1u << 21) | (1u << 20) |
+    (1u << 19) | (1u << 18);
+  reg32(PrimeG2::USBPHY1 + 0x38) = WakeAndAutomaticPower;
+  reg32(PrimeG2::USBPHY1) = 0xFFFFFFFFu;
+  reg32(PrimeG2::USBPHY1 + 0x34) = 1u << 30;
+  PrimeG2::barrier();
 }
 
 }

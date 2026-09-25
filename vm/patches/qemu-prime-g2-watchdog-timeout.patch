@@ -1,0 +1,69 @@
+diff --git a/hw/watchdog/wdt_imx2.c b/hw/watchdog/wdt_imx2.c
+--- a/hw/watchdog/wdt_imx2.c
++++ b/hw/watchdog/wdt_imx2.c
+@@ -106,7 +106,7 @@
+ 
+ static void imx_wdt2_update_itimer(IMX2WdtState *s, bool start)
+ {
+-    bool running = (s->wcr & IMX2_WDT_WCR_WDE) && (s->wcr & IMX2_WDT_WCR_WT);
++    bool running = (s->wcr & IMX2_WDT_WCR_WDE);
+     bool enabled = s->wicr & IMX2_WDT_WICR_WIE;
+ 
+     ptimer_transaction_begin(s->itimer);
+@@ -138,7 +138,7 @@
+     if (start) {
+         ptimer_stop(s->timer);
+     }
+-    if ((s->wcr & IMX2_WDT_WCR_WDE) && (s->wcr & IMX2_WDT_WCR_WT)) {
++    if (s->wcr & IMX2_WDT_WCR_WDE) {
+         int count = (s->wcr & IMX2_WDT_WCR_WT) >> 8;
+ 
+         /* A value of 0 reflects one period (0.5s). */
+@@ -164,18 +164,18 @@
+     case IMX2_WDT_WCR:
+         if (s->wcr_locked) {
+             value &= ~IMX2_WDT_WCR_LOCK_MASK;
+-            value |= (s->wicr & IMX2_WDT_WCR_LOCK_MASK);
++            value |= (s->wcr & IMX2_WDT_WCR_LOCK_MASK);
+         }
+         s->wcr_locked = true;
+         if (s->wcr_wde_locked) {
+             value &= ~IMX2_WDT_WCR_WDE;
+-            value |= (s->wicr & ~IMX2_WDT_WCR_WDE);
++            value |= (s->wcr & IMX2_WDT_WCR_WDE);
+         } else if (value & IMX2_WDT_WCR_WDE) {
+             s->wcr_wde_locked = true;
+         }
+         if (s->wcr_wdt_locked) {
+             value &= ~IMX2_WDT_WCR_WDT;
+-            value |= (s->wicr & ~IMX2_WDT_WCR_WDT);
++            value |= (s->wcr & IMX2_WDT_WCR_WDT);
+         } else if (value & IMX2_WDT_WCR_WDT) {
+             s->wcr_wdt_locked = true;
+         }
+@@ -184,8 +184,8 @@
+         if (!(value & IMX2_WDT_WCR_SRS)) {
+             s->wrsr = IMX2_WDT_WRSR_SFTW;
+         }
+-        if (!(value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS)) ||
+-            (!(value & IMX2_WDT_WCR_WT) && (value & IMX2_WDT_WCR_WDE))) {
++        /* WDA controls the external output. WT=0 is a half-second timer. */
++        if (!(value & IMX2_WDT_WCR_SRS)) {
+             imx2_wdt_perform_reset(s);
+         }
+         s->wcr |= IMX2_WDT_WCR_SRS;
+diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+--- a/hw/misc/imx6_src.c
++++ b/hw/misc/imx6_src.c
+@@ -98,7 +98,11 @@
+     uint32_t gpr10 = s->regs[SRC_GPR10];
+     bool watchdog_reset = s->watchdog_reset_pending;
+     uint32_t reset_status = s->regs[SRC_SRSR];
++    /* Captured 6ULL ROM checks SRC_SRSR bit 4, not WDOG WRSR.
++     * Both immediate SRS and timeout through WDOG1 can select the override.
++     * WDOG3 alone records bit 7 and does not satisfy that check. */
+     bool rom_downloader = watchdog_reset &&
++        ((reset_status | s->watchdog_reset_cause) & BIT(4)) &&
+         (gpr10 & IMX6_SRC_GPR10_BMODE) &&
+         ((gpr9 & IMX6_SRC_GPR9_BOOT_CFG_MASK) == IMX6ULL_ROM_USB_CFG);
+ 

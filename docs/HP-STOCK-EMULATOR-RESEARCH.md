@@ -194,19 +194,12 @@ That model exposes the public NXP ROM identity `15a2:0080` and enough HID
 control descriptors for normal host enumeration. A cold reset clears the
 override, and an incorrect boot configuration remains in guest mode.
 
-The black-box test covers all three paths and reads the NAND model's overlay,
-program-failure, and BCH-write counters after each transition:
-
-```sh
-./scripts/build_prime_g2_rom_recovery_stub.sh
-python3 vm/test-prime-g2-rom-recovery.py
-```
-
-The compiled ARM RAM stub is 88 bytes. It masks interrupts, writes only the two
-SRC boot-mode registers and WDOG1, then waits for reset. Executed by the
-emulated Cortex-A7 with the private physical NAND fixture attached, it
-enumerates as `15a2:0080` with zero NAND erases or programs. This proves the
-RAM-resident bridge itself; it does not prove that HP's OS will launch it.
+The original RAM-stub experiment was retired after physical testing disproved
+its ROM-reset assumptions. The stub and builder have been removed. Corrected
+ROM reset-model tests remain in `vm/test-prime-g2-rom-recovery.py`; product
+recovery uses the [one-shot U-Boot protocol](UBOOT-ONESHOT-RECOVERY.md).
+The preceding description records the original model, not a supported physical
+native-to-ROM transition.
 
 The authentic current OS and maintenance image were also audited without
 emitting firmware bytes, signatures, or hashes:

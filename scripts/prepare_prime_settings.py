@@ -96,16 +96,23 @@ def prepare(source: Path, stamp: str | None = None):
     messages = {
         "LefonyBuildId": "Build ID",
         "LefonyUsbStatus": "USB status",
-        "LefonyEnterRecovery": "Enter Recovery",
-        "LefonyRecoveryWarning1": "Restart into USB recovery?",
-        "LefonyRecoveryWarning2": "The display may go blank.",
-        "LefonyRecoveryWarning3": "Use the Lefony OS installer",
-        "LefonyRecoveryWarning4": "to install or exit recovery.",
+        "LefonyEnterRecovery": "Enter recovery mode",
+        "LefonyRecoveryWarning1": "Restart into recovery mode?",
+        "LefonyRecoveryWarning2": "To return to Lefony OS,",
+        "LefonyRecoveryWarning3": "press RESET again or wait",
+        "LefonyRecoveryWarning4": "3 minutes.",
+        "LefonyRecoveryUpgrade1": "Update the bootloader first",
+        "LefonyRecoveryUpgrade2": "at lefony.com.",
+        "LefonyRecoveryFailed": "Recovery request failed",
+
     }
     text = translations.read_text()
     for key, value in messages.items():
-        if not re.search(rf"^{key}\s*=", text, re.M):
-            text = text.rstrip() + f"\n{key} = {json.dumps(value)}\n"
+        line = f"{key} = {json.dumps(value)}"
+        if re.search(rf"^{key}\s*=", text, re.M):
+            text = re.sub(rf"^{key}\s*=.*$", lambda _: line, text, flags=re.M)
+        else:
+            text = text.rstrip() + "\n" + line + "\n"
     translations.write_text("\n".join(line for line in text.splitlines() if line.strip()) + "\n")
     identity = source / "ion/src/prime_g2/lefony_build_identity.h"
     identity.write_text("#pragma once\n" +

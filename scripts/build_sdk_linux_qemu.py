@@ -22,7 +22,7 @@ from build_sdk_linux_cross import executable, require_elf
 from build_sdk_linux_toolchain import digest, run_step
 
 VERSION = '11.1.1'
-PATCHSET = 'r71'
+PATCHSET = 'r75'
 SOURCE_ROOT = 'qemu-prime-g2-source-v' + VERSION + '-' + PATCHSET
 HOST = 'x86_64-linux-gnu'
 

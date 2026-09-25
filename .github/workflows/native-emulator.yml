@@ -105,7 +105,7 @@ jobs:
           key="$RUNNER_TEMP/lefony-release-private.pem"
           trap 'rm -f "$key"' EXIT
           printf '%s\n' "$SIGNING_KEY" > "$key"
-          python scripts/package_lefony_release.py --version "$VERSION" --commit "$GITHUB_SHA" --private-key "$key" --recovery-dir build/browser-recovery
+          python scripts/package_lefony_release.py --version "$VERSION" --commit "$GITHUB_SHA" --private-key "$key" --recovery-dir build/browser-recovery --full-install
       - name: Publish complete development package
         env:
           GH_TOKEN: ${{ github.token }}

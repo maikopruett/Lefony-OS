@@ -14,7 +14,7 @@ def main():
         vm = recovery.RecoveryVM(Path(directory) / 'vm')
         try:
             recovery.arm_rom_usb_boot(vm.qtest)
-            vm.qtest.writew(recovery.WDOG1_WCR, 4)
+            recovery.trigger_timeout(vm.qtest)
             vm.wait_for_mode('rom-sdp')
             vm.usb.connect_and_enumerate()
             address = 0x80800000

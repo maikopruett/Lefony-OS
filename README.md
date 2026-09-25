@@ -127,6 +127,11 @@ Outputs are in `dist/`. The physical image is
 `build/lefony-prime-g2/` is disposable: builds recreate it. Make durable changes
 in the port, patches, or preparation scripts.
 
+Settings → About → **Enter recovery mode** restarts through the installed
+one-shot U-Boot. Press rear RESET again or wait three minutes to leave recovery;
+normal Lefony startup follows. Older installations receive the bootloader through
+the website's explicit recovery update. See [U-Boot recovery](docs/UBOOT-ONESHOT-RECOVERY.md).
+
 **Building does not install or flash anything.** For bootable recovery capsules
 and signed updates, see [the installer guide](docs/LEFONY-INSTALLER.md).
 
@@ -177,7 +182,7 @@ do not repartition an unprovisioned calculator.
 | Directory | Contents |
 | --- | --- |
 | `ports/lefony-prime-g2/` | Native Ion drivers, app overlays, theme, upstream patches and build definitions |
-| `native/prime_g2/` | Boot capsule, recovery stub, NAND layout and physical U-Boot integration |
+| `native/prime_g2/` | Boot capsule, one-shot U-Boot recovery and NAND layout |
 | `scripts/` | Firmware builds, preparation, installer, signing, history and diagnostics |
 | `vm/` | QEMU board models, emulator runners, boot media and integration tests |
 | `sdk/` | Experimental native C/C++ SDK, templates, examples and publisher tools |

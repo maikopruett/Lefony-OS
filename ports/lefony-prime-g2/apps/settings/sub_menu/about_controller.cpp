@@ -10,6 +10,7 @@
 #include "../../../ion/src/prime_g2/lefony_build_identity.h"
 #include "../../../ion/src/prime_g2/usb_diagnostics.h"
 #include "../../../ion/src/prime_g2/services.h"
+#include "../../../ion/src/prime_g2/system.h"
 
 #include <poincare/preferences.h>
 
@@ -47,6 +48,11 @@ bool AboutController::handleEvent(Ion::Events::Event event) {
   }
   if (childLabel == I18n::Message::LefonyEnterRecovery &&
       (event == Ion::Events::OK || event == Ion::Events::EXE || event == Ion::Events::Right)) {
+    if (PrimeG2::System::bootloaderRecoveryVersion() != 1) {
+      Container::activeApp()->displayWarning(I18n::Message::LefonyRecoveryUpgrade1,
+        I18n::Message::LefonyRecoveryUpgrade2);
+      return true;
+    }
     Container::activeApp()->displayModalViewController(&m_recoveryController,
       0.f, 0.f, Metric::ExamPopUpTopMargin, Metric::PopUpRightMargin,
       Metric::ExamPopUpBottomMargin, Metric::PopUpLeftMargin);

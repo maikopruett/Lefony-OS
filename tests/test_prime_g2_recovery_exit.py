@@ -20,7 +20,7 @@ def test_sdp_exit_uses_staged_clear_reset_uboot_without_nand_access():
     assert "nand" not in script.lower()
 
 
-def test_fastboot_exit_clears_and_verifies_override_before_reset():
+def test_fastboot_exit_restarts_without_nand_access():
     script = installer.make_exit_recovery_script("recovery-fastboot")
     recovery_reset = script.index("/proc/sysrq-trigger")
     clear_reset = script.index("SDP: boot")
@@ -42,7 +42,9 @@ def test_clear_reset_uboot_patches_only_manufacturing_environment(tmp_path=None)
         installer.build_clear_reset_uboot(source, destination)
         patched = destination.read_bytes()
         assert len(patched) == len(original)
+        assert installer.CLEAR_RESET_ENV == b"bootcmd_mfg=reset;"
         assert installer.CLEAR_RESET_ENV in patched
+        assert b"mw.l" not in patched
         start = original.index(installer.CLEAR_RESET_ENV_KEY)
         end = original.index(b"\0", start)
         assert patched[:start] == original[:start]

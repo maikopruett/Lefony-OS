@@ -1,0 +1,68 @@
+--- a/include/hw/misc/imx7_snvs.h
++++ b/include/hw/misc/imx7_snvs.h
+@@ -46,6 +46,9 @@
+     uint64_t tick_offset;
+     uint64_t hp_tick_offset;
+     uint64_t lpcr;
++    uint32_t lpgpr;
++    uint32_t hplr;
++    uint32_t lplr;
+     uint32_t hpcomr;
+     uint32_t hpcr;
+     uint32_t hpsr;
+--- a/hw/misc/imx7_snvs.c
++++ b/hw/misc/imx7_snvs.c
+@@ -115,7 +115,7 @@
+ 
+ static const VMStateDescription vmstate_imx7_snvs = {
+     .name = TYPE_IMX7_SNVS,
+-    .version_id = 6,
++    .version_id = 7,
+     .minimum_version_id = 1,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT64(tick_offset, IMX7SNVSState),
+@@ -127,6 +127,9 @@
+         VMSTATE_TIMER_PTR_V(hp_alarm_timer, IMX7SNVSState, 4),
+         VMSTATE_UINT64_V(hp_tick_offset, IMX7SNVSState, 5),
+         VMSTATE_TIMER_PTR_V(hp_periodic_timer, IMX7SNVSState, 6),
++        VMSTATE_UINT32_V(lpgpr, IMX7SNVSState, 7),
++        VMSTATE_UINT32_V(hplr, IMX7SNVSState, 7),
++        VMSTATE_UINT32_V(lplr, IMX7SNVSState, 7),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -151,6 +154,9 @@
+     uint64_t ret = 0;
+ 
+     switch (offset) {
++    case 0x00: ret = s->hplr; break;
++    case 0x34: ret = s->lplr; break;
++    case 0x68: ret = s->lpgpr; break;
+     case SNVS_HPCOMR:
+         ret = s->hpcomr;
+         break;
+@@ -192,6 +198,10 @@
+ {
+     IMX7SNVSState *s = IMX7_SNVS(dev);
+ 
++    /* LPGPR and its hard lock are in the battery-backed low-power domain.
++     * Retain them on system reset, like the RTC. A new machine starts at 0.
++     * Only the high-power soft lock is released by a system reset. */
++    s->hplr = 0;
+     s->lpcr = 0;
+     s->hpcomr = 0;
+     s->hpcr = 0;
+@@ -221,6 +231,13 @@
+     }
+ 
+     switch (offset) {
++    case 0x00: s->hplr |= v & BIT(5); break;
++    case 0x34: s->lplr |= v & BIT(5); break;
++    case 0x68:
++        if (!((s->hplr | s->lplr) & BIT(5))) {
++            s->lpgpr = v;
++        }
++        break;
+     case SNVS_HPCOMR:
+         s->hpcomr = v;
+         break;

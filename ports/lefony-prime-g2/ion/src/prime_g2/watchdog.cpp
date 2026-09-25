@@ -1,6 +1,7 @@
 #include "watchdog.h"
 
 #include "registers.h"
+#include "system.h"
 
 #include <ion/timing.h>
 
@@ -8,7 +9,6 @@ namespace {
 constexpr uintptr_t WCR = PrimeG2::WDOG1 + 0x00;
 constexpr uintptr_t WSR = PrimeG2::WDOG1 + 0x02;
 constexpr uintptr_t WRSR = PrimeG2::WDOG1 + 0x04;
-constexpr uintptr_t WMCR = PrimeG2::WDOG1 + 0x08;
 constexpr uintptr_t ReasonMagic = PrimeG2::SNVS + 0x68;
 constexpr uintptr_t ReasonValue = PrimeG2::SNVS + 0x6C;
 constexpr uint32_t Magic = 0x57444752; // WDGR
@@ -17,10 +17,6 @@ constexpr uint16_t Enable = 1u << 2;
 constexpr uint16_t SuspendInLowPower = 1u << 0;
 constexpr uint16_t AssertReset = (1u << 5) | (1u << 4);
 constexpr uint16_t TimeoutTwoSeconds = 3u << 8;
-constexpr uintptr_t SRCGPR9 = PrimeG2::SRC + 0x40;
-constexpr uintptr_t SRCGPR10 = PrimeG2::SRC + 0x44;
-constexpr uint32_t ROMUSBBoot = 0x20;
-constexpr uint32_t BootModeEnable = 1u << 28;
 
 bool sEnabled = false;
 uint32_t sFeeds = 0;
@@ -45,6 +41,15 @@ void recordResetReason(PrimeG2::Watchdog::ResetReason reason) {
   if (PrimeG2::reg32(ReasonMagic) == BootSuccessMagic) return;
   PrimeG2::reg32(ReasonValue) = static_cast<uint32_t>(reason);
   PrimeG2::reg32(ReasonMagic) = Magic;
+}
+
+[[noreturn]] void resetSystem() {
+  /* Ordinary NAND boot also consumes the one-shot U-Boot recovery token. */
+  PrimeG2::reg16(WCR) = 0;
+  PrimeG2::reg16(WCR) = 0;
+  PrimeG2::reg16(WCR) = 0;
+  PrimeG2::barrier();
+  while (true) asm volatile("wfi");
 }
 }
 
@@ -136,55 +141,51 @@ void prepareForHang(ResetReason reason) {
   barrier();
 }
 
+bool canRequestUBootRecovery() {
+  // SNVS LPGPR is the single documented retained word on i.MX6ULL.
+  // Never overwrite a pending signed A/B boot confirmation.
+  return reg32(ReasonMagic) != BootSuccessMagic &&
+    !(reg32(PrimeG2::SNVS) & (1u << 5)) &&
+    !(reg32(PrimeG2::SNVS + 0x34) & (1u << 5));
+}
+
+bool requestUBootRecovery() {
+  if (!canRequestUBootRecovery()) return false;
+  // Linux rtc-snvs.c initializes LPPGDR before clearing the power-glitch
+  // latch. A latched PGD event continuously zeroizes LPGPR despite unlocked
+  // GPR_SL/GPR_HL. Preserve every other status bit and all RTC state.
+  if (reg32(PrimeG2::SNVS + 0x4c) & 8u) {
+    reg32(PrimeG2::SNVS + 0x64) = 0x41736166;
+    barrier();
+    reg32(PrimeG2::SNVS + 0x4c) = 8u;
+    for (unsigned attempt = 0; attempt < 100; attempt++) {
+      if (!(reg32(PrimeG2::SNVS + 0x4c) & 8u)) break;
+      Ion::Timing::usleep(100);
+    }
+    if (reg32(PrimeG2::SNVS + 0x4c) & 8u) return false;
+  }
+  reg32(ReasonMagic) = 0x3153464c; // LFS1, consumed before U-Boot's sdp 0
+  barrier();
+  // SNVS LP writes cross the 32 kHz clock domain. DSB alone does not
+  // guarantee that the retained word is visible on the first read.
+  for (unsigned attempt = 0; attempt < 100; attempt++) {
+    if (reg32(ReasonMagic) == 0x3153464c) return true;
+    Ion::Timing::usleep(100);
+  }
+  return false;
+}
+
+bool rebootToUBootRecovery() {
+  if (System::bootloaderRecoveryVersion() != 1 || !requestUBootRecovery()) return false;
+  // Ordinary reset: ROM loads the installed NAND bootloader. No SRC override.
+  resetSystem();
+}
+
 [[noreturn]] void rebootForUpdate() {
   recordResetReason(ResetReason::Software);
   /* This is an explicit post-commit reset, not the physical observation
    * watchdog. The inactive slot and redundant metadata are already verified. */
-  /* WDA/SRS are active-low assertion controls. Clearing SRS requests the
-   * immediate software reset even when WDE was already write-once latched. */
-  reg16(WCR) = 0;
-  barrier();
-  while (true) {
-    asm volatile("wfi");
-  }
-}
-
-[[noreturn]] void rebootToROMRecovery() {
-  /* Reproduce the Linux command verified on 2026-09-01T00:46:46Z:
-   * devmem GPR9 32 0x20; devmem GPR10 32 0x10000000; sleep 1; sysrq b.
-   * This is a retained override, not a NAND modification. The installer
-   * clears it before requesting a normal boot. Do not touch SNVS here:
-   * Linux's command does not depend on our reset-reason bookkeeping. */
-  reg32(SRCGPR9) = ROMUSBBoot;
-  reg32(SRCGPR10) = BootModeEnable;
-  barrier();
-  // Flush posted writes with the same register reads as the Linux command.
-  uint32_t bootModeReadback = reg32(SRCGPR9);
-  uint32_t bootEnableReadback = reg32(SRCGPR10);
-  asm volatile("" :: "r"(bootModeReadback), "r"(bootEnableReadback) : "memory");
-  Ion::Timing::msleep(1000);
-  asm volatile("cpsid if" ::: "memory");
-  /* Internal-only Linux restart sequence: WDA stays high, so WDOG_B is not
-   * asserted alongside SRS. Avoid the inherited warm-DDR reset handshake.
-   * Keep WDOG1 clocked and do not enter WFI: WDZST may already be latched. */
-  reg32(PrimeG2::CCM + 0x74) |= 3u << 16; // CCGR3: WDOG1
-  reg32(PrimeG2::SRC) &= ~1u;             // SCR: WARM_RESET_ENABLE
-  reg16(WMCR) = 0; // imx2_wdt_probe: disable watchdog power-down counter
-  barrier();
-  constexpr uint16_t internalReset = Enable | (1u << 4); // WDA=1, SRS=0
-  reg16(WCR) = internalReset;
-  /* imx2_wdt_restart checks hardware WDE after the first write, then pings.
-   * Do not use feed(): restart must not depend on event-loop telemetry. */
-  if (reg16(WCR) & Enable) {
-    reg16(WSR) = 0x5555;
-    reg16(WSR) = 0xAAAA;
-  }
-  reg16(WCR) = internalReset;
-  reg16(WCR) = internalReset;
-  barrier();
-  while (true) {
-    asm volatile("nop");
-  }
+  resetSystem();
 }
 
 bool enabled() { return sEnabled; }

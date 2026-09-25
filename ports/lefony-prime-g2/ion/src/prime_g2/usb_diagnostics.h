@@ -36,6 +36,8 @@ DebugSnapshot debugSnapshot();
 bool configured();
 bool plugged();
 void shutdown();
+// Final ROM handoff: also disable PHY wake/automatic power and gate the PHY.
+void shutdownForBootloader();
 
 }
 }

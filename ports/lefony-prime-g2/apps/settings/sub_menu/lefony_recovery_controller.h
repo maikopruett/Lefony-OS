@@ -10,7 +10,10 @@ class LefonyRecoveryController : public ::PopUpController {
 public:
   LefonyRecoveryController() : ::PopUpController(4, Invocation(
     [](void *, void *) {
-      PrimeG2::Watchdog::rebootToROMRecovery();
+      if (!PrimeG2::Watchdog::rebootToUBootRecovery()) {
+        Container::activeApp()->dismissModalViewController();
+        Container::activeApp()->displayWarning(I18n::Message::LefonyRecoveryFailed);
+      }
       return true;
     }, nullptr)) {
     m_contentView.setMessage(0, I18n::Message::LefonyRecoveryWarning1);

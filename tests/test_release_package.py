@@ -14,7 +14,14 @@ from package_lefony_release import package
 
 
 @pytest.mark.parametrize('working_tree', [False, True])
-def test_package_allowlist_and_integrity(tmp_path, working_tree):
+@pytest.mark.parametrize('recovery_mode', ['none', 'slot', 'full'])
+def test_package_allowlist_and_integrity(tmp_path, working_tree, recovery_mode, monkeypatch):
+    if recovery_mode != 'none':
+        data = b'synthetic public recovery asset'
+        descriptor = {'path': 'artifacts/recovery.bin', 'bytes': len(data),
+                      'sha256': hashlib.sha256(data).hexdigest()}
+        monkeypatch.setattr('package_lefony_release.verified_assets',
+                            lambda _: ({'recoveryUboot': descriptor}, {'recoveryUboot': data}))
     (tmp_path / 'dist').mkdir()
     (tmp_path / 'ports/lefony-prime-g2').mkdir(parents=True)
     (tmp_path / 'LICENSES').mkdir()
@@ -32,9 +39,19 @@ def test_package_allowlist_and_integrity(tmp_path, working_tree):
     output = tmp_path / 'dist/release'
     manifest = package(tmp_path, output, '1.0.0+123', 'a' * 40,
                        ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem',
-                       working_tree=working_tree)
+                       working_tree=working_tree,
+                       recovery_directory=tmp_path if recovery_mode != 'none' else None,
+                       full_install=recovery_mode == 'full')
     assert manifest['status'] == 'package'
     assert manifest['qualification'] == 'build-tested'
+    if recovery_mode == 'none':
+        assert 'browserRecovery' not in manifest
+    else:
+        assert manifest['browserRecovery'] == {
+            'protocol': 2 if recovery_mode == 'full' else 1,
+            'target': 'boot-os-dtb' if recovery_mode == 'full' else 'single-slot-mtd1',
+            'development': True,
+        }
     if working_tree:
         assert manifest['sourceState'] == {
             'kind': 'working-tree', 'baseCommit': 'a' * 40,
@@ -57,3 +74,12 @@ def test_package_allowlist_and_integrity(tmp_path, working_tree):
     with pytest.raises(FileExistsError):
         package(tmp_path, output, '1.0.0+123', 'a' * 40,
                 ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem')
+
+
+def test_full_install_requires_recovery_before_creating_output(tmp_path):
+    output = tmp_path / 'release'
+    with pytest.raises(ValueError, match='complete recovery bundle'):
+        package(tmp_path, output, '1.0.0+123', 'a' * 40,
+                ROOT / 'tests/fixtures/prime_g2_emulator_update_private.pem',
+                full_install=True)
+    assert not output.exists()

@@ -105,6 +105,7 @@ class SettingsIdentityTests(unittest.TestCase):
         self.assertIn("displayModalViewController(&m_recoveryController", about)
         self.assertNotIn("rebootToROMRecovery()", about)
         self.assertIn("Invocation(", popup)
-        self.assertEqual(popup.count("rebootToROMRecovery()"), 1)
+        self.assertEqual(popup.count("rebootToUBootRecovery()"), 1)
+        self.assertIn("bootloaderRecoveryVersion() != 1", about)
         self.assertIn("LEFONY_OS_VERSION", about)
         self.assertIn("LEFONY_BUILD_ID", about)

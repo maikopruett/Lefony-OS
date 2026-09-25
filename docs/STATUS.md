@@ -6,6 +6,22 @@ of these build scripts.
 
 ## Firmware and applications
 
+The [one-shot U-Boot recovery implementation](UBOOT-ONESHOT-RECOVERY.md) replaces
+the unsuccessful native-to-ROM handoffs. Settings → About → Enter recovery mode
+confirms the restart and explains rear RESET or the three-minute timeout.
+The native firmware writes a one-use SNVS request; U-Boot consumes it before
+starting its own SDP endpoint (`cafe:5053`). The enumeration and transfer phases
+share one 180-second window, followed by normal Lefony startup.
+
+The failed ROM-entry stubs, SRC-override probes, ROM-reading endpoint, timeout
+reset experiment and inactive launcher recovery app have been removed. The
+ordinary watchdog reset, the successful SNVS initialization, RAM U-Boot migration,
+and legitimate hardware ROM recovery/emulator tests remain.
+[Earlier investigation notes](FULL-INSTALL-RECOVERY-20260924.md) are historical.
+The website now supports both ROM and U-Boot SDP and an explicit protocol-2
+bootloader/OS/DTB install. The release workflow uses the pinned one-shot bootloader
+for subsequent packages. See the recovery record for exact validation limits.
+
 Candidate `1.0.0+1790287024` adds a white app-install/update progress screen
 that dismisses automatically, plus long-press dragging on the Apps grid.
 Ordering is saved by stable app identity in the existing app filesystem and

@@ -1,6 +1,7 @@
 #include "system.h"
 
 #include <stdint.h>
+#include <string.h>
 
 extern "C" {
 extern char _text_start;
@@ -20,6 +21,7 @@ namespace {
 
 /* ARMv7 short-descriptor table. One section descriptor covers 1 MiB and the
  * 4096-entry table therefore describes the complete 32-bit address space. */
+uint32_t sBootloaderRecoveryVersion = 0;
 alignas(16384) uint32_t sTranslationTable[4096];
 alignas(1024) uint32_t sAppCodePages[256];
 alignas(1024) uint32_t sAppDataPages[256];
@@ -76,6 +78,13 @@ namespace PrimeG2 {
 namespace System {
 
 void initMemory() {
+  // U-Boot v1 capability, outside firmware/heap/staging and Linux boot params.
+  // Consume it now so a later boot through an older U-Boot cannot reuse it.
+  volatile uint32_t *cap = reinterpret_cast<volatile uint32_t *>(0x80001000u);
+  if (cap[0] == 0x4255464cu && cap[1] == ~0x4255464cu && cap[2] == 1)
+    sBootloaderRecoveryVersion = 1;
+  cap[0] = cap[1] = cap[2] = 0;
+
   for (uint32_t &entry : sTranslationTable) entry = 0;
 
   /* i.MX6UL peripheral and private-peripheral windows. Everything not listed
@@ -107,6 +116,46 @@ void initMemory() {
   sctlr |= (1u << 0) | (1u << 2) | (1u << 11) | (1u << 12);
   __asm volatile("mcr p15, 0, %0, c1, c0, 0\n"
                  "isb" :: "r"(sctlr) : "memory");
+}
+
+uint32_t bootloaderRecoveryVersion() { return sBootloaderRecoveryVersion; }
+
+bool validBootloaderRAMCapsule(const void *image, size_t length) {
+  // Development-only, CRC-verified staging; fixed destination and entry.
+  // The wrapper is not executable and must never be installed as an OS.
+  if (!image || length < 0x1100 || length > 0x100000) return false;
+  const uint32_t *h = reinterpret_cast<const uint32_t *>(image);
+  const uint32_t *entry = reinterpret_cast<const uint32_t *>(
+    static_cast<const uint8_t *>(image) + 0x1000);
+  return h[0] == 0x3155424c && h[1] == 1 && h[2] == 0x87800000 &&
+    h[3] == length - 0x1000 && h[9] == 0x016f2818 && h[11] == length &&
+    (entry[0] & 0xff000000u) == 0xea000000u;
+}
+
+[[noreturn]] void launchBootloaderRAM(const void *image, size_t length) {
+  // Caller owns shutdown of DMA/display/USB and has masked IRQ/FIQ. Bounds
+  // were validated before acknowledging the USB request; no arbitrary jump.
+  void *destination = reinterpret_cast<void *>(0x87800000u);
+  memcpy(destination, static_cast<const uint8_t *>(image) + 0x1000, length - 0x1000);
+  // Bounded clean of the board's 256 MiB identity-mapped DDR, including the
+  // copied U-Boot and all native dirty data, before U-Boot disables the MMU.
+  // No live DMA remains. Cache maintenance does not load untouched DDR.
+  cleanInvalidateDataCacheRange(reinterpret_cast<void *>(0x80000000u), 0x10000000u);
+  asm volatile(
+    "dsb sy\n"
+    "mrc p15, 0, r0, c1, c0, 0\n"
+    "bic r0, r0, #1\n"
+    "bic r0, r0, #4\n"
+    "bic r0, r0, #4096\n"
+    "mcr p15, 0, r0, c1, c0, 0\n"
+    "isb sy\n"
+    "mov r0, #0\n"
+    "mcr p15, 0, r0, c7, c5, 0\n"
+    "mcr p15, 0, r0, c7, c5, 6\n"
+    "mcr p15, 0, r0, c8, c7, 0\n"
+    "dsb sy\n isb sy\n"
+    "bx %0" :: "r"(destination) : "r0", "memory");
+  __builtin_unreachable();
 }
 
 void cleanDataCacheRange(const void *address, size_t length) {

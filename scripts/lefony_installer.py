@@ -56,7 +56,7 @@ UBOOT_NAND_SLOT = "/dev/mtd0"
 UBOOT_PRIMARY_OFFSET = 1024 * 1024
 UBOOT_SECONDARY_OFFSET = 2560 * 1024
 CLEAR_RESET_ENV_KEY = b"bootcmd_mfg="
-CLEAR_RESET_ENV = b"bootcmd_mfg=mw.l 20d8040 0 2; reset;"
+CLEAR_RESET_ENV = b"bootcmd_mfg=reset;"
 LINUX_PORT_PATTERNS = (
     "/dev/cu.usbmodem*",
     "/dev/tty.usbmodem*",
@@ -127,7 +127,7 @@ PROGRESS_MILESTONES: dict[str, tuple[tuple[str, str], ...]] = {
     "exit-recovery": (
         ("start cmd:fbk: acmd", "Returning recovery Linux to the ROM downloader"),
         ("start cmd:sdp: boot", "Loading the NAND-free clear/reset helper"),
-        ("start cmd:sdp: jump", "Clearing the ROM override and booting Lefony"),
+        ("start cmd:sdp: jump", "Restarting into Lefony"),
     ),
     "verify-uboot": (
         ("start cmd:sdp:", "Booting read-only recovery Linux"),
@@ -652,7 +652,7 @@ def build_clear_reset_uboot(source: Path, destination: Path) -> None:
 
 
 def make_exit_recovery_script(mode: str) -> str:
-    """Clear the persistent ROM override and reset without accessing NAND."""
+    """Reset from recovery without accessing NAND or SRC overrides."""
     if mode not in ("recovery-sdp", "recovery-fastboot"):
         raise ValueError(f"cannot exit unsupported device mode: {mode}")
     lines = ["uuu_version 1.2.135", ""]
@@ -1136,7 +1136,7 @@ class LefonyOSPrimeInstaller:
         self.status = DeviceStatus(
             mode,
             "ROM RECOVERY" if mode == "recovery-sdp" else "RECOVERY LINUX",
-            "Clearing retained ROM boot override",
+            "Restarting into Lefony",
             None,
             time.time(),
         )
@@ -1381,57 +1381,6 @@ class LefonyOSPrimeInstaller:
                 raise RuntimeError("install the native-updater build once through recovery; "
                                    "this OS only supports the older recovery handoff. NAND untouched.")
             return self._native_development_update(device)
-
-    def _legacy_development_update(self) -> int:
-        errors = self.validation_errors("dev-update")
-        if errors:
-            raise RuntimeError(errors[0])
-        with usb_update.LibUSB() as device:
-            capabilities = usb_update.development_capabilities(device)
-            if capabilities["flags"] & 2:
-                return self._native_development_update(device)
-        # Snapshot image, qualified U-Boot baseline and recovery assets BEFORE
-        # disrupting the running OS. This is the same isolated mtd1 writer.
-        operation = self.prepare_operation("install", "recovery-sdp")
-        self.log_path.write_text("Development USB update: preflight complete; NAND untouched\n")
-        try:
-            with usb_update.LibUSB() as device:
-                usb_update.development_capabilities(device)
-                last_percent = -1
-                def progress(received, total):
-                    nonlocal last_percent
-                    percent = received * 100 // total
-                    if percent != last_percent:
-                        last_percent = percent
-                        with self.log_path.open("a") as log:
-                            log.write(f"RAM upload {percent}%: {received}/{total} bytes\n")
-                staged = usb_update.stage_capsule(
-                    device, operation.stage / "lefony-os-native.zImage", progress)
-                # A USB disconnect can race the status ACK. Detection below,
-                # not the transfer return alone, decides whether to proceed.
-                try:
-                    usb_update.request_development_recovery(device, staged)
-                except usb_update.USBError as error:
-                    with self.log_path.open("a") as log:
-                        log.write(f"Handoff ACK uncertain: {error}\n")
-            with self.log_path.open("a") as log:
-                log.write("Waiting for ROM/recovery USB; NAND untouched\n")
-            deadline = time.monotonic() + 30
-            while True:
-                detected = self.detector.probe()
-                if detected.recovery:
-                    break
-                if time.monotonic() >= deadline:
-                    raise RuntimeError("native-to-recovery handoff was not detected; "
-                                       "NAND untouched. Enter ROM recovery and use Install.")
-                time.sleep(0.25)
-            self.active_bootstrap = detected.mode == "recovery-sdp"
-            operation.script.write_text(make_uuu_script(
-                "install", staged["length"], self.active_bootstrap,
-                operation.uboot_entry.size))
-            return self._execute_recovery_operation("install", operation)
-        finally:
-            shutil.rmtree(operation.stage, ignore_errors=True)
 
     def _native_development_update(self, device) -> int:
         self.log_path.write_text("Native development update; U-Boot untouched; no recovery Linux\n")

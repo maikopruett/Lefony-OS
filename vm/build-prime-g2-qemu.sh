@@ -7,7 +7,7 @@ QEMU_COMMIT=c3d48b7d1e89604920e5b81b91140c2ad39a1943
 # Bump this whenever an already-applied patch changes semantics. Keeping the
 # patch-set revision in both paths prevents an old modified source tree or
 # Meson object from silently surviving a corrected hardware model.
-PATCHSET_REV=r71
+PATCHSET_REV=r75
 SOURCE_DIR=${PRIME_G2_QEMU_SOURCE_DIR:-"$REPO_DIR/build/qemu-prime-g2-source-$QEMU_VERSION-$PATCHSET_REV"}
 # Include the checkout identity: different clones must never share a Meson
 # source link or objects, even when the upstream and patch revision match.
@@ -257,6 +257,18 @@ DDR_GATE_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-ddr-gate.patch"
 if ! git -C "$SOURCE_DIR" apply --recount --unidiff-zero --reverse --check "$DDR_GATE_PATCH" >/dev/null 2>&1; then
   git -C "$SOURCE_DIR" apply --recount --unidiff-zero --check "$DDR_GATE_PATCH"
   git -C "$SOURCE_DIR" apply --recount --unidiff-zero "$DDR_GATE_PATCH"
+fi
+
+WATCHDOG_TIMEOUT_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-watchdog-timeout.patch"
+if ! git -C "$SOURCE_DIR" apply --reverse --check "$WATCHDOG_TIMEOUT_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$WATCHDOG_TIMEOUT_PATCH"
+  git -C "$SOURCE_DIR" apply "$WATCHDOG_TIMEOUT_PATCH"
+fi
+
+SNVS_LPGPR_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-snvs-lpgpr.patch"
+if ! git -C "$SOURCE_DIR" apply --reverse --check "$SNVS_LPGPR_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$SNVS_LPGPR_PATCH"
+  git -C "$SOURCE_DIR" apply "$SNVS_LPGPR_PATCH"
 fi
 
 # QEMU rejects source/build paths containing spaces. Stable short paths also

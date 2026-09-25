@@ -1,0 +1,201 @@
+diff --git a/board/hp/mx6ull_prime/mx6ull_prime.c b/board/hp/mx6ull_prime/mx6ull_prime.c
+index 8cdb58b2a5..f7932deae6 100644
+--- a/board/hp/mx6ull_prime/mx6ull_prime.c
++++ b/board/hp/mx6ull_prime/mx6ull_prime.c
+@@ -16,6 +16,7 @@
+ #include <asm/mach-imx/mxc_i2c.h>
+ #include <asm/io.h>
+ #include <common.h>
++#include <command.h>
+ #include <fsl_esdhc.h>
+ #include <i2c.h>
+ #include <linux/sizes.h>
+@@ -466,8 +467,50 @@ static const struct boot_mode board_boot_modes[] = {
+ };
+ #endif
+ 
++/* Service an inherited watchdog during RAM recovery, but never arm it.
++ * Ordinary NAND boots preserve the board's existing watchdog policy. */
++void hw_watchdog_reset(void)
++{
++	if (readw(WDOG1_BASE_ADDR) & 4) {
++		writew(0x5555, WDOG1_BASE_ADDR + 2);
++		writew(0xaaaa, WDOG1_BASE_ADDR + 2);
++	}
++}
++
+ int board_late_init(void)
+ {
++	/* Lefony recovery protocol v1. SNVS_LPGPR is retained across reset.
++	 * Only this token is ours: preserve WDGR and pending-slot LFOK tokens.
++	 * Clear and read back BEFORE USB setup; RESET must boot NAND normally.
++	 * SRC GPRs are reserved for ROM and are deliberately not used here. */
++	volatile u32 *request = (u32 *)(SNVS_BASE_ADDR + 0x68);
++	volatile u32 *cap = (u32 *)0x80001000;
++	int recovery = readl(request) == 0x3153464c; /* LFS1 */
++	if (recovery) {
++		int retries = 100;
++		writel(0, request);
++		while (readl(request) != 0 && retries-- > 0)
++			udelay(100);
++		if (readl(request) != 0)
++			recovery = 0;
++	}
++	/* Publish support only when actually handing off to native firmware.
++	 * A RESET during RAM testing must not leave a stale capability cookie
++	 * for the older bootloader still installed in NAND. */
++	writel(0, cap);
++	writel(0, cap + 1);
++	writel(0, cap + 2);
++	flush_dcache_range(0x80001000, 0x80001040);
++	if (recovery) {
++		puts("Lefony: consumed one-shot SDP request\n");
++		run_command("sdp 0", 0);
++		puts("Lefony: SDP ended; continuing normal NAND boot\n");
++	}
++	writel(0x4255464c, cap); /* LFUB */
++	writel(~0x4255464cU, cap + 1);
++	writel(1, cap + 2);
++	flush_dcache_range(0x80001000, 0x80001040);
++
+ #ifdef CONFIG_CMD_BMODE
+ 	add_board_boot_modes(board_boot_modes);
+ #endif
+@@ -512,7 +555,7 @@ iomux_v3_cfg_t const usb_otg2_pads[] = {
+ 
+ int board_usb_phy_mode(int port)
+ {
+-	return usb_phy_mode(port);
++	return USB_INIT_DEVICE; /* Prime is a USB peripheral; never source VBUS. */
+ }
+ 
+ int board_ehci_hcd_init(int port)
+@@ -522,17 +565,6 @@ int board_ehci_hcd_init(int port)
+ 	if (port > 1)
+ 		return -EINVAL;
+ 
+-	switch (port) {
+-	case 0:
+-		SETUP_IOMUX_PADS(usb_otg1_pads);
+-		break;
+-	case 1:
+-		SETUP_IOMUX_PADS(usb_otg2_pads);
+-		break;
+-	default:
+-		printf("MXC USB port %d not yet supported\n", port);
+-		return 1;
+-	}
+ 
+ 	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
+ 				 port * 4);
+diff --git a/cmd/usb_gadget_sdp.c b/cmd/usb_gadget_sdp.c
+index 97d00ec545..7b66834640 100644
+--- a/cmd/usb_gadget_sdp.c
++++ b/cmd/usb_gadget_sdp.c
+@@ -21,10 +21,16 @@ static int do_sdp(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ 
+ 	char *usb_controller = argv[1];
+ 	int controller_index = simple_strtoul(usb_controller, NULL, 0);
+-	board_usb_init(controller_index, USB_INIT_DEVICE);
++	ret = board_usb_init(controller_index, USB_INIT_DEVICE);
++	if (ret)
++		return CMD_RET_FAILURE;
+ 
+ 	g_dnl_clear_detach();
+-	g_dnl_register("usb_dnl_sdp");
++	ret = g_dnl_register("usb_dnl_sdp");
++	if (ret) {
++		board_usb_cleanup(controller_index, USB_INIT_DEVICE);
++		return CMD_RET_FAILURE;
++	}
+ 
+ 	ret = sdp_init(controller_index);
+ 	if (ret) {
+diff --git a/configs/mx6ull_prime_defconfig b/configs/mx6ull_prime_defconfig
+index 1f4f0b3bd3..75b6d8ebe7 100644
+--- a/configs/mx6ull_prime_defconfig
++++ b/configs/mx6ull_prime_defconfig
+@@ -28,10 +28,23 @@ CONFIG_DM_GPIO=y
+ CONFIG_DM_I2C=y
+ CONFIG_PINCTRL=y
+ CONFIG_PINCTRL_IMX6=y
+-CONFIG_USB=n
++CONFIG_USB=y
+ CONFIG_DM_USB=n
+ CONFIG_USB_HOST_ETHER=n
+ CONFIG_USB_ETHER_ASIX=n
+ CONFIG_USB_STORAGE=n
+ CONFIG_DM_ETH=n
+ CONFIG_NAND_BOOT=y
++
++CONFIG_LOCALVERSION="-lefony-sdp1"
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_MX6=y
++CONFIG_USB_GADGET=y
++CONFIG_CI_UDC=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_USB_GADGET_MANUFACTURER="Lefony"
++CONFIG_USB_GADGET_VENDOR_NUM=0xcafe
++CONFIG_USB_GADGET_PRODUCT_NUM=0x5053
++CONFIG_CMD_USB_SDP=y
++CONFIG_CMD_SOURCE=y
++CONFIG_HW_WATCHDOG=y
+diff --git a/drivers/usb/gadget/f_sdp.c b/drivers/usb/gadget/f_sdp.c
+index d87877e2a8..ca6fc1141c 100644
+--- a/drivers/usb/gadget/f_sdp.c
++++ b/drivers/usb/gadget/f_sdp.c
+@@ -640,10 +640,15 @@ static int sdp_bind_config(struct usb_configuration *c)
+ 	return status;
+ }
+ 
++static ulong lefony_sdp_start;
++
+ int sdp_init(int controller_index)
+ {
++	lefony_sdp_start = get_timer(0);
+ 	printf("SDP: initialize...\n");
+ 	while (!sdp_func->configuration_done) {
++		if (get_timer(lefony_sdp_start) >= 180000)
++			return -ETIMEDOUT;
+ 		if (ctrlc()) {
+ 			puts("\rCTRL+C - Operation aborted.\n");
+ 			return 1;
+@@ -830,8 +835,8 @@ static void sdp_handle_in_ep(void)
+ 
+ void sdp_handle(int controller_index)
+ {
+-	printf("SDP: handle requests...\n");
+-	while (1) {
++	printf("SDP: handle requests (180 second recovery window)...\n");
++	while (get_timer(lefony_sdp_start) < 180000) {
+ 		if (ctrlc()) {
+ 			puts("\rCTRL+C - Operation aborted.\n");
+ 			return;
+diff --git a/drivers/usb/host/ehci-mx6.c b/drivers/usb/host/ehci-mx6.c
+index f03dc9df8e..57e7777332 100644
+--- a/drivers/usb/host/ehci-mx6.c
++++ b/drivers/usb/host/ehci-mx6.c
+@@ -457,7 +457,9 @@ int ehci_mx6_common_init(struct usb_ehci *ehci, int index)
+ 
+ #if defined(CONFIG_MX6) || defined(CONFIG_MX7ULP) || defined(CONFIG_IMX8)
+ 	usb_internal_phy_clock_gate(index, 1);
+-	usb_phy_enable(index, ehci);
++	ret = usb_phy_enable(index, ehci);
++	if (ret)
++		return ret;
+ #endif
+ 
+ 	return 0;
+diff --git a/include/configs/mx6ull_prime.h b/include/configs/mx6ull_prime.h
+index 81a0b27401..555c3f6386 100644
+--- a/include/configs/mx6ull_prime.h
++++ b/include/configs/mx6ull_prime.h
+@@ -231,7 +231,7 @@
+ #endif
+ 
+ /* USB Configs */
+-#ifdef CONFIG_CMD_USB
++#ifdef CONFIG_USB_EHCI_MX6
+ #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
+ #endif
+ 

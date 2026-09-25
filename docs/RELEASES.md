@@ -42,12 +42,12 @@ do not become GitHub's stable `/releases/latest` target.
 These remain **development packages** with explicit browser recovery opt-in.
 Automated compilation and host tests do not establish hardware acceptance or
 change the release to `physical-verified`. The website checks the new signed
-firmware and all recovery assets before offering installation. The installed
-bootloader must match the included baseline; this does not provision or
-repartition an arbitrary stock calculator.
+firmware and all recovery assets before offering installation. Protocol 1 requires the installed bootloader to match its baseline. Protocol 2
+explicitly installs and verifies the pinned bootloader, OS and device tree in
+the fixed single-slot layout; it does not create an A/B layout.
 
 `ports/lefony-prime-g2/browser-recovery.json` pins the eight public environment,
-baseline and attribution files from `recovery-build-34377898071-1` by exact size
+baseline and attribution files from the one-shot recovery release named in that pin by exact size
 and SHA-256. The workflow downloads only those names into ignored `build/`, then
 checks every file and the recovery RAM layout before packaging. Firmware and
 the signing key are never copied from the older release. The package uses the
@@ -56,14 +56,14 @@ new build's capsule, version and existing release identity.
 Missing or changed pinned files fail the publish job before a draft is created;
 the workflow must not fall back to publishing a firmware-only package. The
 package manifest and release body both carry
-`browserRecovery: {"protocol": 1, "target": "single-slot-mtd1", "development": true}`.
+`browserRecovery: {"protocol": 2, "target": "boot-os-dtb", "development": true}`.
 Recovery files remain separate release assets, outside the firmware ZIP. No
 calculator backups, local captures or private signing keys are distributed.
 Changing the recovery pin requires an explicit review of the replacement
 components and their upstream references/notices.
 
 The local packager still supports firmware-only output when `--recovery-dir`
-is omitted. CI always supplies it. To fetch and verify the public environment
+is omitted. CI always supplies it together with `--full-install`. To fetch and verify the public environment
 without building, signing, publishing or accessing a calculator:
 
 ```sh

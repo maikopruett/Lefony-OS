@@ -353,7 +353,7 @@ def test_recovery_exit_boots_nand(directory: Path) -> None:
         wait_runtime(1)
         for count in (2, 3):
             recovery.arm_rom_usb_boot(qtest)
-            qtest.writew(recovery.WDOG1_WCR, 4)
+            recovery.trigger_timeout(qtest)
             deadline = time.monotonic() + 5
             while "mode=rom-sdp" not in usb.command("STATUS"):
                 if time.monotonic() >= deadline:

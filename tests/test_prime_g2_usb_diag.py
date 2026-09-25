@@ -147,11 +147,11 @@ class PrimeG2UsbDiagnosticsTests(unittest.TestCase):
 
     def test_development_handoff_contract(self):
         device = Mock()
-        device.read.return_value = struct.pack("<4I", 0x3156444c, 1, 1, 8 << 20)
+        device.read.return_value = struct.pack("<4I", 0x3156444c, 1, 4, 8 << 20)
         self.assertEqual(diag.development_capabilities(device)["version"], 1)
         diag.request_development_recovery(device,
             {"state": 2, "received": 4096, "length": 4096, "crc32": 0x1234abcd})
-        device.write.assert_called_once_with(0x4E, value=0xabcd, index=0x1234, timeout_ms=10000)
+        device.write.assert_called_once_with(0x5C, value=0xabcd, index=0x1234, timeout_ms=10000)
         device.write.reset_mock()
         with self.assertRaises(diag.USBError):
             diag.request_development_recovery(device,
@@ -163,13 +163,13 @@ class PrimeG2UsbDiagnosticsTests(unittest.TestCase):
 
     def test_development_handoff_is_crc_and_status_ack_gated(self):
         source = (REPO / "ports/lefony-prime-g2/ion/src/prime_g2/usb_diagnostics.cpp").read_text()
-        request = source.split("case 0x4E: // explicit development", 1)[1].split("case 0x4C:", 1)[0]
+        request = source.split("case 0x5C:", 1)[1].split("case 0x53:", 1)[0]
         self.assertIn("sRecoveryState != RecoveryState::Ready", request)
         self.assertIn("setupValue32(setup) != sRecoveryCRC", request)
         self.assertNotIn("rebootToROMRecovery()", request)
         for function in ("handleSetup", "handleBusReset"):
             body = source.split(f"void {function}() {{", 1)[1].split("\n}", 1)[0]
-            self.assertIn("sRecoveryAfterStatus = false", body)
+            self.assertIn("sUBootAfterStatus = 0", body)
 
     def test_ram_upload_progress_and_failure_cleanup(self):
         payload = bytearray(1100)

@@ -48,15 +48,6 @@ def test_qemu_models_persistent_boot_override_and_rom_sdp_usb():
     assert "$QEMU_VERSION-$PATCHSET_REV" in builder
 
 
-def test_ram_stub_is_bounded_and_has_no_nand_access():
-    stub = (ROOT / "native/prime_g2/rom_recovery_stub.S").read_text()
-    linker = (ROOT / "native/prime_g2/rom_recovery_stub.ld").read_text()
-    assert "SRC_GPR9" in stub and "SRC_GPR10" in stub
-    assert "WDOG1_WCR" in stub and "strh" in stub
-    assert "nand" not in stub.lower().replace("never initializes, erases, or programs nand", "")
-    assert "SIZEOF(.text) <= 4096" in linker
-
-
 def test_built_qemu_enters_rom_sdp_without_nand_writes():
     qemu = ROOT / "build/qemu-prime-g2/qemu-system-arm"
     if not qemu.exists():

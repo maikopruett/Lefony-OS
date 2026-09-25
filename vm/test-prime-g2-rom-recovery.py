@@ -180,6 +180,31 @@ def arm_rom_usb_boot(qtest: QTest, boot_cfg: int = ROM_USB_BOOT_CFG) -> None:
     qtest.writel(SRC_GPR10, SRC_GPR10_BMODE)
 
 
+def trigger_timeout(qtest: QTest, watchdog: int = WDOG1_WCR) -> None:
+    # NXP RM 59.7.1: 0.5 second timeout, inactive SRS/WDA, then WDE.
+    qtest.writew(watchdog, 0x0030)
+    qtest.writew(watchdog, 0x0034)
+    qtest.writew(watchdog + 2, 0x5555)
+    qtest.writew(watchdog + 2, 0xaaaa)
+
+
+def test_software_reset_enters_rom(directory: Path) -> None:
+    # Captured 6ULL ROM uses SRC_SRSR[4], without checking WDOG WRSR.
+    vm = RecoveryVM(directory)
+    try:
+        arm_rom_usb_boot(vm.qtest)
+        vm.qtest.writew(WDOG1_WCR, 0x0020)  # SRS only; WDA remains inactive
+        deadline = time.monotonic() + 2
+        while not vm.qtest.readl(SRC_SRSR) & 0x10:
+            assert time.monotonic() < deadline, 'software reset never occurred'
+            time.sleep(0.01)
+        vm.wait_for_mode('rom-sdp')
+        assert vm.qtest.readl(SRC_GPR9) == ROM_USB_BOOT_CFG
+        assert_nand_untouched(vm.qtest)
+    finally:
+        vm.close()
+
+
 def find_stock_nand() -> Path | None:
     manifest_path = STOCK_FIXTURE / "nand-fixture.json"
     if not manifest_path.is_file():
@@ -205,8 +230,7 @@ def test_watchdog_transition(directory: Path) -> None:
     vm = RecoveryVM(directory)
     try:
         arm_rom_usb_boot(vm.qtest)
-        # Clearing SRS requests the same warm reset used by U-Boot's reset_cpu.
-        vm.qtest.writew(WDOG1_WCR, 0x0004)
+        trigger_timeout(vm.qtest)
         status = vm.wait_for_mode("rom-sdp")
         if "vid=15a2 pid=0080" not in status:
             raise AssertionError(f"wrong ROM USB identity: {status}")
@@ -242,8 +266,12 @@ def test_ram_stub_transition(directory: Path) -> None:
 def test_wrong_boot_cfg(directory: Path) -> None:
     vm = RecoveryVM(directory)
     try:
-        arm_rom_usb_boot(vm.qtest, boot_cfg=0x21)
-        vm.qtest.writew(WDOG1_WCR, 0x0004)
+        arm_rom_usb_boot(vm.qtest, boot_cfg=0x893)
+        trigger_timeout(vm.qtest)
+        deadline = time.monotonic() + 2
+        while not vm.qtest.readl(SRC_SRSR) & 0x10:
+            assert time.monotonic() < deadline
+            time.sleep(0.01)
         vm.wait_for_mode("guest")
         assert_nand_untouched(vm.qtest)
     finally:
@@ -276,8 +304,13 @@ def test_reset_status_and_recovery_exit(directory: Path) -> None:
         assert vm.qtest.readl(SRC_SRSR) == 1, "zero write cleared POR"
         for watchdog, cause in ((WDOG1_WCR, 0x10), (0x021E4000, 0x80)):
             arm_rom_usb_boot(vm.qtest)
-            vm.qtest.writew(watchdog, 0x0004)
-            vm.wait_for_mode("rom-sdp")
+            trigger_timeout(vm.qtest, watchdog)
+            expected = "rom-sdp" if cause == 0x10 else "guest"
+            vm.wait_for_mode(expected)
+            deadline = time.monotonic() + 2
+            while not vm.qtest.readl(SRC_SRSR) & cause:
+                assert time.monotonic() < deadline
+                time.sleep(0.01)
             assert vm.qtest.readl(SRC_SRSR) == (1 | cause)
             vm.qtest.writel(SRC_SRSR, 1)
             assert vm.qtest.readl(SRC_SRSR) == cause
@@ -289,8 +322,12 @@ def test_reset_status_and_recovery_exit(directory: Path) -> None:
             # The installer clears both retained words before reset.
             vm.qtest.writel(SRC_GPR9, 0)
             vm.qtest.writel(SRC_GPR10, 0)
-            vm.qtest.writew(watchdog, 0x0004)
+            trigger_timeout(vm.qtest, watchdog)
             vm.wait_for_mode("guest")
+            deadline = time.monotonic() + 2
+            while not vm.qtest.readl(SRC_SRSR) & cause:
+                assert time.monotonic() < deadline
+                time.sleep(0.01)
             assert vm.qtest.readl(SRC_SRSR) == cause
             assert vm.qtest.readl(SRC_GPR9) == 0
             assert vm.qtest.readl(SRC_GPR10) == 0
@@ -319,7 +356,7 @@ def test_physical_src_profile(directory: Path) -> None:
                 vm.qtest.writel(address, write)
                 assert vm.qtest.readl(address) == expected, f"{name} is software-writable"
         arm_rom_usb_boot(vm.qtest)
-        vm.qtest.writew(WDOG1_WCR, 4)
+        trigger_timeout(vm.qtest)
         vm.wait_for_mode("rom-sdp")
         vm.usb.connect_and_enumerate()
         for name in ("SRC_SBMR1", "SRC_SBMR2"):
@@ -386,7 +423,7 @@ def test_sdp_download_and_execute(directory: Path) -> None:
     vm = RecoveryVM(directory)
     try:
         arm_rom_usb_boot(vm.qtest)
-        vm.qtest.writew(WDOG1_WCR, 4)
+        trigger_timeout(vm.qtest)
         vm.wait_for_mode("rom-sdp")
         device, _ = vm.usb.connect_and_enumerate()
         config = vm.usb.control_in(0x80, 6, 0x200, length=255)
@@ -486,6 +523,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="lefony-rom-recovery-") as tmp:
         root = Path(tmp)
         test_watchdog_transition(root / "warm")
+        test_software_reset_enters_rom(root / "software-reset")
         stub_tested = ROM_STUB.is_file()
         if stub_tested:
             test_ram_stub_transition(root / "ram-stub")

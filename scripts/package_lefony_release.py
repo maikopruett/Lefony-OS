@@ -35,11 +35,13 @@ def describe(path):
 
 
 def package(root, output, version, commit, private_key, recovery_directory=None,
-            working_tree=False):
+            working_tree=False, full_install=False):
     parts = parse_version(version)
     if not re.fullmatch(r'[a-f0-9]{40}', commit):
         raise ValueError('Release needs a full source commit')
     recovery = verified_assets(recovery_directory) if recovery_directory is not None else None
+    if full_install and recovery is None:
+        raise ValueError('Full installation requires the pinned complete recovery bundle')
     if recovery and set(Path(a['path']).name for a in recovery[0].values()) & set(FILES.values()):
         raise ValueError('Recovery artifact collides with firmware package')
     output.mkdir(parents=True, exist_ok=False)
@@ -77,6 +79,12 @@ def package(root, output, version, commit, private_key, recovery_directory=None,
             'Recovery components and their upstream references/notices are separate downloads in this release.',
         ]
         manifest['message'] = 'Development browser recovery installation is available for testing.'
+        if full_install:
+            manifest['browserRecovery'] = {'protocol': 2, 'target': 'boot-os-dtb', 'development': True}
+            notes[3:5] = [
+                'Explicit full recovery installation writes and verifies the bootloader, OS and device tree, including on blank NAND.',
+                'This development path uses fixed MTD0/MTD1/MTD2 targets; no A/B repartitioning is performed. Physical power-loss qualification remains open.',
+            ]
     if working_tree:
         notes[0] = 'Working-tree development build for HP Prime G2.'
         notes.append('The commit identifies the base revision. The corresponding-source archive contains the exact public working tree and prepared firmware sources used for this build.')
@@ -112,6 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, default=ROOT / 'dist/release')
     parser.add_argument('--recovery-dir', type=Path, help='Directory containing the exact pinned public recovery files')
     parser.add_argument('--working-tree', action='store_true', help='Identify --commit as the base of the exact working-tree source archive, not a clean source revision')
+    parser.add_argument('--full-install', action='store_true', help='Explicitly enable development browser protocol 2 bootloader/OS/device-tree provisioning; requires --recovery-dir')
     args = parser.parse_args()
     package(ROOT, args.output, args.version, args.commit, args.private_key, args.recovery_dir,
-            args.working_tree)
+            args.working_tree, args.full_install)

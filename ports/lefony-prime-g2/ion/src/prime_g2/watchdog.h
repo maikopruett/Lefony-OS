@@ -21,7 +21,10 @@ void noteStorageProgress();
 void prepareForSuspend();
 void prepareForHang(ResetReason reason);
 [[noreturn]] void rebootForUpdate();
-[[noreturn]] void rebootToROMRecovery();
+bool canRequestUBootRecovery();
+bool requestUBootRecovery();
+// Returns false without resetting if support/mailbox is unavailable.
+bool rebootToUBootRecovery();
 bool enabled();
 uint32_t feedCount();
 uint32_t unhealthyCount();
