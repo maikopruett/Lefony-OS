@@ -5,6 +5,13 @@ Prime keyboard. QEMU runs the ARM firmware; the window embeds the shared
 HTML/canvas renderer using Qt WebEngine. No browser tab is opened, no browser
 installation is required, and there is no browser mode or browser fallback.
 
+The window content is only the HP Prime device artwork, live display and keys.
+Native application menus provide **File → Stop Emulator**, **View → Layout**,
+**View → Scale** (including **Fit to Screen**), and **Help → Keyboard Shortcuts
+and Saving / Connection Status**. macOS uses its system menu bar; Linux and
+Windows use the desktop’s native application menu placement. The complete
+device scales to fit both dimensions without clipping the keypad.
+
 ## Source installations
 
 Install `requirements-dev.txt` in the repository virtual environment. Standalone
@@ -35,7 +42,7 @@ frames and declared skin assets. The embedded view blocks outside requests,
 new windows, downloads and navigation away from its session. It uses an
 in-memory profile. No public listener or user browsing profile is used.
 
-Closing the window, clicking **Stop emulator**, or pressing Ctrl-C releases
+Closing the window, choosing **File → Stop Emulator**, or pressing Ctrl-C releases
 held keys/touch. The SDK then leaves the app through Home and drains workspace
 saves before stopping QEMU. A window startup failure is reported as an error;
 it never falls back to opening a browser.

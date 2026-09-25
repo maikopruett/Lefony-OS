@@ -113,12 +113,13 @@ lefony-sdk source
 ```
 
 `run` opens the shared desktop emulator with the bundled HP Prime Medium skin,
-a 320 × 240 display and all 51 keys, including On/Off. The Layout and Scale
-selectors change the complete calculator together; the panel fits narrower
-windows. See [emulator skins](../docs/EMULATOR-SKINS.md) for the asset notice.
+a 320 × 240 display and all 51 keys, including On/Off. The window shows only the calculator. Native **View → Layout** and
+**View → Scale** menus change the complete device together; it fits both the
+width and height of smaller windows. **Help** contains shortcuts and connection
+status. On macOS these menus are in the system menu bar. See [emulator skins](../docs/EMULATOR-SKINS.md) for the asset notice.
 Click the screen for touch input, click the keypad, or
 use your computer's arrows, digits, Enter and Backspace. Shift and Alpha use
-the calculator's normal behavior. The panel's **Stop emulator** button or Ctrl-C
+the calculator's normal behavior. **File → Stop Emulator** or Ctrl-C
 closes the app and drains workspace saves. Closing the desktop window performs
 the same cleanup. No browser is opened. Source SDK users must install
 `sdk/requirements-emulator.txt`; see [desktop setup](../docs/EMULATOR-DESKTOP.md).
@@ -130,7 +131,7 @@ The installer rejects ARM64 Linux until a current bundle is available; it no
 longer falls back to an older browser-based source snapshot. `debug` retains
 its diagnostic native window.
 
-<p align="center"><img src="../docs/images/emulator-sdk.png" alt="Counter SDK app running in the shared desktop emulator" width="400"></p>
+<p align="center"><img src="../docs/images/emulator-device-sdk.png" alt="Counter SDK app running in the shared desktop emulator" width="400"></p>
 
 `test`
 runs bounded JSON keypad/Goodix replays below `tests/` (including nested folders), stores frames under

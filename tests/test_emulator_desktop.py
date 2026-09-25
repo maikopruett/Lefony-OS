@@ -126,3 +126,33 @@ def test_boot_ui_wait_fails_boundedly(monkeypatch, clock):
     channel = SimpleNamespace(command=lambda command: 'VALUE 0' if clock == 'stalled' else 'ERR unsupported')
     with pytest.raises((TimeoutError, RuntimeError)):
         desktop.wait_for_boot_ui(channel)
+
+
+@pytest.mark.parametrize('width,height,scale,available,expected', [
+    (381, 797, 1, (1440, 900), (381, 797)),
+    (381, 797, 2, (1440, 900), (430, 900)),
+    (662, 420, 1, (500, 700), (500, 317)),
+    (381, 797, None, (1440, 900), (430, 900)),
+])
+def test_device_size_preserves_shape_and_fits_desktop(width, height, scale, available, expected):
+    from emulator_window import device_size
+    assert device_size(width, height, scale, *available) == expected
+
+
+def test_renderer_contains_device_without_page_controls():
+    from html.parser import HTMLParser
+    from emulator_ui_page import page
+    from emulator_skin import load_skins
+    class Elements(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.tags = []
+            self.buttons = []
+        def handle_starttag(self, tag, attrs):
+            self.tags.append(tag)
+            if tag == 'button':
+                self.buttons.append(dict(attrs))
+    document = Elements()
+    document.feed(page('OS', load_skins()[0]))
+    assert not set(document.tags) & {'header', 'footer', 'select', 'details', 'h1'}
+    assert document.buttons and all('data-key' in button for button in document.buttons)

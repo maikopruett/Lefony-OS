@@ -33,7 +33,7 @@ launching have been removed. The embedded desktop renderer uses the same
 layout and inputs on all platforms. Explicit `LEFONY_VM_DISPLAY=cocoa` or `sdl`
 remains a diagnostic raw-display override.
 
-The layout selector exposes every supplied skin. Whole-calculator scaling
+The native **View → Layout** menu exposes every supplied skin. Whole-calculator scaling
 keeps the key regions, framebuffer and touch coordinates aligned. At 1×, the
 Medium skin has a 320 × 240 CSS-pixel display; the Large landscape skin uses
 640 × 480. These are screen coordinates, not calibrated physical inches.
@@ -50,7 +50,7 @@ interactive calculator. Headless and plain Cocoa/SDL runs retain their battery d
 current VM can leave its display blank after battery-mode suspend/resume; this
 host preview does not fix or qualify that firmware/model behavior.
 
-Stop the QEMU preview with **Stop emulator**, closing the desktop
+Stop the QEMU preview with **File → Stop Emulator**, closing the desktop
 window, or Ctrl-C. Direct boot has no persistent SD storage. The SDK keeps
 its existing workspace/save lifecycle.
 

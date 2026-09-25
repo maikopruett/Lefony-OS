@@ -146,13 +146,14 @@ The window embeds the renderer; it does not open a browser. It needs this
 repository's Prime-specific QEMU models, which run the actual ARM firmware.
 
 <p align="center">
-  <img src="docs/images/qemu-hardware-home.png" alt="Lefony OS Home screen captured directly from the QEMU hardware emulator framebuffer" width="320">
-  <img src="docs/images/qemu-hardware-calculation.png" alt="Lefony OS calculating 7 plus 8 equals 15 in the QEMU hardware emulator" width="320">
+  <img src="docs/images/emulator-device-home.png" alt="Full HP Prime device skin and keyboard displaying Lefony OS Home in the desktop QEMU emulator" width="320">
+  <img src="docs/images/emulator-device-calculation.png" alt="Full HP Prime device skin and keyboard calculating 7 plus 8 equals 15 in the desktop QEMU emulator" width="320">
 </p>
 
-Actual 320 × 240 framebuffer captures of the ARM firmware running in the Prime
-G2 QEMU hardware emulator: Home and `7 + 8 = 15`. These screenshots show the LCD
-only; `make run` and the SDK launch it with the integrated Prime keyboard.
+Actual desktop-window captures of the ARM firmware running in QEMU, with the
+full HP Prime device skin and clickable keyboard. The window contains only the
+calculator; **File → Stop Emulator**, **View → Layout / Scale**, and **Help**
+live in native application menus (the macOS menu bar or the desktop’s menu bar).
 
 ```sh
 make emulator       # Build pinned QEMU with the Prime G2 models

@@ -35,26 +35,14 @@ HTML = r'''<!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Lefony Emulator · __TITLE__</title>
 <style>
-:root{color-scheme:dark;font:14px system-ui,sans-serif;background:#10171c;color:#edf1ef}
-*{box-sizing:border-box}body{margin:0}header{max-width:1100px;margin:auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-h1{font-size:18px;margin:0 0 3px;font-weight:650}.subtitle{color:#a0b2b7;font-size:12px}
-button,select{font:inherit;color:inherit;background:#28343b;border:1px solid #4b5b63;border-radius:7px;padding:8px 12px;cursor:pointer}
-button:focus-visible,select:focus-visible,canvas:focus-visible{outline:3px solid #87d4bf;outline-offset:3px}
-.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.toolbar label{color:#b7c8ca}#stop{background:#403034;border-color:#735357}
-main{max-width:1100px;margin:0 auto;padding:0 20px 30px;display:flex;flex-direction:column;align-items:center}
-.calculator{--screen-width:640px;width:min(100%,calc(var(--screen-width) + 46px));padding:14px;background:linear-gradient(145deg,#39464c,#212c32);border:1px solid #5b6b72;border-radius:18px;box-shadow:0 18px 60px #0005}
-.screen-frame{background:#0a0f11;padding:8px;border-radius:8px;box-shadow:inset 0 2px 5px #000}
-canvas{width:100%;height:auto;aspect-ratio:4/3;display:block;background:#fff;image-rendering:pixelated;touch-action:none;cursor:crosshair}
-.brand{font-size:10px;letter-spacing:2px;color:#c7d6d8;display:flex;justify-content:space-between;margin:10px 3px}
-.keypad{display:grid;gap:6px}.key-row{display:grid;gap:7px}.cols-6{grid-template-columns:repeat(6,1fr)}.cols-5{grid-template-columns:repeat(5,1fr)}.cols-3{grid-template-columns:1fr 1fr 3fr}
-.key{min-width:0;min-height:35px;box-shadow:0 3px 0 #0b1116;user-select:none;touch-action:none;padding:5px 3px;background:linear-gradient(#48565e,#35434b);font-size:15px}
-.key-row:nth-child(-n+2) .key{font-size:12px;min-height:30px;background:#222e35}
-.key.pressed,.key:active{background:#547d73;box-shadow:0 1px 0 #0b1116;transform:translateY(2px)}
-.key.shift{color:#a9d0ff}.key.alpha{color:#f6c492}.key.ok{background:#598775;color:#fff;font-weight:650}.key.back{color:#f2b8af}
-.arrows{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:28px 28px;gap:5px;justify-content:center;margin:2px 0 5px}.arrows .key{min-height:28px;padding:0}.up{grid-column:2}.left{grid-column:1;grid-row:2}.down{grid-column:2;grid-row:2}.right{grid-column:3;grid-row:2}
-.hint{max-width:640px;font-size:12px;line-height:1.6;color:#aec0c4;margin:14px 2px 0}#status{color:#98d9ba}details{max-width:640px;width:100%;margin-top:12px;color:#b9c9cc;font-size:12px}summary{cursor:pointer}details p{line-height:1.7}
-@media(max-width:600px){header{padding:12px;align-items:flex-start}main{padding:0 8px 20px}.calculator{padding:9px}.toolbar{justify-content:flex-end}h1{font-size:15px}.key{min-height:36px;font-size:13px}}
-.calculator.skin-mode{position:relative;width:min(100%,var(--skin-width));aspect-ratio:var(--skin-ratio);padding:0;border:0;border-radius:0;background:var(--normal-image) center/100% 100% no-repeat;box-shadow:none}
+:root{color-scheme:dark;background:#10171c}
+*{box-sizing:border-box}html,body,main{width:100%;height:100%;margin:0;overflow:hidden}
+main{display:flex;align-items:center;justify-content:center}
+canvas{display:block;background:#fff;image-rendering:pixelated;touch-action:none;cursor:crosshair}
+.key{user-select:none;touch-action:none;cursor:pointer}
+.key:focus-visible,canvas:focus-visible{outline:2px solid #87d4bf;outline-offset:-2px}
+.brand{display:none}
+.calculator.skin-mode{position:relative;width:min(100vw,calc(100vh * var(--skin-ratio)));aspect-ratio:var(--skin-ratio);flex-shrink:0;padding:0;border:0;border-radius:0;background:var(--normal-image) center/100% 100% no-repeat;box-shadow:none}
 .skin-mode .screen-frame{position:absolute;padding:0;border-radius:0;box-shadow:none}
 .skin-mode .screen-frame canvas{width:100%;height:100%}
 .skin-mode .brand{display:none}.skin-mode .keypad{display:contents}
@@ -63,13 +51,12 @@ canvas{width:100%;height:auto;aspect-ratio:4/3;display:block;background:#fff;ima
 .skin-mode .key.pressed,.skin-mode .key:active{background-image:var(--pressed-image);transform:none;box-shadow:none}
 .skin-mode .key:focus-visible{outline-offset:-2px}
 </style>
-<header><div><h1>Lefony Emulator</h1><div class="subtitle">__TITLE__ · HP Prime G2</div></div><div class="toolbar"><label id="skin-label" for="skin" hidden>Layout</label><select id="skin" hidden></select><label for="zoom">Scale</label><select id="zoom"><option value="480">1.5×</option><option value="640" selected>2×</option><option value="960">3×</option></select><button id="stop">Stop emulator</button></div></header>
 <main><section class="calculator" aria-label="HP Prime emulator"><div class="screen-frame"><canvas id="screen" width="320" height="240" tabindex="0" aria-label="Calculator touchscreen"></canvas></div><div class="brand"><span>LEFONY</span><span>PRIME G2</span></div><div class="keypad" aria-label="HP Prime keypad">__KEYS__</div></section>
-<p class="hint"><span id="status" role="status">Connecting…</span><br>Click the screen to touch it. Use the keypad below or your keyboard’s arrows, numbers and Enter. Shift and Alpha work like calculator keys.</p>
-<details><summary>Keyboard shortcuts &amp; saving</summary><p>Enter = Enter · Escape = Esc · Backspace = ⌫ · Arrow keys = directions · Home = Home · F1–F6 = Symb, Plot, Num, Help, View, Menu. Use the calculator’s Alpha key for letters. Physical Shift = Shift; Alt = Alpha. Command or Control shortcuts remain available.</p><p>Save inside the app, then use <b>Stop emulator</b> to close normally. Closing the window releases all keys and stops the emulator. A named workspace keeps its saved calculator data between runs.</p></details></main>
+</main>
 <script>
 'use strict';
-const screen=document.querySelector('#screen'),ctx=screen.getContext('2d'),status=document.querySelector('#status');
+const screen=document.querySelector('#screen'),ctx=screen.getContext('2d');
+let connection='Connecting…';
 const skins=__SKINS__,held=new Map(),touches=new Map();
 let buttons=[...document.querySelectorAll('[data-key]')],activeSkin=null;
 let stopped=false,queue=Promise.resolve(),pendingMoves=false,pendingInputs=0;
@@ -78,7 +65,7 @@ function state(){return {keys:names(),touch:[...touches.values()].map(v=>v.conta
 function paintKeys(){const active=new Set(names());buttons.forEach(b=>b.classList.toggle('pressed',active.has(b.dataset.key)))}
 function post(action,value){return fetch(action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value),signal:AbortSignal.timeout(4000)}).then(r=>{if(!r.ok)throw Error('Emulator connection ended')})}
 function send(){if(stopped)return;if(pendingInputs>=32){fail();return}const value=state();paintKeys();pendingInputs++;queue=queue.then(()=>stopped?null:post('input',value)).catch(fail).finally(()=>pendingInputs--)}
-function fail(){if(stopped)return;stopped=true;held.clear();touches.clear();paintKeys();status.textContent='Disconnected. Restart the run from your terminal.'}
+function fail(){if(stopped)return;stopped=true;held.clear();touches.clear();paintKeys();connection='Disconnected. Restart the run from your terminal.'}
 function release(){held.clear();touches.clear();send()}
 function point(event,id){const r=screen.getBoundingClientRect();return [id,Math.max(0,Math.min(319,Math.floor((event.clientX-r.left)*320/r.width))),Math.max(0,Math.min(239,Math.floor((event.clientY-r.top)*240/r.height)))]}
 function bindKey(b){
@@ -97,9 +84,8 @@ window.addEventListener('keyup',e=>{if(held.delete('k'+e.code)){e.preventDefault
 window.addEventListener('blur',release);document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
 window.addEventListener('pagehide',()=>{held.clear();touches.clear();fetch('input',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state()),keepalive:true}).catch(()=>{})});
 setInterval(()=>{if(!stopped&&(held.size||touches.size))send()},350);
-const calculator=document.querySelector('.calculator'),zoom=document.querySelector('#zoom'),picker=document.querySelector('#skin');
+const calculator=document.querySelector('.calculator');
 function rect(element,r,skin){Object.assign(element.style,{left:(r.x/skin.width*100)+'%',top:(r.y/skin.height*100)+'%',width:(r.width/skin.width*100)+'%',height:(r.height/skin.height*100)+'%'})}
-function skinScale(){calculator.style.setProperty('--skin-width',(activeSkin.width*Number(zoom.value))+'px')}
 function chooseSkin(skin){
  release();activeSkin=skin;calculator.classList.add('skin-mode');
  calculator.style.setProperty('--skin-ratio',skin.width+'/'+skin.height);
@@ -109,17 +95,16 @@ function chooseSkin(skin){
  buttons=skin.keys.map(k=>{const b=document.createElement('button');b.type='button';b.className='key';b.dataset.key=k.name;b.setAttribute('aria-label',k.name==='onoff'?'On / Off':k.label);b.title=b.getAttribute('aria-label');rect(b,k,skin);
  b.style.backgroundSize=(skin.width/k.width*100)+'% '+(skin.height/k.height*100)+'%';
  b.style.backgroundPosition=(k.x/(skin.width-k.width)*100)+'% '+(k.y/(skin.height-k.height)*100)+'%';
- bindKey(b);keypad.append(b);return b});skinScale();screen.focus();
+ bindKey(b);keypad.append(b);return b});screen.focus();
 }
-if(skins.length){
- picker.hidden=false;document.querySelector('#skin-label').hidden=false;
- for(const skin of skins){const o=document.createElement('option');o.value=skin.id;o.textContent=skin.title;picker.append(o)}
- zoom.replaceChildren();for(const value of [.75,1,1.25,1.5,2]){const o=document.createElement('option');o.value=value;o.textContent=value+'×';zoom.append(o)}zoom.value='1';
- const initial=skins.find(s=>s.title==='Medium')||skins[0];picker.value=initial.id;chooseSkin(initial);
- picker.addEventListener('change',()=>chooseSkin(skins.find(s=>String(s.id)===picker.value)));
-}
-zoom.addEventListener('change',e=>{if(activeSkin){release();skinScale()}else calculator.style.setProperty('--screen-width',e.target.value+'px');screen.focus()});
-document.querySelector('#stop').addEventListener('click',async()=>{release();await queue;try{await post('stop',{});stopped=true;status.textContent='Emulator stopped.'}catch{fail()}});
-async function frame(){if(stopped)return;try{const r=await fetch('frame',{signal:AbortSignal.timeout(4000)});if(!r.ok)throw Error();const bitmap=await createImageBitmap(await r.blob());if(!stopped){ctx.drawImage(bitmap,0,0);status.textContent='Connected'}bitmap.close();}catch{fail()}if(!stopped)setTimeout(frame,100)}
+if(skins.length)chooseSkin(skins.find(s=>s.title==='Medium')||skins[0]);
+// Narrow interface used only by the native desktop host's application menus.
+window.lefonyDesktop={
+ configuration:()=>({skins:skins.map(({id,title,width,height})=>({id,title,width,height})),activeSkin:activeSkin?.id}),
+ chooseSkin:id=>{const skin=skins.find(s=>s.id===id);if(skin)chooseSkin(skin)},
+ release,
+ connection:()=>connection
+};
+async function frame(){if(stopped)return;try{const r=await fetch('frame',{signal:AbortSignal.timeout(4000)});if(!r.ok)throw Error();const bitmap=await createImageBitmap(await r.blob());if(!stopped){ctx.drawImage(bitmap,0,0);connection='Connected'}bitmap.close();}catch{fail()}if(!stopped)setTimeout(frame,100)}
 frame();screen.focus();
 </script></html>'''
