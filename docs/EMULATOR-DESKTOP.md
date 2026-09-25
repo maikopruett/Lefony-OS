@@ -16,7 +16,8 @@ Linux distributions. Linux also needs its normal desktop libraries; on Ubuntu
 
 ```sh
 sudo apt-get install libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6 \
-  libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libasound2t64 libegl1 libgl1
+  libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-keysyms1 \
+  libxcb-shape0 libxcb-icccm4 libpulse0 libasound2t64 libegl1 libgl1
 ```
 
 ```sh

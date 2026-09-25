@@ -35,7 +35,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libasound2t64 libegl1 libgl1
+          sudo apt-get install -y xvfb libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-keysyms1 libxcb-shape0 libxcb-icccm4 libpulse0 libasound2t64 libegl1 libgl1
       - run: python -m pip install -r sdk/requirements-emulator.txt pyinstaller==6.20.0 Pillow==12.3.0
       - run: python scripts/build_emulator_window.py --output build/emulator-window-native
       - name: Smoke embedded window on Linux

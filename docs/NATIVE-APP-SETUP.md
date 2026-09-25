@@ -89,8 +89,9 @@ own exact-candidate qualification before a stable durability claim.
 `scripts/package_native_sdk.py` creates a deterministic standalone source kit.
 `scripts/package_native_desktop.py` packages compiler, newlib, GDB, Python, QEMU,
 USB dependencies and notices for host-specific candidates. The current recipe
-requires `--newlib`, `--gdb-runtime`, `--libusb` and `--project-sources` on every
-supported packaging host; see the
+requires `--newlib`, `--gdb-runtime`, `--libusb`, `--project-sources` and
+`--emulator-window` on every supported packaging host. Build the native window
+first using the [shared desktop guide](EMULATOR-DESKTOP.md); see also the
 [native host guide](../sdk/HOSTS.md). Corresponding source must match every bundled
 binary. Rebuild and qualify relocated/offline bundles after SDK changes;
 historical hashes do not qualify new candidates.

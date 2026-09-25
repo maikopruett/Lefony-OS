@@ -704,8 +704,10 @@ GCC base source. The ARM app compiler remains pinned independently at 16.2.0.
 
 `scripts/package_native_desktop.py` requires the existing firmware, QEMU,
 compiler, binutils, OpenSSL, trusted public keys and corresponding-source inputs,
-plus `--newlib`, `--gdb-runtime`, `--libusb` and `--project-sources`. It checks source hashes and
-debugger build identity. Build QEMU from neutral source/build paths as described
+plus `--newlib`, `--gdb-runtime`, `--libusb`, `--project-sources` and
+`--emulator-window`. Build the native window first with
+[`scripts/build_emulator_window.py`](../docs/EMULATOR-DESKTOP.md). The packager
+checks source hashes, debugger build identity and the window bundle manifest. Build QEMU from neutral source/build paths as described
 in the maintainer setup notes; binaries with private home paths are rejected.
 
 The resulting folder includes the compiler, newlib, GDB, Python host runtime,
