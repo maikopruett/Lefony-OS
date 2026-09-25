@@ -40,7 +40,7 @@ Linux desktop and its obsolete deployment scripts are outside this project.
   macOS, Linux and Windows; no browser launch is used. See the
   [desktop setup and build guide](docs/EMULATOR-DESKTOP.md). The website’s macOS
   and Linux SDK downloads include this window and keyboard by default; see the
-  [download release record](docs/DESKTOP-SDK-RELEASE-20260925.md).
+  [download release record](docs/DEVICE-ONLY-EMULATOR-20260925.md).
 
 SDK 1.0 remains in development. Source changes, downloadable bundles and
 physical qualification have separate status; consult

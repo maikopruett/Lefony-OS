@@ -12,6 +12,9 @@ and Saving / Connection Status**. macOS uses its system menu bar; Linux and
 Windows use the desktop’s native application menu placement. The complete
 device scales to fit both dimensions without clipping the keypad.
 
+The current downloadable bundles are recorded in the
+[device-only emulator release](DEVICE-ONLY-EMULATOR-20260925.md).
+
 ## Source installations
 
 Install `requirements-dev.txt` in the repository virtual environment. Standalone

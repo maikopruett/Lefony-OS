@@ -41,7 +41,7 @@ def package(output, newlib=None):
                  'scripts/sdk-windows/openssl-portable-getenv.patch','scripts/native_desktop_openssl.py',
                  'scripts/package_native_desktop.py','scripts/package_native_desktop_sources.py','scripts/build_emulator_window.py','scripts/emulator_window_sources.py',
                  'sdk/requirements-emulator.txt','docs/EMULATOR-DESKTOP.md','vm/test-emulator-window.py',
-                 'docs/images/emulator-sdk.png',
+                 'docs/images/emulator-device-sdk.png',
                  'scripts/windows_python_sources.py','scripts/windows_python_sources.json',
                  'scripts/windows_cpython_sources.py','scripts/windows_cpython_sources.json',
                  'scripts/collect_native_windows_sources.py','scripts/native_desktop_windows_sources.py','scripts/native_desktop_project.py','scripts/native_desktop_firmware.py',

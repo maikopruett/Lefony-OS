@@ -44,6 +44,8 @@ def test_source_kit_contains_working_default_skins(tmp_path, monkeypatch):
     skins, assets = load_skins()
     assert len(skins) == 5 and len(assets) == 15
     assert (sdk / 'assets/prime/EULA_en.txt').is_file()
+    assert (sdk.parent / 'docs/images/emulator-device-sdk.png').is_file()
+    assert 'emulator-device-sdk.png' in (sdk / 'README.md').read_text()
 
 
 def test_missing_asset_directory_fails_instead_of_using_generic_keyboard(tmp_path):
