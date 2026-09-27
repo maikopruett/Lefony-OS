@@ -19,7 +19,8 @@ def read_pin():
     pin = json.loads(PIN_PATH.read_text())
     if (pin.get('schema') != 1 or pin.get('repository') != 'maikopruett/Lefony-OS' or
             not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._+-]{0,127}', pin.get('tag', '')) or
-            set(pin.get('assets', {})) != set(ASSETS)):
+            set(pin.get('assets', {})) != set(ASSETS) or
+            ('bootMenu' in pin and (type(pin['bootMenu']) is not int or pin['bootMenu'] != 1))):
         raise ValueError('Invalid public recovery pin')
     names = set()
     for asset in pin['assets'].values():

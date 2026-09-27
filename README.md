@@ -19,6 +19,10 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 
 ## Latest updates — September 27, 2026
 
+- **Shared startup menu:** Simple Install and Dual Boot Install now use the same
+  bootloader core, with the progress bar and Enter-key menu in both. Simple
+  Install enables Lefony only. See the [implementation and qualification notes](docs/SHARED-BOOTLOADER-20260927.md).
+
 - **HP OS and Lefony dual boot:** an Enter-key startup menu, saved priority, and
   return to the startup bar after Off/On in either OS. The browser-only installer
   creates a verified local recovery backup, preserves HP files, and supports

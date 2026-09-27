@@ -196,3 +196,10 @@ bad-block markers, installed OS/DTB/U-Boot through the website, and automaticall
 returned to native firmware `1.0.0+1790305558`. The browser displayed its verified
 current-version screen. The obsolete desktop native-to-ROM update fallback is
 also removed; recovery exit no longer writes SRC override registers.
+
+## Shared menu capability
+
+The shared loader preserves recovery protocol v1 and additionally supplies the
+LFMW menu/wake mailbox. Native USB development flags expose this as bit 5
+(value 32) after validating and consuming both mailboxes. See
+[Simple Install and dual boot integration](SHARED-BOOTLOADER-20260927.md).

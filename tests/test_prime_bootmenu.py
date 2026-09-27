@@ -33,3 +33,23 @@ def test_preparation_is_checked_and_idempotent(tmp_path):
     (board/'Makefile').write_text('obj-y := unexpected.o\n')
     with pytest.raises(ValueError, match='unexpected U-Boot context'):
         module.prepare(tmp_path)
+
+
+def test_shared_profile_is_explicit_and_idempotent(tmp_path):
+    import pytest
+    sys.path.insert(0,str(ROOT/'scripts'))
+    from prepare_prime_shared_boot import prepare
+    dtb=tmp_path/'arch/arm/dts/imx6ull-prime.dts';dtb.parent.mkdir(parents=True)
+    dtb.write_text('/ { model = "HP Prime G2 Calculator"; };\n')
+    config=tmp_path/'configs/mx6ull_prime_defconfig';config.parent.mkdir()
+    config.write_text('CONFIG_LOCALVERSION="-lefony-dual5-candidate1"\n')
+    header=tmp_path/'include/configs/mx6ull_prime.h';header.parent.mkdir(parents=True)
+    header.write_text('\t"bootcmd=nand read ${loadaddr} 0x400000 0x800000;"\\\n'
+                      '\t\t"nand read ${fdt_addr} 0xc00000 0x100000;"\\\n'
+                      '\t\t"bootz ${loadaddr} - ${fdt_addr}\\0"')
+    for layout in (1,5,1):
+        prepare(tmp_path,layout);before=dtb.read_bytes();prepare(tmp_path,layout)
+        assert before==dtb.read_bytes()
+        assert f'lefony,boot-layout = <{layout}>' in dtb.read_text()
+    dtb.write_text(dtb.read_text().replace('<1>','<9>'))
+    with pytest.raises(ValueError,match='unexpected shared boot configuration'):prepare(tmp_path,1)

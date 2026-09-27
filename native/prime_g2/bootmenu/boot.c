@@ -6,6 +6,7 @@
 #include <linux/errno.h>
 #include <watchdog.h>
 #include <linux/libfdt.h>
+#include <asm/io.h>
 #include "hardware.h"
 #include "preferences.h"
 #define PREF0 0x00dc0000u
@@ -59,7 +60,7 @@ static int load_lefony(void) {
     /* Keep the existing zImage handoff and installer signature trust policy.
      * These are additional bounded type/size checks, not a secure-boot claim. */
     bytes=image[11];
-    if(image[0]!=0xea00000e || image[9]!=0x016f2818 || image[10] || bytes<0x1100 || bytes>0x800000 || (bytes&3))return -1;
+    if(image[12]==0x354c464c || image[0]!=0xea00000e || image[9]!=0x016f2818 || image[10] || bytes<0x1100 || bytes>0x800000 || (bytes&3))return -1;
     length=ALIGN(bytes,PAGE);
     if(nand_read_skip_bad(flash,0x400000,&length,&actual,0x800000,(u8 *)image))return -1;
     if(image[0x1000/4]!=0xea000006 || image[0x1020/4]!=0xf10c00c0)return -1;
@@ -67,6 +68,18 @@ static int load_lefony(void) {
     if(nand_read_skip_bad(flash,0xc00000,&length,&actual,0x100000,dtb) || fdt_check_header(dtb) || fdt_totalsize(dtb)>0x100000)return -1;
     flush_dcache_range((ulong)image,(ulong)image+ALIGN(bytes,64));
     return 0;
+}
+/* Shared loader's single-OS profile. Never interpret an LFL5 image as legacy
+ * storage, and never advertise HP in this profile. The same renderer, keypad,
+ * countdown and wake contract are used by both install configurations. */
+int lf_single_storage_ready(void) { return geometry(); }
+int lf_boot_single_os(void) {
+    if(load_lefony())return -1;
+    writel(0x574d464c,(void *)0x8000100c);
+    writel(~0x574d464cU,(void *)0x80001010);
+    flush_dcache_range(0x80001000,0x80001040);
+    lf_hw_shutdown();run_command("bootz 80800000 - 83000000",0);
+    return -1;
 }
 /* bootz from SDP also hands display ownership away, not just menu boots. */
 void board_quiesce_devices(void) { lf_hw_shutdown(); }

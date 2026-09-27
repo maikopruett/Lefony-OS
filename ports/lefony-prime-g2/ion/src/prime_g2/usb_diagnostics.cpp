@@ -992,7 +992,9 @@ bool vendorRequest(const SetupPacket &setup) {
       }
       if (setup.value) return false;
       const uint32_t capabilities[] = {0x3156444c, 1,
-        16u | (PrimeG2::DualBoot::legacyUpdateAllowed() ? 2u : 0u) | 8u | (PrimeG2::System::bootloaderRecoveryVersion() == 1 ? 4u : 0u), RecoveryCapacity};
+        16u | (PrimeG2::DualBoot::legacyUpdateAllowed() ? 2u : 0u) | 8u |
+        (PrimeG2::System::bootloaderRecoveryVersion() == 1 ? 4u : 0u) |
+        (PrimeG2::System::bootloaderWakeMenuSupported() ? 32u : 0u), RecoveryCapacity};
       controlIn(capabilities, sizeof(capabilities), setup.length);
       return true;
     }

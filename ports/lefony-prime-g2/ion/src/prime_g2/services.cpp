@@ -940,7 +940,7 @@ KDColor updateColorWithPlugAndCharge() {
 
 namespace Power {
 void suspend(bool checkIfOnOffKeyReleased) {
-  const bool wakeToMenu = PrimeG2::DualBoot::Enabled && checkIfOnOffKeyReleased &&
+  const bool wakeToMenu = checkIfOnOffKeyReleased &&
     PrimeG2::System::bootloaderWakeMenuSupported();
   if ((!wakeToMenu && PrimeG2::USBDiagnostics::externalPowerConnected()) ||
       PrimeG2::DevelopmentUpdate::busy() || PrimeG2::USBDiagnostics::transferBusy()) return;

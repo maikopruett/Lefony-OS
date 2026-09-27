@@ -4,12 +4,19 @@ Lefony targets the **HP Prime G2** (i.MX6ULL). It is a native, bare-metal Upsilo
 port, not a Linux desktop. Prime G1 and stock NumWorks hardware are not targets
 of these build scripts.
 
+## Shared website bootloader
+
+Simple Install now includes the new countdown/Enter bootloader. The two install
+profiles share an identical executable core with explicit storage configuration;
+the new single-OS profile is emulator-qualified, not physically qualified. See
+[shared bootloader qualification](SHARED-BOOTLOADER-20260927.md).
+
 ## Current dual-boot release
 
 The [browser development release](DUAL-BOOT-BROWSER-RELEASE.md) packages the
 accepted two-OS countdown/Enter and Off/On behavior for HP Prime G2. Generation 3
-uses the same accepted firmware and bootloader binaries with a new signed
-descriptor. Browser-only migration, update, full local backup and journaled
+retains the accepted OS images and signed descriptor. The shared-boot update
+rebuilds the menu core for both explicit storage profiles. Browser-only migration, update, full local backup and journaled
 resume are implemented. HP V15751 is supplied by the user, never bundled.
 Broader battery and physical power-loss qualification remain open; the user
 authorized development publication with those limits. See the Phase 7 ledger

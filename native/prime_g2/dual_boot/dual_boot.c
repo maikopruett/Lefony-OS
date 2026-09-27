@@ -10,6 +10,8 @@
 #include <u-boot/rsa-mod-exp.h>
 #include <watchdog.h>
 #include <asm/io.h>
+#include <fdtdec.h>
+DECLARE_GLOBAL_DATA_PTR;
 #include "hardware.h"
 #include "preferences.h"
 #include "dual_layout.h"
@@ -28,6 +30,16 @@ static const unsigned blocks[] = {LF_DUAL_HP_IMAGE_BLOCKS, LF_DUAL_LEFONY_IMAGE_
     LF_DUAL_LEFONY_DTB_BLOCKS, LF_DUAL_RESCUE_BLOCKS};
 static const unsigned maximum[] = {8192864, 8388608, 1048576, 8388608};
 int hp_boot_staged_os(int confined);
+int lf_single_storage_ready(void);
+int lf_boot_single_os(void);
+/* Profile comes only from this release's embedded, hash-checked bootloader
+ * configuration. Missing/broken dual metadata never selects the simple path. */
+static int boot_layout(void) {
+    return fdtdec_get_config_int(gd->fdt_blob,"lefony,boot-layout",5);
+}
+static int single_priority(void *ctx,unsigned os) {
+    (void)ctx;return os==LF_LEFONY ? 0 : -1;
+}
 static u32 word(const u8 *b) { return (u32)b[0] | (u32)b[1]<<8 | (u32)b[2]<<16 | (u32)b[3]<<24; }
 static int read_exact(ulong off, u8 *data, size_t count)
 {
@@ -157,10 +169,10 @@ static int recovery(void)
 static int do_lfdualboot(cmd_tbl_t *cmdtp,int flag,int argc,char *const argv[])
 {
     struct lf_menu menu;struct lf_preference pref;
-    int valid,drawn=-1;unsigned selected=99;u32 last=0;
+    int valid,layout=boot_layout(),simple=layout==1,drawn=-1;unsigned selected=99;u32 last=0;
     enum lf_notice notice=LF_NONE;
     (void)cmdtp;(void)flag;(void)argc;(void)argv;
-    if (load_layout() || lf_hw_init()) return recovery();
+    if ((layout!=1 && layout!=5) || (simple ? !lf_single_storage_ready() : load_layout()) || lf_hw_init()) return recovery();
     /* LFM1 is one-use and does not change NAND preferences. Preserve recovery,
      * watchdog and boot-confirmation tokens owned by the existing protocols. */
     if (readl((void *)0x020cc068)==0x314d464c) {
@@ -168,8 +180,9 @@ static int do_lfdualboot(cmd_tbl_t *cmdtp,int flag,int argc,char *const argv[])
         writel(0,(void *)0x020cc068);
         while (readl((void *)0x020cc068) && retry--) udelay(100);
     }
-    valid=!lf_pref_load(&preferences,&pref);
-    lf_menu_init(&menu,get_timer(0),valid?pref.priority:LF_LEFONY,valid,3,save_priority,NULL);
+    valid=simple || !lf_pref_load(&preferences,&pref);
+    lf_menu_init(&menu,get_timer(0),!simple && valid?pref.priority:LF_LEFONY,
+                 valid,simple?1:3,simple?single_priority:save_priority,NULL);
     /* Off/On returns through the same countdown as an ordinary startup.
      * The retained request is consumed above; only Enter opens the menu. */
     if (lf_hw_present(&menu,menu.start)) return recovery();
@@ -187,7 +200,9 @@ static int do_lfdualboot(cmd_tbl_t *cmdtp,int flag,int argc,char *const argv[])
         }
         if (menu.screen==LF_BOOT) {
             printf("Dual boot: loading OS %u\n",menu.boot_os);
-            if (!load_layout()) {
+            if (simple) {
+                if (menu.boot_os==LF_LEFONY) lf_boot_single_os();
+            } else if (!load_layout()) {
                 if (menu.boot_os==LF_LEFONY) boot_lefony();
                 else if (menu.boot_os==LF_HP && !load_image(0,HP_STAGE)) hp_boot_staged_os(1);
             }

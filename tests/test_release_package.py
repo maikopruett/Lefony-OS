@@ -13,9 +13,11 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from package_lefony_release import package
 
 
+@pytest.mark.parametrize('menu', [False, True])
 @pytest.mark.parametrize('working_tree', [False, True])
 @pytest.mark.parametrize('recovery_mode', ['none', 'slot', 'full'])
-def test_package_allowlist_and_integrity(tmp_path, working_tree, recovery_mode, monkeypatch):
+def test_package_allowlist_and_integrity(tmp_path, working_tree, recovery_mode, monkeypatch, menu):
+    monkeypatch.setattr('package_lefony_release.read_pin', lambda: {'bootMenu': 1} if menu else {})
     if recovery_mode != 'none':
         data = b'synthetic public recovery asset'
         descriptor = {'path': 'artifacts/recovery.bin', 'bytes': len(data),
@@ -51,6 +53,7 @@ def test_package_allowlist_and_integrity(tmp_path, working_tree, recovery_mode, 
             'protocol': 2 if recovery_mode == 'full' else 1,
             'target': 'boot-os-dtb' if recovery_mode == 'full' else 'single-slot-mtd1',
             'development': True,
+            **({'bootMenu': 1} if menu and recovery_mode == 'full' else {}),
         }
     if working_tree:
         assert manifest['sourceState'] == {

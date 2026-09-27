@@ -13,7 +13,7 @@ import shutil
 import zipfile
 
 from prime_g2_update_capsule import build, inspect, parse_version
-from browser_recovery_assets import verified_assets
+from browser_recovery_assets import verified_assets, read_pin
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = {
@@ -83,6 +83,9 @@ def package(root, output, version, commit, private_key, recovery_directory=None,
         manifest['message'] = 'Development browser recovery installation is available for testing.'
         if full_install:
             manifest['browserRecovery'] = {'protocol': 2, 'target': 'boot-os-dtb', 'development': True}
+            if read_pin().get('bootMenu') == 1:
+                manifest['browserRecovery']['bootMenu'] = 1
+                notes.append('Simple Install includes the shared progress-bar and Enter-key bootloader, configured for Lefony only. This profile is emulator-qualified; physical acceptance remains open.')
             notes[3:5] = [
                 'Explicit full recovery installation writes and verifies the bootloader, OS and device tree, including on blank NAND.',
                 'This development path uses fixed MTD0/MTD1/MTD2 targets; no A/B repartitioning is performed. Physical power-loss qualification remains open.',
