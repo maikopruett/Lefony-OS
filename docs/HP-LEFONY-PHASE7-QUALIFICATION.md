@@ -368,3 +368,30 @@ Lefony app-screen Off/On, HP warm suspend/On, HP full-off with modeled cold
 power-on, saved HP history and one-use wake requests. Model cold power-on uses
 QMP reset/cont while retaining SNVS and does not qualify electrical battery or
 PMIC behavior.
+
+### Publication and post-restart verification
+
+After the browser-issued NAND restart, its native WebUSB check confirmed
+committed layout 5, release 3. The local result records Lefony startup separately
+from the verified NAND transaction. A fresh manual HP check was requested; the
+previous physical HP acceptance remains applicable to the unchanged HP image
+and bootloader, but a new manual response is not invented here.
+
+[Development release 3](https://github.com/maikopruett/Lefony-OS/releases/tag/dual-boot-20260927)
+is published with 18 audited public assets. Every GitHub asset size and SHA-256
+digest matched its local file before the draft became public; public downloads
+of the manifest and boot image were also compared after publication. The
+62,668,515-byte corresponding-source archive hashes to
+`da8b2e965ee36790dec311fb5f6e3ea04cc00b2387df53158aad497164ed22bc`.
+It contains the prepared sources/configurations and documented public emulator
+key fixture; it contains no production key, HP image or device dump.
+
+The browser-only flow is live at [lefony.com/#install](https://lefony.com/#install).
+Cloudflare deployment `20ce3c0a-4990-432f-a870-712e43f6f6fb` serves website commit
+`04bd71e1e90256dc95eff2fdc84c237917219b8b`. The actual public-origin browser flow
+downloaded and authenticated all release assets and the codec successfully.
+The physical write/readback journey above used the locally served production
+build; public-origin download verification is recorded separately. A clean
+GitHub Actions website build also fetched and verified the public release assets.
+The OS source release commit is `7bfab6cf0d7fb4d7349e9a9527a58e1e3ff23cbe`.
+Both repositories' README updates and source changes were pushed to `main`.
