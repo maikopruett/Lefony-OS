@@ -152,6 +152,12 @@ static uint64_t prime_mmdc_read(void *opaque, hwaddr offset, unsigned size)
         }
         return value;
     }
+    if (offset == 0x83c && s->supply_present && prime_mmdc_ready(s)) {
+        /* MPDGCTRL0[RST_RD_FIFO] is self-clearing. U-Boot's i.MX6
+         * reset_read_data_fifos() and HP's OCRAM wake routine poll bit 31.
+         * Model completion, not PHY delay/training or electrical retention. */
+        s->regs[offset / 4] &= ~BIT(31);
+    }
     return s->regs[offset / 4];
 }
 
@@ -302,6 +308,59 @@ struct PrimeKPPState {
 #define KPSR_KDSC 0x0400
 #define KPSR_KRSS 0x0800
 
+/* Same switch matrix, sampled through physical GPIO2 rather than KPP.
+ * Rows have pull-ups; input-direction columns are high impedance. */
+static PrimeKPPState *prime_gpio_keypad;
+static void (*prime_gpio_keypad_changed)(void *);
+static void *prime_gpio_keypad_opaque;
+void prime_g2_keypad_notify(void (*changed)(void *), void *opaque)
+{
+    prime_gpio_keypad_changed = changed;
+    prime_gpio_keypad_opaque = opaque;
+}
+uint32_t prime_g2_keypad_gpio(uint32_t direction, uint32_t output)
+{
+    bool cols[8] = { false }, rows[8] = { false }, changed;
+    unsigned c, r;
+    uint32_t result = 0x5554;
+    if (!prime_gpio_keypad) {
+        return result;
+    }
+    for (c = 0; c < 8; c++) {
+        cols[c] = (direction & ~output & (1u << (2 * c + 1))) != 0;
+    }
+    do {
+        changed = false;
+        for (r = 1; r < 8; r++) {
+            for (c = 0; c < 8; c++) {
+                if (!(prime_gpio_keypad->pressed & (1ULL << (8 * r + c)))) {
+                    continue;
+                }
+                if (cols[c] && !rows[r]) { rows[r] = true; changed = true; }
+                if (rows[r] && !cols[c]) { cols[c] = true; changed = true; }
+            }
+        }
+    } while (changed);
+    for (r = 1; r < 8; r++) {
+        if (rows[r]) { result &= ~(1u << (2 * r)); }
+    }
+    /* An undriven column connected to a pulled-up row samples high too.
+     * GPIO DR reads those pad levels while the column is an input; unrelated
+     * read/modify/write operations can copy them into its output latch. */
+    for (c = 0; c < 8; c++) {
+        if (cols[c] || (direction & (1u << (2 * c + 1)))) {
+            continue;
+        }
+        for (r = 1; r < 8; r++) {
+            if (!rows[r] &&
+                (prime_gpio_keypad->pressed & (1ULL << (8 * r + c)))) {
+                result |= 1u << (2 * c + 1);
+            }
+        }
+    }
+    return result;
+}
+
 static void prime_kpp_irq(PrimeKPPState *s)
 {
     qemu_set_irq(s->irq, ((s->kpsr & KPSR_KDIE) && (s->kpsr & KPSR_KPKD)) ||
@@ -392,6 +451,9 @@ static void prime_kpp_write(void *opaque, hwaddr off, uint64_t value,
             s->pressed &= ~mask;
             s->kpsr |= KPSR_KPKR;
         }
+        if (prime_gpio_keypad_changed) {
+            prime_gpio_keypad_changed(prime_gpio_keypad_opaque);
+        }
         prime_kpp_irq(s);
         break;
     }
@@ -415,6 +477,7 @@ static void prime_kpp_reset(DeviceState *dev)
 static void prime_kpp_realize(DeviceState *dev, Error **errp)
 {
     PrimeKPPState *s = PRIME_KPP(dev);
+    prime_gpio_keypad = s;
     memory_region_init_io(&s->iomem, OBJECT(dev), &prime_kpp_ops, s,
                           TYPE_PRIME_KPP, 0x10);
     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
@@ -2326,20 +2389,20 @@ static void prime_pf_class_init(ObjectClass *oc, const void *data)
 
 /* GPMI/BCH NAND ---------------------------------------------------------- */
 #define TYPE_PRIME_NAND TYPE_PRIME_G2_NAND
-/* The overlay must hold more than one legacy 8 MiB Lefony slot. HP's signed
- * maintenance package writes the OS, updater, and bundled filesystem content
- * in one transaction; a 4096-page (8 MiB) overlay filled mid-update and made
- * every subsequent program operation look like a bad NAND block. 65536 pages
- * keeps the VM sparse while covering HP's multi-copy/filesystem update work. */
-#define PRIME_NAND_SPARSE_PAGES 65536
 #define PRIME_NAND_PAGE_BYTES (2048 + 64)
 #define PRIME_NAND_BLOCKS 4096
 #define PRIME_NAND_TOTAL_PAGES (PRIME_NAND_BLOCKS * 64)
+/* Every physical page needs an overlay slot. A 128 MiB host-side limit caused
+ * false program failures during the 207 MiB HP filesystem capacity test.
+ * Unused payload pages remain demand-zero host memory. No hash collisions
+ * occur with one slot per physical page, including after block erasure. */
+#define PRIME_NAND_SPARSE_PAGES PRIME_NAND_TOTAL_PAGES
 OBJECT_DECLARE_SIMPLE_TYPE(PrimeNANDState, PRIME_NAND)
 struct PrimeNANDState {
     SysBusDevice parent_obj; MemoryRegion gpmi, bch, apbh;
     qemu_irq gpmi_irq, bch_irq, apbh_irq;
     uint32_t gpmi_regs[0x80], bch_regs[0x80]; uint8_t id[5]; uint8_t status;
+    unsigned rom_marker_metadata_index;
     uint32_t apbh_ctrl[4], apbh_next, apbh_bar, apbh_sema;
     uint32_t apbh_cmd;
     QEMUTimer *ready_timer;
@@ -2360,6 +2423,7 @@ struct PrimeNANDState {
     GMappedFile *stock_nand;
     uint8_t onfi_parameters[256]; bool onfi_enabled;
     bool physical_pages;
+    bool trace_writes; /* observer only: never masks or rejects guest writes */
     PrimeBCH *codecs[2][21]; /* immutable arithmetic cache, not migrated */
     uint8_t corrected_bits, fault_kind, fault_mask; uint16_t fault_offset;
     uint32_t fault_page; bool uncorrectable, initialized;
@@ -2551,10 +2615,17 @@ static bool prime_nand_overlay_replay(PrimeNANDState *s, Error **errp)
     s->stock_overlay_path);
   g_free(contents);return true;
 }
+/* OOB markers are a host/ROM exclusion policy, not device write protection.
+ * Keep injected physical defects separate: U-Boot's explicit scrub can remove
+ * an artificial marker, but must still fail on a modeled physical defect.
+ * See upstream U-Boot doc/README.nand, markbad and scrub. */
+static bool prime_nand_defective(PrimeNANDState*s,uint32_t page)
+{unsigned block=page/64;
+ return block>=PRIME_NAND_BLOCKS ||
+   (s->bad_blocks[block/8]&(1u<<(block&7)));}
 static bool prime_nand_bad(PrimeNANDState*s,uint32_t page)
 {unsigned block=page/64,index;const uint8_t *stock;
- if(block>=PRIME_NAND_BLOCKS)return true;
- if(s->bad_blocks[block/8]&(1u<<(block&7)))return true;
+ if(prime_nand_defective(s,page))return true;
  /* Large-page NAND marks a factory/runtime bad block in the OOB
   * of either of its first two pages.  The private fixture is a Linux
   * nanddump --oob stream, so those marker bytes are already available and
@@ -2639,6 +2710,16 @@ static bool prime_rom_decode_fcb(PrimeNANDState *s,uint8_t *page)
     for(j=0;j<128;j++)fcb[block*128+j]=prime_bch_reverse(page[start+j]);
     for(j=0;j<65;j++)parity[j]=prime_bch_reverse(page[start+128+j]);
     result=prime_bch_decode(*bch,fcb+block*128,128,parity,NULL);
+    if(result<0&&block==0){
+      /* Stock HP's captured FCB protects metadata with its first codeword,
+       * as its 0x0720a020 BCH layout does. Keep the earlier synthetic fixture
+       * form as well; both require correction of all words and full checksum. */
+      uint8_t first[160];
+      for(j=0;j<160;j++)first[j]=prime_bch_reverse(page[j]);
+      for(j=0;j<65;j++)parity[j]=prime_bch_reverse(page[160+j]);
+      result=prime_bch_decode(*bch,first,sizeof(first),parity,NULL);
+      if(result>=0)memcpy(fcb,first+32,128);
+    }
     if(result<0)return false;
     corrected+=result;
     for(j=0;j<128;j++)fcb[block*128+j]=prime_bch_reverse(fcb[block*128+j]);
@@ -2673,7 +2754,9 @@ static bool prime_rom_configure_bch(PrimeNANDState *s,const uint8_t *fcb)
    * mode. Reject unsupported swap modes instead of guessing at the layout. */
   if(ldl_le_p(fcb+0xac)||ldl_le_p(fcb+0x84)!=2048||
      ldl_le_p(fcb+0x80)>7||ldl_le_p(fcb+0x7c)>=2048||
-     ldl_le_p(fcb+0x7c)*8+ldl_le_p(fcb+0x80)!=marker)return false;
+     ldl_le_p(fcb+0x7c)*8+ldl_le_p(fcb+0x80)!=marker||
+     ldl_le_p(fcb+0xb0)>=metadata)return false;
+  s->rom_marker_metadata_index=ldl_le_p(fcb+0xb0);
   /* fcb_block.erase_th at 0x5c is the ROM BCH_MODE configuration,
    * not the SDK ECC geometry. Only ERASE_THRESHOLD[7:0] is defined. */
   s->bch_regs[2]=ldl_le_p(fcb+0x5c)&0xff;
@@ -2689,7 +2772,9 @@ static bool prime_rom_decode_data(PrimeNANDState *s,uint32_t number,uint8_t *pag
   if(!prime_nand_capture_layout(s,&metadata,&chunks,&marker))return false;
   memcpy(s->page_cache,page,PRIME_NAND_PAGE_BYTES);
   if(!prime_nand_bch_transfer(s,false,page,aux)||s->uncorrectable)return false;
-  prime_nand_swap_marker(page,aux,marker);
+  /* ROM uses FCB BBMarkerPhysicalOffsetInSpareData, not the native
+   * mxs_nand driver's metadata[0]. HP's captured FCB specifies byte 34. */
+  prime_nand_swap_marker(page,aux+s->rom_marker_metadata_index,marker);
   memcpy(page+2048,aux,metadata);
   if(s->corrected_bits)qemu_log("hp-prime-g2-rom: BCH corrected %u bits at NAND page %u\n",
                               s->corrected_bits,number);
@@ -2953,8 +3038,21 @@ bool prime_g2_nand_rom_load(uint32_t *entry, Error **errp)
   error_setg(errp,"no valid i.MX6ULL NAND FCB/DBBT/IVT boot chain");
   return false;
 }
+/* Observe the NAND command boundary shared by PIO and APBH/BCH transfers,
+ * including failed attempts. The overlay separately records successful writes.
+ * No emulator confinement filter: an escaping guest write must remain visible. */
+static void prime_nand_trace_write(PrimeNANDState *s, const char *operation)
+{
+    if (s->trace_writes) {
+        qemu_log("prime-nand-write: {\"operation\":\"%s\",\"page\":%u,"
+                 "\"block\":%u,\"descriptor\":%u,\"buffer\":%u,"
+                 "\"ecc_payload\":%u}\n", operation, s->page, s->page / 64,
+                 s->last_descriptor, s->last_dma_buffer, s->last_ecc_payload);
+    }
+}
+
 static bool prime_nand_program_page(PrimeNANDState*s)
-{unsigned i;int slot;if(prime_nand_bad(s,s->page)){
+{unsigned i;int slot;if(prime_nand_defective(s,s->page)){
    s->program_failures++;if(s->page>=PRIME_NAND_TOTAL_PAGES)s->program_out_of_range++;
    return false;}
  slot=prime_nand_find(s,s->page,true);if(slot<0){
@@ -2965,7 +3063,7 @@ static bool prime_nand_program_page(PrimeNANDState*s)
    &s->page_data[slot*PRIME_NAND_PAGE_BYTES]);
  return true;}
 static bool prime_nand_erase_block(PrimeNANDState*s)
-{unsigned i,block=s->page/64;if(prime_nand_bad(s,s->page))return false;
+{unsigned i,block=s->page/64;if(prime_nand_defective(s,s->page))return false;
  if(s->erase_counts[block]!=0xffff)s->erase_counts[block]++;
  if(s->erase_counts[block]>s->wear_limit){s->bad_blocks[block/8]|=1u<<(block&7);return false;}
  s->erased_blocks[block/8]|=1u<<(block&7);
@@ -2986,9 +3084,9 @@ static void prime_nand_command_cycle(PrimeNANDState *s, uint8_t value)
   case 0x00:s->column=0;s->page=0;break;
   case 0x30:prime_nand_load_page(s);break;
   case 0x80:s->column=0;memset(s->page_cache,0xff,sizeof(s->page_cache));s->page_cache_valid=true;break;
-  case 0x10:s->status=prime_nand_program_page(s)?0xe0:0xe1;break;
+  case 0x10:prime_nand_trace_write(s,"program");s->status=prime_nand_program_page(s)?0xe0:0xe1;break;
   case 0x60:s->page=0;break;
-  case 0xd0:s->status=prime_nand_erase_block(s)?0xe0:0xe1;s->page_cache_valid=false;break;
+  case 0xd0:prime_nand_trace_write(s,"erase");s->status=prime_nand_erase_block(s)?0xe0:0xe1;s->page_cache_valid=false;break;
   default:break;
   }
 }
@@ -3049,28 +3147,38 @@ static void prime_gpmi_pull(PrimeNANDState *s, uint8_t *data, size_t len)
   }
 }
 
-/* The backing store is a decoded capture, not physical interleaved ECC.
- * Adapt the driver-side marker swap to the guest's current BCH layout;
- * do not bake in the zero-ECC marker offset used by the old model. */
-static bool prime_nand_capture_layout(PrimeNANDState *s, unsigned *metadata,
-                                      unsigned *chunks, unsigned *marker)
+/* Physical BCH transfers need not fill the 2 KiB NAND data area: FCB
+ * discovery uses eight 128-byte codewords. Marker projection is a separate
+ * restriction of the legacy decoded-capture representation, not hardware. */
+static bool prime_nand_dma_layout(PrimeNANDState *s, unsigned *metadata,
+                                  unsigned *chunks, unsigned *marker,
+                                  unsigned *payload_bytes, bool capture)
 {
   uint32_t l0=s->bch_regs[8],l1=s->bch_regs[9];
   unsigned index,wire=0,payload=0;bool found=false;
   *metadata=(l0>>16)&255;*chunks=(l0>>24)+1;
-  if(!*metadata||((*metadata+3)&~3u)+*chunks>64)return false;
+  if(((*metadata+3)&~3u)+*chunks>64 || (l1>>16)>PRIME_NAND_PAGE_BYTES)return false;
   for(index=0;index<*chunks;index++){
     uint32_t reg=index?l1:l0;
     unsigned bytes=(reg&0x3ff)*4,meta=index?0:*metadata;
     unsigned strength=((reg>>11)&31)*2,gf=reg&(1<<10)?14:13;
     unsigned begin=wire+meta*8;
-    if(strength>40)return false;
+    if(strength>40 || (!bytes && !meta))return false;
     if(begin<=2048*8&&2048*8+8<=begin+bytes*8){
       *marker=payload*8+2048*8-begin;found=true;
     }
     wire=begin+bytes*8+strength*gf;payload+=bytes;
   }
-  return found&&payload==2048&&wire<=(l1>>16)*8&&wire<=PRIME_NAND_PAGE_BYTES*8;
+  if(!payload || payload>2048 || wire>(l1>>16)*8)return false;
+  *payload_bytes=payload;
+  return !capture || (*metadata&&found&&payload==2048);
+}
+
+static bool prime_nand_capture_layout(PrimeNANDState *s, unsigned *metadata,
+                                      unsigned *chunks, unsigned *marker)
+{
+  unsigned bytes;
+  return prime_nand_dma_layout(s,metadata,chunks,marker,&bytes,true);
 }
 
 static void prime_nand_swap_marker(uint8_t *payload,uint8_t *aux,unsigned bit)
@@ -3104,9 +3212,9 @@ static void prime_nand_bits(uint8_t *dst,unsigned dstbit,const uint8_t *src,
 static bool prime_nand_bch_transfer(PrimeNANDState *s,bool encode,
                                     uint8_t *payload,uint8_t *aux)
 {
-  unsigned metadata,chunks,marker,index,wire=0,offset=0;
+  unsigned metadata,chunks,marker,index,wire=0,offset=0,payload_bytes;
   uint32_t result_status=0;
-  if(!prime_nand_capture_layout(s,&metadata,&chunks,&marker))return false;
+  if(!prime_nand_dma_layout(s,&metadata,&chunks,&marker,&payload_bytes,false))return false;
   s->corrected_bits=0;s->uncorrectable=false;
   /* Linux/MXS software repairs erased data after inspecting DEBUG1. Keep
    * damaged DMA bytes intact. Nine-bit saturation and page aggregation are
@@ -3326,13 +3434,13 @@ static void prime_apbh_execute(PrimeNANDState *s)
     }
     if(pio_count&&GPMI_MODE(s->gpmi_regs[0])==GPMI_MODE_READ&&
        (s->gpmi_regs[2]&GPMI_ECC_ENABLE)&&s->page_cache_valid){
-      uint8_t payload_data[2048],auxiliary[64];unsigned metadata,chunks,marker;
+      uint8_t payload_data[2048],auxiliary[64];unsigned metadata,chunks,marker,payload_bytes;
       uint32_t payload=s->gpmi_regs[4],aux=s->gpmi_regs[5];s->last_ecc_payload=payload;
       /* Raw mode decodes stored codewords. Decoded capture mode only adapts
        * the driver-side marker representation; it is not raw ECC evidence. */
       memcpy(payload_data,s->page_cache,sizeof(payload_data));
       memset(auxiliary,0xff,sizeof(auxiliary));
-      if(!prime_nand_capture_layout(s,&metadata,&chunks,&marker)){
+      if(!prime_nand_dma_layout(s,&metadata,&chunks,&marker,&payload_bytes,!s->physical_pages)){
         qemu_log_mask(LOG_GUEST_ERROR,"prime-g2-bch: unsupported capture layout\n");
         s->uncorrectable=true;break;
       }
@@ -3345,7 +3453,7 @@ static void prime_apbh_execute(PrimeNANDState *s)
         prime_nand_swap_marker(payload_data,auxiliary,marker);
         memset(auxiliary+((metadata+3)&~3u),s->uncorrectable?0xfe:0,chunks);
       }
-      if(payload)prime_apbh_guest_write(payload,payload_data,sizeof(payload_data));
+      if(payload)prime_apbh_guest_write(payload,payload_data,payload_bytes);
       if(aux)prime_apbh_guest_write(aux,auxiliary,sizeof(auxiliary));
       s->bch_regs[0]|=1u;prime_bch_update_irq(s);
     }else if(pio_count&&GPMI_MODE(s->gpmi_regs[0])==GPMI_MODE_WRITE&&
@@ -3353,15 +3461,15 @@ static void prime_apbh_execute(PrimeNANDState *s)
       /* BCH encode descriptors carry data through PAYLOAD/AUXILIARY pointers,
        * not the APBH descriptor's ordinary data buffer. Mirror the read path:
        * capture the clean payload and metadata before PAGEPROG consumes them. */
-      uint32_t payload=s->gpmi_regs[4],aux=s->gpmi_regs[5];unsigned metadata,chunks,marker;
-      if(!prime_nand_capture_layout(s,&metadata,&chunks,&marker)){
+      uint32_t payload=s->gpmi_regs[4],aux=s->gpmi_regs[5];unsigned metadata,chunks,marker,payload_bytes;
+      if(!prime_nand_dma_layout(s,&metadata,&chunks,&marker,&payload_bytes,!s->physical_pages)){
         qemu_log_mask(LOG_GUEST_ERROR,"prime-g2-bch: unsupported capture layout\n");
         s->uncorrectable=true;s->page_cache_valid=false;break;
       }
       if(s->physical_pages){
         uint8_t message[2048],auxiliary[64];
         memset(message,0xff,sizeof(message));memset(auxiliary,0xff,sizeof(auxiliary));
-        if(payload)prime_apbh_guest_read(payload,message,sizeof(message));
+        if(payload)prime_apbh_guest_read(payload,message,payload_bytes);
         if(aux)prime_apbh_guest_read(aux,auxiliary,metadata);
         if(!prime_nand_bch_transfer(s,true,message,auxiliary)){
           s->page_cache_valid=false;s->uncorrectable=true;break;
@@ -3647,7 +3755,9 @@ static int prime_nand_post_load(void *opaque,int version_id)
   }
   prime_gpmi_update_irq(s);prime_bch_update_irq(s);prime_apbh_update_irq(s);return 0;
 }
-static const VMStateDescription prime_nand_vmstate={.name=TYPE_PRIME_G2_NAND,.version_id=5,.minimum_version_id=1,.post_load=prime_nand_post_load,.fields=(const VMStateField[]){
+/* The full-device overlay changes serialized array lengths. Explicitly reject
+ * older snapshots rather than misinterpreting their shorter page arrays. */
+static const VMStateDescription prime_nand_vmstate={.name=TYPE_PRIME_G2_NAND,.version_id=6,.minimum_version_id=6,.post_load=prime_nand_post_load,.fields=(const VMStateField[]){
  VMSTATE_UINT32_ARRAY(gpmi_regs,PrimeNANDState,0x80),VMSTATE_UINT32_ARRAY(bch_regs,PrimeNANDState,0x80),
  VMSTATE_UINT8_ARRAY(id,PrimeNANDState,5),VMSTATE_UINT8(status,PrimeNANDState),
  VMSTATE_UINT8(command,PrimeNANDState),VMSTATE_UINT8(id_cursor,PrimeNANDState),VMSTATE_UINT8(address_count,PrimeNANDState),
@@ -3681,6 +3791,7 @@ static const Property prime_nand_properties[]={
  DEFINE_PROP_UINT32("gpmi-clock-hz",PrimeNANDState,gpmi_clock_hz,0),
  DEFINE_PROP_BOOL("use-ccm-clock",PrimeNANDState,use_ccm_clock,true),
  DEFINE_PROP_BOOL("physical-pages",PrimeNANDState,physical_pages,false),
+ DEFINE_PROP_BOOL("trace-writes",PrimeNANDState,trace_writes,false),
  DEFINE_PROP_BOOL("onfi",PrimeNANDState,onfi_enabled,true),
  DEFINE_PROP_STRING("onfi-parameters",PrimeNANDState,onfi_parameters_path),
  DEFINE_PROP_STRING("stock-nand",PrimeNANDState,stock_nand_path),

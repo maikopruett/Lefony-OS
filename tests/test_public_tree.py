@@ -41,6 +41,19 @@ def test_port_build_definitions_and_register_facts_are_source(tmp_path):
     assert not guard.check_paths(tmp_path, names)
 
 
+def test_public_font_exception_is_content_pinned(tmp_path):
+    for name in guard.PUBLIC_FONTS:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        original = (ROOT / name).read_bytes()
+        path.write_bytes(original)
+        assert not guard.check_paths(tmp_path, [name])
+        path.write_bytes(original[:-1])
+        assert guard.check_paths(tmp_path, [name])
+        (tmp_path / 'unreviewed.ttf').write_bytes(original)
+        assert guard.check_paths(tmp_path, ['unreviewed.ttf'])
+
+
 def test_rejects_symlink_to_private_file(tmp_path):
     (tmp_path / 'alias').symlink_to(tmp_path / 'nonexistent-private-file')
     assert any('symlink' in p for p in guard.check_paths(tmp_path, ['alias']))

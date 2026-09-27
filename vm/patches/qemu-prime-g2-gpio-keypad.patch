@@ -1,0 +1,35 @@
+diff --git a/include/hw/gpio/imx_gpio.h b/include/hw/gpio/imx_gpio.h
+--- a/include/hw/gpio/imx_gpio.h
++++ b/include/hw/gpio/imx_gpio.h
+@@ -51,6 +51,7 @@
+     uint32_t gdir;
+     uint32_t psr;
+     uint32_t reset_psr;
++    uint32_t (*board_pad_sample)(uint32_t direction, uint32_t output);
+     uint64_t icr;
+     uint32_t imr;
+     uint32_t isr;
+diff --git a/hw/gpio/imx_gpio.c b/hw/gpio/imx_gpio.c
+--- a/hw/gpio/imx_gpio.c
++++ b/hw/gpio/imx_gpio.c
+@@ -146,6 +146,9 @@
+     IMXGPIOState *s = IMX_GPIO(opaque);
+     uint32_t reg_value = 0;
+ 
++    if (s->board_pad_sample && (offset == DR_ADDR || offset == PSR_ADDR)) {
++        s->psr = (s->psr & ~0xfffeu) | s->board_pad_sample(s->gdir, s->dr);
++    }
+     switch (offset) {
+     case DR_ADDR:
+         /*
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -773,6 +773,7 @@
+          * bus high. HP verifies this GPIO2 pad mask during startup.
+          */
+         s->gpio[1].reset_psr = 0x00005554;
++        s->gpio[1].board_pad_sample = prime_g2_keypad_gpio;
+     }
+ 
+     /*

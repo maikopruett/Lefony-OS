@@ -1,4 +1,5 @@
 #include "development_update.h"
+#include "dual_boot_guard.h"
 #include "nand_physical.h"
 #include "watchdog.h"
 #include <ion.h>
@@ -15,7 +16,7 @@ const Status &status() { return s; }
 bool busy() { return s.state >= Checking && s.state <= Verifying; }
 void clearResult() { if (!busy()) s = {0x3155444c, 1, Idle, 0, 0, 0, 0, 0}; }
 bool begin(const uint8_t *image, size_t length, uint32_t crc) {
-  if (busy()) return false;
+  if (busy() || !DualBoot::legacyUpdateAllowed()) return false;
   if (!image || length < 0x30 || length > 8u*1024*1024) return false;
   uint32_t magic, bytes;
   memcpy(&magic, image+0x24, 4); memcpy(&bytes, image+0x2c, 4);

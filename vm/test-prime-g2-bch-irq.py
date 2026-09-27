@@ -38,6 +38,8 @@ def main():
             str(recovery.QEMU), '-machine', 'hp-prime-g2', '-S',
             '-display', 'none', '-serial', 'none', '-monitor', 'none',
             '-global', 'prime-g2-gpmi-bch.physical-pages=on',
+            '-global', 'prime-g2-mmdc.preinitialized=on',
+            '-global', 'prime-g2-gpmi-bch.use-ccm-clock=off',
             '-qtest', f'unix:{sock},server=on,wait=off', '-qtest-log', '/dev/null',
             '-qmp', f'unix:{qmp_sock},server=on,wait=off'],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)

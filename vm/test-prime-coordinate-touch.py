@@ -23,6 +23,7 @@ def main():
     parser.add_argument("--display-settings", action="store_true")
     parser.add_argument("--display-settings-only", action="store_true")
     parser.add_argument("--calculation-history", action="store_true")
+    parser.add_argument("--derivative", action="store_true")
     parser.add_argument("--functions", action="store_true")
     options = parser.parse_args()
     output = boot.ROOT / "build/lefony-touch-qualification"
@@ -75,11 +76,11 @@ def main():
                     assert time.monotonic() < deadline, 'guest timer stopped during input synchronization'
                     time.sleep(.01)
 
-            def press(name):
+            def press(name, hold_ms=200):
                 row, col = matrix[name]
                 for down in (True, False):
                     q.command(f"writew 0x020b8008 {((row << 8) | col | (0x8000 if down else 0)):#x}")
-                    wait_guest_ms(200)
+                    wait_guest_ms(hold_ms if down else 200)
 
             def touch(command):
                 assert raw(command) == "OK"
@@ -97,6 +98,13 @@ def main():
                 return path.read_bytes()
 
             assert raw("PING") == "PONG"
+            if options.derivative:
+                press("back")
+                # A brief key-down avoids autorepeating Backspace while host
+                # builds compete with QEMU; retain the normal release interval.
+                importlib.import_module('prime-derivative-check').check(
+                    raw, lambda name: press(name, hold_ms=80), touch, app, capture)
+                return
             if options.functions:
                 press("back")
                 importlib.import_module('prime-functions-touch-check').check(raw, press, touch, app, capture)

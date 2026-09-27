@@ -1,0 +1,97 @@
+--- a/hw/misc/imx7_snvs.c
++++ b/hw/misc/imx7_snvs.c
+@@ -36,13 +36,15 @@
+ #define HPSR_HPTA         BIT(0)
+ #define HPSR_PI           BIT(1)
+ #define HPSR_BTN          BIT(6)
++#define LPSR_SPO          BIT(18)
+ 
+ static uint64_t imx7_snvs_get_count(IMX7SNVSState *s);
+ static uint64_t imx7_snvs_get_hp_count(IMX7SNVSState *s);
+ 
+ static void imx7_snvs_update_irq(IMX7SNVSState *s)
+ {
+-    qemu_set_irq(s->irq, (s->hpsr & HPSR_BTN) != 0);
++    qemu_set_irq(s->irq, (s->lpsr & LPSR_SPO) &&
++                 (s->lpcr & SNVS_LPCR_DP_EN));
+     qemu_set_irq(s->alarm_irq, (s->hpsr & (HPSR_HPTA | HPSR_PI)) != 0);
+ }
+ 
+@@ -115,7 +117,7 @@
+ 
+ static const VMStateDescription vmstate_imx7_snvs = {
+     .name = TYPE_IMX7_SNVS,
+-    .version_id = 7,
++    .version_id = 8,
+     .minimum_version_id = 1,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT64(tick_offset, IMX7SNVSState),
+@@ -130,6 +132,7 @@
+         VMSTATE_UINT32_V(lpgpr, IMX7SNVSState, 7),
+         VMSTATE_UINT32_V(hplr, IMX7SNVSState, 7),
+         VMSTATE_UINT32_V(lplr, IMX7SNVSState, 7),
++        VMSTATE_UINT32_V(lpsr, IMX7SNVSState, 8),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -162,6 +165,9 @@
+         break;
+     case SNVS_HPCR:
+         ret = s->hpcr;
++        break;
++    case SNVS_LPSR:
++        ret = s->lpsr;
+         break;
+     case SNVS_HPSR:
+         ret = s->hpsr;
+@@ -249,7 +255,7 @@
+         break;
+     case SNVS_HPSR:
+         /* HPTA and the other latched HP status bits are write-one-clear. */
+-        s->hpsr &= ~v;
++        s->hpsr &= ~(v & ~HPSR_BTN); /* BTN reflects the pin, not W1C. */
+         imx7_snvs_update_irq(s);
+         break;
+     case SNVS_HPRTCMR:
+@@ -266,8 +272,15 @@
+         s->hp_alarm = deposit64(s->hp_alarm, 0, 32, v);
+         imx7_snvs_reschedule_alarm(s);
+         break;
++    case SNVS_LPSR:
++        s->lpsr &= ~v;
++        imx7_snvs_update_irq(s);
++        break;
+     case SNVS_DIAG_PWRKEY:
+         /* Emulator-only power-key ingress used by qtest and the UI proxy. */
++        if (v && !(s->hpsr & HPSR_BTN)) {
++            s->lpsr |= LPSR_SPO;
++        }
+         s->hpsr = deposit32(s->hpsr, 6, 1, v != 0);
+         imx7_snvs_update_irq(s);
+         break;
+@@ -279,6 +292,7 @@
+         break;
+     case SNVS_LPCR: {
+         s->lpcr = v;
++        imx7_snvs_update_irq(s);
+ 
+         const uint32_t mask  = SNVS_LPCR_TOP | SNVS_LPCR_DP_EN;
+ 
+--- a/include/hw/misc/imx7_snvs.h
++++ b/include/hw/misc/imx7_snvs.h
+@@ -28,6 +28,7 @@
+     SNVS_HPTALR = 0x30,
+     SNVS_DIAG_PWRKEY = 0xfc,
+     SNVS_LPCR = 0x38,
++    SNVS_LPSR = 0x4c,
+     SNVS_LPCR_TOP   = BIT(6),
+     SNVS_LPCR_DP_EN = BIT(5),
+     SNVS_LPSRTCMR = 0x050, /* Secure Real Time Counter MSB Register */
+@@ -52,6 +53,7 @@
+     uint32_t hpcomr;
+     uint32_t hpcr;
+     uint32_t hpsr;
++    uint32_t lpsr;
+     uint64_t hp_alarm;
+     QEMUTimer *hp_alarm_timer;
+     QEMUTimer *hp_periodic_timer;

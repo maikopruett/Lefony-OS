@@ -1,0 +1,13 @@
+diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -774,6 +774,9 @@
+          */
+         s->gpio[1].reset_psr = 0x00005554;
+         s->gpio[1].board_pad_sample = prime_g2_keypad_gpio;
++        /* Prime I2C1/2 external pull-ups: GPIO recovery probes must see idle
++         * high SDA/SCL while the pads are inputs. Bus transfers use I2C. */
++        s->gpio[0].reset_psr |= 0xf0000000u;
+     }
+ 
+     /*

@@ -15,6 +15,7 @@ void poll();
 // UI timers still run on every iteration; silent/stalled hosts do not renew it.
 bool needsPolling();
 bool managementActive();
+bool transferBusy();
 bool externalPowerConnected();
 struct TransferStatus { uint32_t state, received, total; };
 TransferStatus transferStatus();

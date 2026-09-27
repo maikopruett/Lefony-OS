@@ -149,7 +149,7 @@ bool canRequestUBootRecovery() {
     !(reg32(PrimeG2::SNVS + 0x34) & (1u << 5));
 }
 
-bool requestUBootRecovery() {
+static bool requestUBootAction(uint32_t token) {
   if (!canRequestUBootRecovery()) return false;
   // Linux rtc-snvs.c initializes LPPGDR before clearing the power-glitch
   // latch. A latched PGD event continuously zeroizes LPGPR despite unlocked
@@ -164,15 +164,23 @@ bool requestUBootRecovery() {
     }
     if (reg32(PrimeG2::SNVS + 0x4c) & 8u) return false;
   }
-  reg32(ReasonMagic) = 0x3153464c; // LFS1, consumed before U-Boot's sdp 0
+  reg32(ReasonMagic) = token;
   barrier();
   // SNVS LP writes cross the 32 kHz clock domain. DSB alone does not
   // guarantee that the retained word is visible on the first read.
   for (unsigned attempt = 0; attempt < 100; attempt++) {
-    if (reg32(ReasonMagic) == 0x3153464c) return true;
+    if (reg32(ReasonMagic) == token) return true;
     Ion::Timing::usleep(100);
   }
   return false;
+}
+
+bool requestUBootRecovery() { return requestUBootAction(0x3153464c); } // LFS1
+
+bool rebootToBootMenu() {
+  if (!System::bootloaderWakeMenuSupported() || !requestUBootAction(0x314d464c))
+    return false;
+  resetSystem();
 }
 
 bool rebootToUBootRecovery() {

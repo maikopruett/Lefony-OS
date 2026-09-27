@@ -1,4 +1,5 @@
 #include "nand_update.h"
+#include "dual_boot_guard.h"
 #include "usb_diagnostics.h"
 #include "development_update.h"
 
@@ -127,6 +128,7 @@ bool installPayload(const uint8_t*payload,size_t length,Metadata*m,int source){
 
 namespace PrimeG2 { namespace NANDUpdate {
 void init(){memset(&sManifest,0,sizeof(sManifest));memset(&sStatus,0,sizeof(sStatus));sStatus.magic=StatusMagic;sStatus.protocol=2;sStatus.state=uint32_t(State::Idle);sStatus.activeSlot=0;sStatus.pendingSlot=NoSlot;sStatus.bootLimit=3;memcpy(sStatus.version,CurrentVersion,sizeof(CurrentVersion));
+if(DualBoot::Enabled){sStatus.flags=0;return;}
 #if PRIME_G2_EMULATOR
 sStatus.flags=FlagDirectInstall;
 #else
@@ -137,13 +139,13 @@ if(geometryValid()){int source;Metadata m=currentMetadata(&source);sStatus.activ
 #endif
 volatile BootHandoff*handoff=reinterpret_cast<volatile BootHandoff*>(BootHandoffAddress);sBootHandoffSlot=NoSlot;if(handoff->magic==BootHandoffMagic){sBootHandoffSlot=handoff->booted;if(handoff->schema==BootHandoffSchema){sStatus.activeSlot=handoff->active;sStatus.pendingSlot=handoff->pending;sStatus.attempts=handoff->attempts;sStatus.bootLimit=handoff->bootLimit;sStatus.generation=handoff->generation;for(unsigned i=0;i<4;i++)sStatus.version[i]=handoff->version[i];}handoff->magic=0;PrimeG2::barrier();}
 }
-bool acceptManifest(const void*data,size_t length){if(length!=sizeof(Manifest)){setError(Error::ManifestLength);return false;}
+bool acceptManifest(const void*data,size_t length){if(!DualBoot::legacyUpdateAllowed()){setError(Error::LayoutNotProvisioned);return false;}if(length!=sizeof(Manifest)){setError(Error::ManifestLength);return false;}
 #if !PRIME_G2_EMULATOR
 if(sStatus.pendingSlot<=1){setError(Error::PendingUpdateExists);return false;}
 #endif
 memcpy(&sManifest,data,sizeof(sManifest));if(sManifest.magic!=ManifestMagic||sManifest.schema!=1||sManifest.headerBytes!=512||sManifest.payloadBytes<0x30||sManifest.payloadBytes>8u*1024u*1024u){setError(Error::ManifestFormat);return false;}if(sManifest.model!=ModelHPG2){setError(Error::WrongModel);return false;}uint32_t manifestVersion[4];memcpy(manifestVersion,sManifest.version,sizeof(manifestVersion));if(compareVersion(manifestVersion,sStatus.version)<=0){setError(Error::VersionRejected);return false;}if(!verifySignature(sManifest)){setError(Error::SignatureRejected);return false;}sStatus.state=uint32_t(State::ManifestReady);sStatus.error=0;sStatus.totalBytes=sManifest.payloadBytes;sStatus.writtenBytes=0;memcpy(sStatus.version,manifestVersion,sizeof(manifestVersion));sStatus.flags|=FlagManifestAuthenticated;return true;}
 bool noteCapsuleReady(const uint8_t*payload,size_t length){if(sStatus.state!=uint32_t(State::ManifestReady)||length!=sManifest.payloadBytes){setError(Error::CapsuleMismatch);return false;}uint8_t digest[32];sha256(payload,length,digest);if(memcmp(digest,sManifest.payloadSHA256,32)){setError(Error::CapsuleMismatch);return false;}sStatus.state=uint32_t(State::CapsuleReady);sStatus.flags|=FlagPayloadAuthenticated;return true;}
-bool install(const uint8_t*payload,size_t length){if(sStatus.state!=uint32_t(State::CapsuleReady)||length!=sManifest.payloadBytes){setError(Error::CapsuleMismatch);return false;}
+bool install(const uint8_t*payload,size_t length){if(!DualBoot::legacyUpdateAllowed()){setError(Error::LayoutNotProvisioned);return false;}if(sStatus.state!=uint32_t(State::CapsuleReady)||length!=sManifest.payloadBytes){setError(Error::CapsuleMismatch);return false;}
 #if PRIME_G2_EMULATOR
 if(!geometryValid()){setError(Error::GeometryMismatch);return false;}int source;Metadata m=currentMetadata(&source);sStatus.state=uint32_t(State::Installing);if(!installPayload(payload,length,&m,source))return false;sStatus.state=uint32_t(State::PendingReboot);sStatus.flags|=FlagSlotCommitted;return true;
 #else

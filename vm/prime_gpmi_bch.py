@@ -51,11 +51,14 @@ class DecodedPage:
 
 
 class Layout:
-    def __init__(self, layout0: int, layout1: int):
+    def __init__(self, layout0: int, layout1: int, *, marker_metadata_index: int = 0):
         if not 0 <= layout0 <= 0xffffffff or not 0 <= layout1 <= 0xffffffff:
             raise ValueError('layout register outside uint32')
         self.page_bytes = layout1 >> 16
         self.metadata_bytes = (layout0 >> 16) & 0xff
+        if type(marker_metadata_index) is not int or not 0 <= marker_metadata_index < max(1, self.metadata_bytes):
+            raise ValueError('marker metadata index outside layout')
+        self.marker_metadata_index = marker_metadata_index
         self.status_offset = (self.metadata_bytes + 3) & ~3
         blocks_after_first = layout0 >> 24
         self.chunks = []
@@ -102,8 +105,10 @@ class Layout:
         bit = self.marker_payload_bit()
         word = int.from_bytes(payload, 'little')
         marker = (word >> bit) & 0xff
-        word = (word & ~(0xff << bit)) | (metadata[0] << bit)
-        return word.to_bytes(len(payload), 'little'), bytes([marker]) + metadata[1:]
+        index = self.marker_metadata_index
+        word = (word & ~(0xff << bit)) | (metadata[index] << bit)
+        metadata = metadata[:index] + bytes([marker]) + metadata[index+1:]
+        return word.to_bytes(len(payload), 'little'), metadata
 
     def encode(self, payload: bytes, metadata: bytes, encoder=None) -> bytes:
         """Encode controller DMA buffers, with no implicit driver marker swap."""
@@ -125,7 +130,7 @@ class Layout:
             offset += chunk.data_bytes
         return word.to_bytes(self.page_bytes, 'little')
 
-    def decode(self, physical: bytes, erase_threshold: int = 0) -> DecodedPage:
+    def decode(self, physical: bytes, erase_threshold: int = 0, decoder=None) -> DecodedPage:
         """Decode actual interleaved codewords, not payload+OOB capture records.
 
         MODE's threshold counts zero bits in each complete codeword. Erased
@@ -148,8 +153,8 @@ class Layout:
             parity_word = (codeword >> bits) & ((1 << chunk.parity_bits) - 1)
             status = 0
             if chunk.strength:
-                bch = codec(chunk.field, chunk.strength)
-                parity = parity_word.to_bytes(bch.ecc_bytes, 'little')
+                bch = (decoder or codec)(chunk.field, chunk.strength)
+                parity = parity_word.to_bytes((chunk.parity_bits+7)//8, 'little')
                 width = bits + chunk.parity_bits
                 zeros = width - (codeword & ((1 << width) - 1)).bit_count()
                 if zeros <= erase_threshold:

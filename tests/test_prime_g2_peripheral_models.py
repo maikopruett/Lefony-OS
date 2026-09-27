@@ -61,7 +61,7 @@ def test_all_requested_qemu_models_are_wired_and_migratable():
     assert "PRIME_NAND_OVERLAY_MAGIC" in source
     assert "prime_nand_overlay_replay" in source
     assert 'DEFINE_PROP_STRING("stock-overlay"' in source
-    assert "PRIME_NAND_SPARSE_PAGES 65536" in source
+    assert "PRIME_NAND_SPARSE_PAGES PRIME_NAND_TOTAL_PAGES" in source
     assert "program_overlay_full" in source
     assert "s->command==0x60" in source
     assert "ERASE1 is followed by three row cycles" in source

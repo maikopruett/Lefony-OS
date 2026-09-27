@@ -52,6 +52,9 @@ if [ -d "$PORT/themes" ]; then
 fi
 mkdir -p "$SOURCE/ion/src/prime_g2"
 cp -R "$PORT/ion/src/prime_g2/." "$SOURCE/ion/src/prime_g2/"
+if [ "${LEFONY_DUAL_BOOT:-0}" = 1 ]; then
+    "$REPO/.venv/bin/python" "$REPO/scripts/prepare_prime_dual_firmware.py" "$SOURCE"
+fi
 # Public fixed-width input wire contract is shared with the privileged reader.
 cp "$REPO/sdk/include/lefony/input_wire.h" "$SOURCE/ion/src/prime_g2/native_app_input_wire.h"
 mkdir -p "$SOURCE/ion/src/prime_g2/lefony"
@@ -68,6 +71,7 @@ if [ -d "$PORT/apps" ]; then
     cp -R "$PORT/apps/." "$SOURCE/apps/"
 fi
 python3 "$REPO/scripts/prepare_prime_touch.py" "$SOURCE"
+python3 "$REPO/scripts/prepare_prime_derivative.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_native_scheduling.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_native_system.py" "$SOURCE"
 python3 "$REPO/scripts/prepare_prime_display.py" "$SOURCE"

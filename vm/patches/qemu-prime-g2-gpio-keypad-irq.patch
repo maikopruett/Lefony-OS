@@ -1,0 +1,64 @@
+--- a/include/hw/gpio/imx_gpio.h
++++ b/include/hw/gpio/imx_gpio.h
+@@ -63,4 +63,6 @@
+     qemu_irq output[IMX_GPIO_PIN_COUNT];
+ };
+ 
++void imx_gpio_sample_board(void *opaque);
++
+ #endif /* IMX_GPIO_H */
+--- a/hw/gpio/imx_gpio.c
++++ b/hw/gpio/imx_gpio.c
+@@ -114,6 +114,23 @@
+     imx_gpio_update_int(s);
+ }
+ 
++/* Board switch changes are input edges even when the CPU is sleeping. */
++void imx_gpio_sample_board(void *opaque)
++{
++    IMXGPIOState *s = IMX_GPIO(opaque);
++    unsigned line;
++    uint32_t levels;
++    if (!s->board_pad_sample) {
++        return;
++    }
++    levels = s->board_pad_sample(s->gdir, s->dr);
++    for (line = 1; line < 16; line++) {
++        if (!(s->gdir & (1u << line))) {
++            imx_gpio_set(s, line, (levels >> line) & 1);
++        }
++    }
++}
++
+ static void imx_gpio_set_all_int_lines(IMXGPIOState *s)
+ {
+     int i;
+@@ -147,7 +164,7 @@
+     uint32_t reg_value = 0;
+ 
+     if (s->board_pad_sample && (offset == DR_ADDR || offset == PSR_ADDR)) {
+-        s->psr = (s->psr & ~0xfffeu) | s->board_pad_sample(s->gdir, s->dr);
++        imx_gpio_sample_board(s);
+     }
+     switch (offset) {
+     case DR_ADDR:
+@@ -265,6 +282,9 @@
+         qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad register at offset 0x%"
+                       HWADDR_PRIx "\n", TYPE_IMX_GPIO, __func__, offset);
+         break;
++    }
++    if (offset == DR_ADDR || offset == GDIR_ADDR) {
++        imx_gpio_sample_board(s);
+     }
+ }
+ 
+--- a/hw/arm/fsl-imx6ul.c
++++ b/hw/arm/fsl-imx6ul.c
+@@ -774,6 +774,7 @@
+          */
+         s->gpio[1].reset_psr = 0x00005554;
+         s->gpio[1].board_pad_sample = prime_g2_keypad_gpio;
++        prime_g2_keypad_notify(imx_gpio_sample_board, &s->gpio[1]);
+         /* Prime I2C1/2 external pull-ups: GPIO recovery probes must see idle
+          * high SDA/SCL while the pads are inputs. Bus transfers use I2C. */
+         s->gpio[0].reset_psr |= 0xf0000000u;

@@ -64,7 +64,7 @@ class PhysicalDisplayContractTest(unittest.TestCase):
         self.assertIn("if (checkIfOnOffKeyReleased)", physical)
         self.assertIn("while (PrimeG2::Services::onKeyPressed())", physical)
         self.assertIn("armPowerWakeSources()", physical)
-        self.assertIn("while (!sPowerWakeRequested)", physical)
+        self.assertIn("while (!sPowerWakeRequested && !sPowerButtonWakeRequested)", physical)
         self.assertIn('__asm volatile("wfi"', physical)
         self.assertIn("disarmPF1550Wake()", physical)
         self.assertNotIn("while (!PrimeG2::Services::onKeyPressed())", physical)

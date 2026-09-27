@@ -4,7 +4,145 @@ Lefony targets the **HP Prime G2** (i.MX6ULL). It is a native, bare-metal Upsilo
 port, not a Linux desktop. Prime G1 and stock NumWorks hardware are not targets
 of these build scripts.
 
+## Current dual-boot release
+
+The [browser development release](DUAL-BOOT-BROWSER-RELEASE.md) packages the
+accepted two-OS countdown/Enter and Off/On behavior for HP Prime G2. Generation 3
+uses the same accepted firmware and bootloader binaries with a new signed
+descriptor. Browser-only migration, update, full local backup and journaled
+resume are implemented. HP V15751 is supplied by the user, never bundled.
+Broader battery and physical power-loss qualification remain open; the user
+authorized development publication with those limits. See the Phase 7 ledger
+for verification and publication status.
+
+## Earlier implementation milestones
+
+The entries below record each phase at the time it was performed. Statements
+that HP or public installation was disabled describe those earlier candidates.
+
 ## Firmware and applications
+
+The [completed Phase 1 boot-menu milestone](BOOT-MENU-PHASE1.md) adds an Enter-only
+startup shortcut, three-second progress bar, full keypad/Goodix menu, saved
+priority and recovery to the existing pinned U-Boot. HP remains disabled.
+The corrected build is installed in NAND with both boot copies verified, and the
+user confirmed the physical menu works correctly. It remains a development build;
+see the qualification record for evidence and limits, not a shipping release.
+
+[Dual-boot Phase 2 research](HP-LEFONY-PHASE2-COMPATIBILITY.md) reproduces the
+V15751 filesystem bounds and format loop with exact-input instruction checks.
+It identifies raw system-update, diagnostic-erase and bad-block metadata paths
+that bypass those bounds. Phase 2 changed no calculator NAND or boot policy.
+
+[Completed Phase 3](HP-LEFONY-PHASE3-HANDOFF.md) launches unmodified HP V15751 through
+an isolated RAM-loaded menu, both in QEMU and on the physical calculator. The
+user confirmed calculation and saved-history retention after a fresh ROM/menu
+launch. The initial white-screen failure was resolved by using HP's DDR setup;
+the corrected research6 loader includes that setup and rejects incompatible
+inherited memory maps. Its model save/cold-retention and ordinary Lefony
+menu/recovery regressions pass. Logical framebuffer checks remain distinct from
+the strict panel model, and DDR PHY timing is not modeled.
+
+The only available calculator underwent the explicitly approved temporary stock
+restoration, with all 4,096 raw NAND blocks verified. Two matching complete Lefony
+backups are preserved. ROM-to-RAM recovery works, and the research loader uses a
+RAM-only bad-block table. Guarded restore transactions and complete-device
+verification also pass through actual ARM U-Boot in QEMU r84. The earlier Linux
+kexec route remains unqualified. Lefony rollback passed all 672 changed-block
+readbacks and the final 4,096-block comparison; native USB returned after reset.
+Installed one-shot recovery also returned to native USB. The user confirmed
+Lefony and its boot menu work again. The full backup match verifies apps/data
+bytes; a separate application-by-application test is not claimed.
+No experimental HP loader has been installed in NAND; the accepted permanent
+Lefony menu keeps HP disabled.
+
+[Phase 4 confinement](HP-LEFONY-PHASE4-CONFINEMENT.md) is complete for the tested
+V15751 experimental RAM profile. Research7 U-Boot restricts HP's filesystem to
+blocks 392–2047, with narrowly owned bad-block metadata writes. QEMU r85 traces
+both attempted writes and committed records; save/full-scan/checkpoint, cold
+retention, deletion, near-full storage, reclamation, format and persistent bad-
+block retirement pass without writes escaping the permitted regions. Factory-
+reset shortcuts, official updates and maintenance reload are explicitly refused
+by this profile. Fresh welcome-screen touch and the updater frontend remain
+unqualified. This is emulator evidence, not an installed shared layout; no
+calculator operation was performed.
+
+[Phase 5 shared-layout migration](HP-LEFONY-PHASE5-MIGRATION.md) now has a separate
+layout-5 contract, signed NAND loaders and a restartable offline migration/stock
+rollback executor. Both OSes cold-boot through ROM in QEMU r86. All 80 retained
+HP files match their original hashes through HP's own filesystem APIs after
+logical recreation. Both priority choices, legacy-update rejection and exact
+4,096-block stock rollback pass. The physical-codeword fault model passes 116,236 interruption cases; actual
+ARM ROM boot is tested separately. The host suite passes 2,112 tests with two
+private-reference skips. Phase 5 is complete for this stock-source emulator
+milestone. Physical migration remains disabled; the connected
+calculator and its installed Lefony-only menu were not changed.
+
+[Phase 6 installer integration](HP-LEFONY-PHASE6-INSTALLER.md) is complete for
+this tested existing-Lefony source with a same-board HP V15751 backup. The
+website/companion retains explicit mode selection, reviewed signed inputs,
+backups, exclusive transactions, reconnect/resume and separate OS confirmations.
+The physical installation and exact original-Lefony restoration both passed
+all 4,096 block checks; the user confirmed restored startup and working apps.
+The paired website installation also survived an active-page reload without a
+duplicate write request.
+
+Two startup defects were resolved: the generic USB manufacturing boot override,
+and a NAND bootstream marker encoded at metadata byte 0 instead of the HP FCB's
+byte 34. QEMU r87 reproduces the old encoding failure and passes corrected
+both-OS ROM, HP archive, priority, rejection and legacy regression checks. The
+physical eight-block bootstream repair passed full-device verification while
+preserving both OSes and their data. After the requested recovery-pad release
+and rear RESET, the user reported that everything works. Native USB independently
+confirms dual-boot layout 5, release 1. Earlier separate HP and Lefony selections
+passed with the same loader launched from RAM; no additional post-repair HP
+calculation or full power-transition matrix is claimed. The retained companion
+session links the separate repair evidence and records both OS confirmations.
+
+Correction validation totals 2,205 passing host tests and two optional private
+skips across the full run and the final two-test rerun. Actual ARM guarded
+transport/restore checks and public-tree checks pass. Phase 7 remains the broader
+physical compatibility, power/interruption and release qualification. Public
+dual-boot installation remains disabled; both original backups remain retained.
+
+[Phase 7 qualification](HP-LEFONY-PHASE7-QUALIFICATION.md) is in progress.
+The exact repaired readback passes actual ARM both-OS NAND-ROM, priority,
+layout rejection and legacy-update refusal checks. The user confirmed both
+physical reboot-selection directions and HP sleep/wake with saved calculation
+retention on USB power; the battery remains disconnected. A new cross-OS
+retention test preserves HP history through an intervening Lefony boot. The
+corrected existing-Lefony install, final-snapshot rollback and retained repair
+pass 59,055 modeled interruption points, including journal transitions. These
+results do not qualify electrical power loss or public release; remaining
+physical checks are tracked in the matrix. Lefony history is intentionally
+volatile and is excluded from persistent-data acceptance.
+
+Phase 7 now also implements manual Shift+On → On through the normal startup
+progress bar and Enter shortcut. The native/bootloader candidate and exact
+V15751 RAM hooks are installed in NAND. The user confirmed that the original
+direct-menu wake works from both OSes, then requested this startup-page change.
+Native wake, HP warm suspend and HP full power-off passed actual ARM menu-entry
+tests on the direct-menu candidate, including saved history and one-use requests.
+QEMU r88 completes the documented MMDC FIFO reset used by HP's wake routine.
+The retained layout-compatible refresh passes 8,162 modeled interruption
+boundaries and actual ROM checks of its intermediate boot routes. The physical
+48-block update passed full 4,096-block verification, preserving HP, apps and
+preferences against a fresh capture. An ordinary NAND reset returned native
+USB with layout 5, release 2. The subsequent countdown correction replaced only
+eight bootloader blocks and passed complete-device fingerprint comparison. It
+reused the existing backup and did not rerun tests, as requested. Release 2 and
+both OS images are unchanged. The user subsequently confirmed that everything
+works, accepting the corrected Off / On startup page on this calculator.
+The remaining Phase 7 power, recovery, persistence and release checks are still
+tracked separately in the qualification matrix.
+
+Development release [`1.0.0+1790349064`](DERIVATIVE-RELEASE-20260925.md) replaces
+the calculator palette's derivative with a centered `d/dx` button and an editable
+typeset derivative. Symbolic input defaults to `x`, supports changing the
+variable, and retains the notation in history and recall. Evaluated derivatives
+show their evaluation point. Both targets, 1,983 host tests and emulator checks
+passed. The live website selects the new signed package. No calculator was
+flashed; physical input acceptance remains open.
 
 Development release [`1.0.0+1790319519`](https://github.com/maikopruett/Lefony-OS/releases/tag/build-20260925-1790319519)
 adds Maiko Pruett (`@maikopruett`) first in Settings → About → Contributors.

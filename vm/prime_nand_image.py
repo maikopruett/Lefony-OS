@@ -31,7 +31,18 @@ def decode_fcb(physical):
         raise ValueError('incorrect FCB page length')
     for block in range(8):
         chunk = physical[32 + block * 193:32 + (block + 1) * 193]
-        data, _, errors = bch.decode(chunk[:128].translate(REVERSE), chunk[128:].translate(REVERSE))
+        try:
+            data, _, errors = bch.decode(chunk[:128].translate(REVERSE), chunk[128:].translate(REVERSE))
+        except ValueError:
+            if block != 0:
+                raise
+            # The preserved stock HP capture uses a first codeword covering
+            # the 32 metadata bytes as well as the first 128 payload bytes,
+            # matching its own 0x0720a020/0x0840a020 BCH reads. Existing
+            # re-encoded fixtures omit those bytes from first-word parity.
+            data, _, errors = bch.decode(physical[:160].translate(REVERSE),
+                                        chunk[128:].translate(REVERSE))
+            data = data[32:]
         decoded.extend(data.translate(REVERSE))
         corrections.append(len(errors))
     if (decoded[4:12] != bytes.fromhex('4643422000000001') or
@@ -40,16 +51,21 @@ def decode_fcb(physical):
     return bytes(decoded), corrections
 
 
-def encode_fcb(fcb):
+def encode_fcb(fcb, *, covered_metadata=None):
     if len(fcb) != 1024 or struct.unpack_from('<I', fcb)[0] != checksum(fcb):
         raise ValueError('invalid logical FCB size/checksum')
     bch = BCH(13, 40, 0x201b)
+    if covered_metadata is not None and len(covered_metadata) != 32:
+        raise ValueError('FCB metadata must contain exactly 32 bytes')
     physical = bytearray(PAGE)
+    if covered_metadata is not None:
+        physical[:32] = covered_metadata
     for block in range(8):
         chunk = fcb[block * 128:(block + 1) * 128]
         start = 32 + block * 193
         physical[start:start + 128] = chunk
-        physical[start + 128:start + 193] = bch.encode(chunk.translate(REVERSE)).translate(REVERSE)
+        message = covered_metadata + chunk if block == 0 and covered_metadata is not None else chunk
+        physical[start + 128:start + 193] = bch.encode(message.translate(REVERSE)).translate(REVERSE)
     physical[2048:2050] = b'\xff\xff'
     return bytes(physical)
 
@@ -86,7 +102,8 @@ def fcb_layout(fcb):
         raise ValueError('unsupported FCB BCH layout')
     gf = word(0x88) << 10
     layout = Layout((word(0x40) << 24) | (word(0x3c) << 16) | (ecc0 << 11) | gf | (first // 4),
-                    (2112 << 16) | (eccn << 11) | gf | (following // 4))
+                    (2112 << 16) | (eccn << 11) | gf | (following // 4),
+                    marker_metadata_index=word(0xb0))
     if (word(0xac) or word(0x84) != 2048 or word(0x80) > 7 or
             word(0x7c) * 8 + word(0x80) != layout.marker_payload_bit()):
         raise ValueError('unsupported FCB marker mode/location')

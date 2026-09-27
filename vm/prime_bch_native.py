@@ -3,6 +3,7 @@ import ctypes as C
 from pathlib import Path
 import subprocess
 import tempfile
+from prime_bch import UncorrectableError
 
 
 class NativeBCH:
@@ -20,6 +21,7 @@ class NativeBCH:
             self.lib.prime_bch_free.argtypes = [C.c_void_p]
             self.lib.prime_bch_bytes.argtypes = [C.c_void_p]
             self.lib.prime_bch_encode.argtypes = [C.c_void_p, C.c_void_p, C.c_size_t, C.c_void_p]
+            self.lib.prime_bch_decode.argtypes = [C.c_void_p, C.c_void_p, C.c_size_t, C.c_void_p, C.c_void_p]
         except Exception:
             self.temporary.cleanup()
             raise
@@ -47,9 +49,21 @@ class NativeEncoder:
         if not self.pointer:
             raise ValueError('unsupported native BCH configuration')
         self.size = library.prime_bch_bytes(self.pointer)
+        self.strength = strength
 
     def encode(self, data):
         parity = C.create_string_buffer(self.size)
         if self.lib.prime_bch_encode(self.pointer, data, len(data), parity):
             raise ValueError('invalid native BCH message size')
         return parity.raw
+
+    def decode(self, data, parity):
+        if len(parity) != self.size:
+            raise ValueError('incorrect parity size')
+        message = C.create_string_buffer(data, len(data))
+        check = C.create_string_buffer(parity, len(parity))
+        positions = (C.c_uint * self.strength)()
+        count = self.lib.prime_bch_decode(self.pointer, message, len(data), check, positions)
+        if count < 0:
+            raise UncorrectableError('native BCH decode failed')
+        return message.raw, check.raw, list(positions[:count])

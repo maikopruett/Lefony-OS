@@ -36,6 +36,12 @@ _start:
   .word 0x016f2818
   .word 0x00000000
   .word capsule_end - _start
+#ifdef LEFONY_DUAL_BOOT_CAPSULE
+  .word 0x354c464c /* LFL5: distinct from legacy signed update manifests */
+  .word 5
+  .word 1
+  .word 0
+#endif
 
   .org 0x40
 loader:

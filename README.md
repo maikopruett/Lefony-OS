@@ -17,7 +17,14 @@ Linux desktop and its obsolete deployment scripts are outside this project.
 > separately. This is community firmware, not an HP-supported update. Prime G1
 > is not a supported target.
 
-## Latest updates — September 25, 2026
+## Latest updates — September 27, 2026
+
+- **HP OS and Lefony dual boot:** an Enter-key startup menu, saved priority, and
+  return to the startup bar after Off/On in either OS. The browser-only installer
+  creates a verified local recovery backup, preserves HP files, and supports
+  interrupted-install recovery. HP Prime G2 and exact HP build 15751 only.
+  See the [development release guide](docs/DUAL-BOOT-BROWSER-RELEASE.md) and
+  [website installer](https://lefony.com/#install).
 
 - **Native C/C++ SDK:** conventional `main`/newlib support, ARM emulator
   preview, input replay, GDB debugging, UI components and reference apps.
@@ -69,8 +76,9 @@ The [native SDK](sdk/README.md) builds and runs C/C++ app packages in
 the emulator. It includes starter projects, `AGENTS.md`, drawing/input APIs and
 automatic publication tooling, signed ABI 1 packages and USB installation.
 Lefony reserves the fixed app region during OS startup, independently of the
-website. The browser reads installed apps and free capacity, and installs packages. This retires the
-stock HP filesystem and remains a development candidate awaiting hardware qualification.
+website. The browser reads installed apps and free capacity, and installs packages. Legacy Lefony-only installation retires the stock HP filesystem. The new
+shared dual-boot layout preserves HP files in its confined region; see the
+[dual-boot release guide](docs/DUAL-BOOT-BROWSER-RELEASE.md).
 See [implementation status](docs/NATIVE-APP-SDK-STATUS.md) and the
 [SDK maturity roadmap](docs/NATIVE-APP-SDK-MATURITY-PLAN.md) for the path to a
 complete developer platform. The [setup runbook](docs/NATIVE-APP-SETUP.md)
@@ -183,6 +191,13 @@ migrates existing profile-1 apps and saved data. This source change remains a
 development candidate requiring physical storage qualification.
 
 ## Installer
+
+For browser-only dual boot, open [lefony.com/#install](https://lefony.com/#install)
+and select **Install or update dual boot**. Follow the
+[release guide](docs/DUAL-BOOT-BROWSER-RELEASE.md) for supported inputs, local
+backups and recovery. The host commands below remain available for development
+and guarded restoration.
+
 
 ```sh
 python3 scripts/lefony_installer.py --help

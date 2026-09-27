@@ -65,6 +65,13 @@ def run(case):
             expected = case in ('complete', 'different-mode-values', 'system-reset',
                                 'migration-partial', 'migration-complete')
             assert ready(vm) == expected, (case, ready(vm), expected)
+            fifo = 0x41550153
+            for _ in range(2):
+                q.writel(BASE + 0x83c, fifo | (1 << 31))
+                assert q.readl(BASE + 0x83c) == (fifo if expected else fifo | (1 << 31)), \
+                    'FIFO reset completion changed unrelated bits or forged ready DDR'
+            q.writel(BASE + 0x83c, 0x10001000)
+            assert q.readl(BASE + 0x83c) == 0x10001000, 'FIFO reset must not fake DQS calibration'
             if case == 'system-reset':
                 vm.qmp.execute('system_reset')
                 assert not ready(vm), 'cold model reset retained command state'

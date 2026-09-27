@@ -44,7 +44,7 @@ def main():
                 for name, root in roots.items():
                     rate = root['configured_hz']
                     hz = rate['numerator'] // rate['denominator'] if rate else 0
-                    if not root['ccgr4_gate_encoding'] & 1 or not root['ccgr6_gate_encoding'] & 1:
+                    if not root['ccgr4_gate_encoding'] & 1:
                         hz = 0
                     expected = (1000000000 << 32) // hz if hz else 0
                     period = qmp.execute('qom-get', {'path': f'/machine/soc/ccm/{name}',
@@ -61,6 +61,7 @@ def main():
                     check()
             for register, offset in (('CCM_CCGR4', 28), ('CCM_CCGR4', 26),
                                       ('CCM_CCGR6', 8), ('CCM_CCGR6', 6)):
+                # CCGR6 changes must leave the NAND output rates unchanged.
                 original = int(capture['clock_registers'][register]['value'], 16)
                 for gate in range(4):
                     write(register, (original & ~(3 << offset)) | gate << offset)

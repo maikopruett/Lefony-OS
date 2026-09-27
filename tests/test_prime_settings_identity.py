@@ -61,13 +61,21 @@ class SettingsIdentityTests(unittest.TestCase):
             app = source / "apps/settings"
             (app / "sub_menu").mkdir(parents=True)
             (source / "ion/src/prime_g2").mkdir(parents=True)
-            (app / "main_controller.h").write_text("extern tree s_modelAboutChildren[10];")
+            (app / "main_controller.h").write_text(
+                "extern tree s_modelAboutChildren[10];\nextern tree s_contributorsChildren[18];")
             (app / "main_controller.cpp").write_text(
-                "tree s_modelAboutChildren[10] = {SettingsMessageTree(I18n::Message::Contributors, s_contributorsChildren)};")
+                "tree s_modelAboutChildren[10] = {SettingsMessageTree(I18n::Message::Contributors, s_contributorsChildren)};\n"
+                "tree s_contributorsChildren[18] = {};")
+            (app / "sub_menu/contributors_controller.cpp").write_text(
+                "constexpr int s_numberOfDevelopers = 18;\n"
+                "const I18n::Message s_developersUsernames[s_numberOfDevelopers] = {\n};\n"
+                "if (index < s_numberOfUpsilonDevelopers) {\n}\n")
             (app / "base.universal.i18n").write_text('UsbSetting = "USB"\n')
             first = settings.prepare(source, "260909-010000")
             second = settings.prepare(source, "260909-010000")
             self.assertEqual(first, second)
+            self.assertEqual((app / "main_controller.cpp").read_text().count("I18n::Message::MaikoPruett"), 1)
+            self.assertEqual((app / "sub_menu/contributors_controller.cpp").read_text().count("I18n::Message::PMaikoPruett"), 1)
             self.assertLessEqual(len(first["build_id"]), 20)
             self.assertIn(first["build_id"], (source / "ion/src/prime_g2/lefony_build_identity.h").read_text())
             self.assertEqual((app / "main_controller.cpp").read_text().count("I18n::Message::LefonyBuildId"), 1)

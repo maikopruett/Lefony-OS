@@ -25,6 +25,8 @@ bool canRequestUBootRecovery();
 bool requestUBootRecovery();
 // Returns false without resetting if support/mailbox is unavailable.
 bool rebootToUBootRecovery();
+// Consumed by the dual loader; leaves the saved priority untouched.
+bool rebootToBootMenu();
 bool enabled();
 uint32_t feedCount();
 uint32_t unhealthyCount();

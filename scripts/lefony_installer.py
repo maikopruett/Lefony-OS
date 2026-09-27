@@ -1377,6 +1377,11 @@ class LefonyOSPrimeInstaller:
             raise RuntimeError(errors[0])
         with usb_update.LibUSB() as device:
             capabilities = usb_update.development_capabilities(device)
+            if capabilities["flags"] & 16:
+                from prime_dual_installer import decode_native_info
+                info = decode_native_info(device.read(0x4e, value=4, length=64))
+                if not info['legacy_writes_allowed']:
+                    raise RuntimeError("Shared layout requires the dual-boot installer. NAND untouched.")
             if not capabilities["flags"] & 2:
                 raise RuntimeError("install the native-updater build once through recovery; "
                                    "this OS only supports the older recovery handoff. NAND untouched.")

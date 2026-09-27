@@ -12,6 +12,7 @@
 #include "native_app_manifest.h"
 #include "native_app_signature.h"
 #include "nand_physical.h"
+#include "dual_boot_guard.h"
 #include "development_update.h"
 #include "registers.h"
 #include "services.h"
@@ -33,7 +34,7 @@ static_assert(offsetof(CatalogEntry,metadata)==8 && offsetof(Metadata,id)==4 && 
 using namespace AppStorage;
 static_assert(MaximumEntries==MaximumIcons,"menu cache bounds");
 alignas(64) uint8_t sRaw[2176];
-bool range(uint32_t block) { return block>=FirstBlock && block<FirstBlock+BlockCount; }
+bool range(uint32_t block) { return DualBoot::storageAllowed() && block>=FirstBlock && block<FirstBlock+BlockCount; }
 bool usable(void *,uint32_t block) {
   if(!range(block)) return false;
 #if PRIME_G2_EMULATOR

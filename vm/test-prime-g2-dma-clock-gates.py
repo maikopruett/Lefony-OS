@@ -43,15 +43,15 @@ def run(case):
                     q.writel(address, value)
                 q.writel(0x00901ed0, 0x1094)
                 head = 0x00901ecc
-            gates = {'gpmi': (0x020c4080, 3 << 8), 'bch': (0x020c4080, 3 << 6),
+            gates = {'gpmi': (0x020c4078, 3 << 28), 'bch': (0x020c4078, 3 << 26),
                      'gpmi-io': (0x020c4078, 3 << 28),
                      'gpmi-local': (0x01806000, 1 << 30),
                      'bch-local': (0x01808000, 1 << 30),
                      'pll-disabled': (int(clocks['clock_registers']['ANATOP_PLL_SYS']['address'], 16), 1 << 13),
                      'pfd-gated': (int(clocks['clock_registers']['ANATOP_PFD_528']['address'], 16), 1 << 23),
-                     'bch-io': (0x020c4078, 3 << 26), 'both': (0x020c4080, (3 << 6) | (3 << 8)),
-                     'reset': (0x020c4080, 3 << 6), 'migrate': (0x020c4080, 3 << 6),
-                     'bch-then-gpmi': (0x020c4080, 3 << 6), 'preconfigured': (0x020c4080, 3 << 6)}
+                     'bch-io': (0x020c4078, 3 << 26), 'both': (0x020c4078, (3 << 26) | (3 << 28)),
+                     'reset': (0x020c4078, 3 << 26), 'migrate': (0x020c4078, 3 << 26),
+                     'bch-then-gpmi': (0x020c4078, 3 << 26), 'preconfigured': (0x020c4078, 3 << 26)}
             address, mask = gates[case]
             original = q.readl(address)
             q.writel(address, original | mask if case in ('pfd-gated', 'gpmi-local', 'bch-local') else original & ~mask)
@@ -74,11 +74,11 @@ def run(case):
             q.command('clock_step 1000000000')
             pending(expected_stop)
             if case == 'both':
-                q.writel(address, original & ~(3 << 6))
+                q.writel(address, original & ~(3 << 26))
                 pending(0x00901ecc)
             if case == 'bch-then-gpmi':
-                q.writel(address, original & ~((3 << 6) | (3 << 8)))
-                q.writel(address, original & ~(3 << 8))
+                q.writel(address, original & ~((3 << 26) | (3 << 28)))
+                q.writel(address, original & ~(3 << 28))
                 pending(0x00901ecc)
                 q.command('clock_step 1000000000')
                 pending(0x00901ecc)

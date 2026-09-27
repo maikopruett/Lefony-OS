@@ -3,6 +3,7 @@
 #include "diagnostics.h"
 #include "battery_adc.h"
 #include "nand_update.h"
+#include "installer_info.h"
 #include "nand_physical.h"
 #include "storage_profile.h"
 #include "development_update.h"
@@ -974,6 +975,12 @@ bool vendorRequest(const SetupPacket &setup) {
     }
     case 0x4E: { // development protocol capabilities, independent of signed A/B
       if (setup.requestType != 0xC0 || setup.index) return false;
+      if (setup.value == 4) {
+        uint32_t info[16];
+        PrimeG2::DualBoot::installerInfo(info, reinterpret_cast<const uint8_t *>(0x87ffd000));
+        controlIn(info, sizeof(info), setup.length);
+        return true;
+      }
       if (setup.value == 3) {
         const uint32_t bootloader[] = {0x3142554c, 1,
           PrimeG2::System::bootloaderRecoveryVersion(),
@@ -985,7 +992,7 @@ bool vendorRequest(const SetupPacket &setup) {
       }
       if (setup.value) return false;
       const uint32_t capabilities[] = {0x3156444c, 1,
-        2u | 8u | (PrimeG2::System::bootloaderRecoveryVersion() == 1 ? 4u : 0u), RecoveryCapacity};
+        16u | (PrimeG2::DualBoot::legacyUpdateAllowed() ? 2u : 0u) | 8u | (PrimeG2::System::bootloaderRecoveryVersion() == 1 ? 4u : 0u), RecoveryCapacity};
       controlIn(capabilities, sizeof(capabilities), setup.length);
       return true;
     }
@@ -1351,6 +1358,7 @@ bool managementActive() {
   return bulkBusy() || PrimeG2::AppManagement::busy() || externalPowerConnected() || (sManagementSeen && (sStatus & StatusConfigured) &&
     Ion::Timing::millis() - sLastManagementTime < 2000);
 }
+bool transferBusy() { return bulkBusy() || PrimeG2::AppManagement::busy(); }
 bool externalPowerConnected() {
   return plugged() || PrimeG2::Services::externalPowerPresent();
 }

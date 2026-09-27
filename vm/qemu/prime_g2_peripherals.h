@@ -11,6 +11,9 @@
 #define TYPE_PRIME_G2_USBOTG "prime-g2-usbotg-device"
 #define TYPE_PRIME_G2_MMDC "prime-g2-mmdc"
 
+void prime_g2_keypad_notify(void (*changed)(void *), void *opaque);
+uint32_t prime_g2_keypad_gpio(uint32_t direction, uint32_t output);
+
 bool prime_g2_mmdc_initialized(void);
 void prime_g2_mmdc_map_ddr_gate(MemoryRegion *ram);
 

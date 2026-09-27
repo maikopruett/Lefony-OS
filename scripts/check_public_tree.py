@@ -15,6 +15,11 @@ PUBLIC_KEYS = {
     'tests/fixtures/prime_g2_emulator_update_private.pem': '8103c3448b7257026cc0f9639524f5c1b4c9cdb60670f01b47a56aa76cc5f54b',
     'tests/fixtures/prime_g2_emulator_update_public.pem': '90f5157ff9743a69ef05250c207ecbadaeb072d0513848739eb4a3e1245a0c6c',
 }
+# Reviewed typography source, with its SIL OFL notice alongside it. Do not
+# broadly allow binary fonts or relax the private-firmware boundary.
+PUBLIC_FONTS = {
+    'native/prime_g2/bootmenu/fonts/Roboto.ttf': 'd7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134',
+}
 PRIVATE_SUFFIXES = {'.mtd', '.readback', '.bin', '.elf', '.imx', '.img', '.raw',
                     '.qcow2', '.dtb', '.dts', '.zimage', '.lfu', '.lfapp', '.lfsrc', '.pdf', '.zip',
                     '.tar', '.gz', '.bz2', '.xz', '.key', '.pem', '.ppm', '.pyc'}
@@ -48,6 +53,10 @@ def check_paths(root: Path, paths: list[str]) -> list[str]:
         if name in PUBLIC_KEYS:
             if hashlib.sha256(data).hexdigest() != PUBLIC_KEYS[name]:
                 problems.append(f'{name}: public emulator key fixture changed')
+            continue
+        if name in PUBLIC_FONTS:
+            if hashlib.sha256(data).hexdigest() != PUBLIC_FONTS[name]:
+                problems.append(f'{name}: reviewed public font changed')
             continue
         if path.suffix.lower() in PRIVATE_SUFFIXES or path.name == '.env' or path.name.startswith('.env.'):
             problems.append(f'{name}: private/generated artifact extension')

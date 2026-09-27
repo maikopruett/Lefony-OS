@@ -9,6 +9,8 @@ LOADER_SOURCE="$REPO_DIR/native/prime_g2/nand_boot_capsule.S"
 LINKER_SCRIPT="$REPO_DIR/native/prime_g2/nand_boot_capsule.ld"
 MAX_CAPSULE_BYTES=$((8 * 1024 * 1024))
 PAYLOAD_OFFSET=4096
+DUAL_DEFINE=
+if [ "${LEFONY_DUAL_BOOT:-0}" = 1 ]; then DUAL_DEFINE=-DLEFONY_DUAL_BOOT_CAPSULE; fi
 
 if [ ! -s "$PAYLOAD" ]; then
   echo "Native payload is missing: $PAYLOAD" >&2
@@ -29,7 +31,7 @@ if command -v arm-none-eabi-gcc >/dev/null 2>&1 &&
     command -v arm-none-eabi-ld >/dev/null 2>&1 &&
     command -v arm-none-eabi-objcopy >/dev/null 2>&1; then
   arm-none-eabi-gcc -c -mcpu=cortex-a7 -marm -ffreestanding \
-    -DNATIVE_PAYLOAD_BYTES="$PAYLOAD_BYTES" \
+    $DUAL_DEFINE -DNATIVE_PAYLOAD_BYTES="$PAYLOAD_BYTES" \
     -o "${OUTPUT}.loader.o" "$LOADER_SOURCE"
   arm-none-eabi-ld -T "$LINKER_SCRIPT" -o "${OUTPUT}.loader.elf" "${OUTPUT}.loader.o"
   arm-none-eabi-objcopy -O binary "${OUTPUT}.loader.elf" "${OUTPUT}.loader.bin"
@@ -48,13 +50,13 @@ docker run --rm \
   -e LOADER_SOURCE="/work/${LOADER_SOURCE#"$REPO_DIR/"}" \
   -e LINKER_SCRIPT="/work/${LINKER_SCRIPT#"$REPO_DIR/"}" \
   -e OUTPUT="/work/${OUTPUT#"$REPO_DIR/"}" \
-  -e PAYLOAD_BYTES="$PAYLOAD_BYTES" \
+  -e PAYLOAD_BYTES="$PAYLOAD_BYTES" -e DUAL_DEFINE="$DUAL_DEFINE" \
   lefony-prime-g2-u-boot sh -ec '
     object=${OUTPUT}.loader.o
     elf=${OUTPUT}.loader.elf
     binary=${OUTPUT}.loader.bin
     arm-none-eabi-gcc -c -mcpu=cortex-a7 -marm -ffreestanding \
-      -DNATIVE_PAYLOAD_BYTES="$PAYLOAD_BYTES" \
+      $DUAL_DEFINE -DNATIVE_PAYLOAD_BYTES="$PAYLOAD_BYTES" \
       -o "$object" "$LOADER_SOURCE"
     arm-none-eabi-ld -T "$LINKER_SCRIPT" -o "$elf" "$object"
     arm-none-eabi-objcopy -O binary "$elf" "$binary"

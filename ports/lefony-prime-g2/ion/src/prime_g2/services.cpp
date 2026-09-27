@@ -10,6 +10,8 @@
 #include "timing.h"
 #include "usb_diagnostics.h"
 #include "development_update.h"
+#include "dual_boot_guard.h"
+#include "system.h"
 #include "watchdog.h"
 
 #include <ion.h>
@@ -111,6 +113,7 @@ uint64_t sIdleTestOffset = 0;
 uint8_t sIdleBrightness = 192;
 bool sIdleDimmed = false;
 volatile bool sPowerWakeRequested = false;
+volatile bool sPowerButtonWakeRequested = false;
 bool sPFPowerOffConfigured = false;
 bool sLCDSupplyReady = false;
 bool sChargerConfigured = false;
@@ -131,6 +134,7 @@ void snvsPowerKeyInterrupt() {
   uint32_t status = PrimeG2::reg32(SNVSLPSR);
   if (status & SNVSPowerButtonStatus) {
     PrimeG2::reg32(SNVSLPSR) = SNVSPowerButtonStatus;
+    sPowerButtonWakeRequested = true;
     sPowerWakeRequested = true;
   }
 }
@@ -235,6 +239,7 @@ void acknowledgePF1550Interrupt(uint8_t reg) {
 
 void armPowerWakeSources() {
   sPowerWakeRequested = false;
+  sPowerButtonWakeRequested = false;
   PrimeG2::reg32(SNVSLPSR) = SNVSPowerButtonStatus;
 
   uint8_t clear = PFOnKeyEvents;
@@ -935,8 +940,10 @@ KDColor updateColorWithPlugAndCharge() {
 
 namespace Power {
 void suspend(bool checkIfOnOffKeyReleased) {
-  if (PrimeG2::USBDiagnostics::externalPowerConnected() ||
-      PrimeG2::DevelopmentUpdate::busy()) return;
+  const bool wakeToMenu = PrimeG2::DualBoot::Enabled && checkIfOnOffKeyReleased &&
+    PrimeG2::System::bootloaderWakeMenuSupported();
+  if ((!wakeToMenu && PrimeG2::USBDiagnostics::externalPowerConnected()) ||
+      PrimeG2::DevelopmentUpdate::busy() || PrimeG2::USBDiagnostics::transferBusy()) return;
   if (sPowerSuspended || sPowerOff) return;
   PrimeG2::Persistence::commit();
   PrimeG2::USBDiagnostics::shutdown();
@@ -944,7 +951,7 @@ void suspend(bool checkIfOnOffKeyReleased) {
   PrimeG2::Display::shutdown();
   sPowerSuspended = true;
   sSuspendCount++;
-#if PRIME_G2_EMULATOR
+#if PRIME_G2_EMULATOR && !LEFONY_DUAL_BOOT_CANDIDATE
   (void)checkIfOnOffKeyReleased;
   uint8_t powerState = 1;
   PrimeG2::I2C::write8(PrimeG2::I2C1, PF1550Address, 0xF4,
@@ -962,10 +969,22 @@ void suspend(bool checkIfOnOffKeyReleased) {
   armPowerWakeSources();
   PrimeG2::Interrupts::disable(PrimeG2::Interrupts::GPT1);
   PrimeG2::barrier();
-  while (!sPowerWakeRequested) {
-    /* IRQs remain enabled. SNVS SPI4 or the PF1550 GPIO5 falling edge is the
-     * only enabled runtime wake source after GPT1 is masked. */
-    __asm volatile("wfi" ::: "memory");
+  for (;;) {
+    while (!sPowerWakeRequested && !sPowerButtonWakeRequested) {
+      /* IRQs remain enabled while GPT1 is masked. */
+      __asm volatile("wfi" ::: "memory");
+    }
+    if (!wakeToMenu || sPowerButtonWakeRequested) break;
+    uint8_t onKeyStatus = 0;
+    if (PrimeG2::I2C::read8(PrimeG2::I2C1, PF1550Address,
+                           PFOnKeyStatus, &onKeyStatus, 1) &&
+        (onKeyStatus & PFOnKeyEvents)) break;
+    /* The shared PF1550 interrupt also reports charger changes. Those must
+     * not count as the next On press. Keep SNVS armed even if I2C fails. */
+    sPowerWakeRequested = false;
+    acknowledgePF1550Interrupt(PFChargerInterrupt);
+    PrimeG2::reg32(PrimeG2::GPIO5 + 0x18) = 1u << PFInterruptPin;
+    PrimeG2::setBits(PrimeG2::GPIO5 + 0x14, 1u << PFInterruptPin);
   }
   PrimeG2::Interrupts::enable(PrimeG2::Interrupts::GPT1);
   disarmPF1550Wake();
@@ -977,6 +996,10 @@ void suspend(bool checkIfOnOffKeyReleased) {
     Ion::Timing::usleep(2000);
   }
 
+  /* Save and sleep happen before the next On event. Reset through NAND only
+   * after its release, so neither the menu nor a selected OS sees a held key.
+   * A failed retained-mailbox write falls back to the normal resume path. */
+  if (wakeToMenu) PrimeG2::Watchdog::rebootToBootMenu();
   PrimeG2::Display::resume();
   Ion::Backlight::init();
   PrimeG2::USBDiagnostics::init();

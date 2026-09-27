@@ -1,4 +1,11 @@
-# Automatic development packages
+# Development packages
+
+The shared-layout browser release is a separate signed package described in
+[the dual-boot release guide](DUAL-BOOT-BROWSER-RELEASE.md). Its pinned assets
+are not selected by the legacy latest-build discovery below. Publishing a
+legacy main-branch build cannot replace the dual-boot package.
+
+## Automatic legacy packages
 
 Every successful `main` push runs host tests, compiles the physical and emulator
 targets, builds a boot capsule, signs LFU1 with the existing Lefony release key,

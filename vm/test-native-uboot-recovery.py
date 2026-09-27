@@ -40,6 +40,8 @@ def main():
         root = Path(folder)
         cmd = [str(r.QEMU), '-machine', 'hp-prime-g2',
                '-global', 'prime-g2-mmdc.preinitialized=on',
+               '-global', 'imx6ul-lcdif.prime-g2-panel=on',
+               '-global', 'cortex-a7-arm-cpu.cntfrq=8000000',
                '-kernel', str(args.elf.resolve()), '-display', 'none',
                '-serial', f'file:{root}/serial', '-monitor', 'none',
                '-watchdog-action', 'reset', '-S',

@@ -185,7 +185,8 @@ def main() -> int:
         "writel 0x020cc02c 0x00001234", "writel 0x020cc030 0x89abcdef",
         "readl 0x020cc02c", "readl 0x020cc030",
         "writel 0x020cc0fc 0x00000001", "readl 0x020cc014",
-        "writel 0x020cc014 0x00000040", "readl 0x020cc014",
+        # BTN is a pin level; release the key instead of clearing it as W1C.
+        "writel 0x020cc0fc 0x00000000", "readl 0x020cc014",
         # LCDIF atomic aliases and deferred NEXT buffer switch.
         "writel 0x021c8000 0x00000001", "writel 0x021c8004 0x00000002",
         "readl 0x021c8000", "writel 0x021c8008 0x00000001",
@@ -264,7 +265,7 @@ def main() -> int:
     reads = [int(line.split()[1], 16) for line in replies if len(line.split()) == 2]
     expected = [
         0x00005554,
-        0x00000002,
+        0xf0000002,  # GPIO1 output bits plus Prime I2C1/2 external pull-ups
         0xFEFB, 0x0001, 0xFEFF, 0xFEF3,
         0x00000020, 0x00000001, 0x000000D3, 0x00000000,
         0x00001234, 0x89ABCDEF, 0x00000040, 0x00000000,

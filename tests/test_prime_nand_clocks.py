@@ -23,7 +23,7 @@ class NANDClockTests(unittest.TestCase):
             self.assertEqual(root['pfd_fraction'], 24)
             self.assertEqual(root['post_divisor'], 2)
             self.assertEqual(root['ccgr4_gate_encoding'], 3)
-            self.assertEqual(root['ccgr6_gate_encoding'], 3)
+            self.assertEqual(root['ccgr6_unrelated_encoding'], 3)
 
     def test_independent_parent_selectors_and_all_dividers(self):
         self.setreg('CCM_CSCMR1', 1 << 19)
@@ -77,7 +77,7 @@ class NANDClockTests(unittest.TestCase):
         self.setreg('ANATOP_PFD_528', 24 << 16)
         result = decode(self.capture)['roots']['gpmi']
         self.assertEqual(result['ccgr4_gate_encoding'], 1)
-        self.assertEqual(result['ccgr6_gate_encoding'], 2)
+        self.assertEqual(result['ccgr6_unrelated_encoding'], 2)
         self.assertFalse(result['pfd_stable_flag'])
 
 

@@ -66,7 +66,7 @@ private:
       {"Square", "^2"}, {"Square root", "√(\x11)"},
       {"Nth root", "root(\x11,\x11)"}, {"Absolute value", "abs(\x11)"},
       {"Logarithm with base", "log(\x11,\x11)"}, {"Exponential", "ℯ^(\x11)"},
-      {"Derivative", "diff(\x11,x,\x11)"}, {"Integral", "int(\x11,x,\x11,\x11)"},
+      {"Derivative", "diff(\x11,x,x)"}, {"Integral", "int(\x11,x,\x11,\x11)"},
       {"Sum", "sum(\x11,x,\x11,\x11)"}, {"Product", "product(\x11,x,\x11,\x11)"},
       {"Matrix", "["}, {"Row vector", "[[\x11,\x11]]"},
       {"Parentheses", "(\x11)"}, {"Reciprocal", "^(-1)"},
@@ -132,10 +132,10 @@ private:
           text("log", -24, -10); box(ctx, x + 12, y - 7, fg);
           box(ctx, x + 8, y + 6, fg, 5); break;
         case 8:
-          ctx->drawString("d", KDPoint(x - 14, y - 15), KDFont::SmallFont, fg, bg);
-          ctx->fillRect(KDRect(x - 18, y - 1, 19, 1), fg);
-          ctx->drawString("dx", KDPoint(x - 16, y + 2), KDFont::SmallFont, fg, bg);
-          box(ctx, x + 8, y - 3, fg, 9); break;
+          ctx->drawString("d", KDPoint(x - 3, y - 15), KDFont::SmallFont, fg, bg);
+          ctx->fillRect(KDRect(x - 9, y - 1, 19, 1), fg);
+          ctx->drawString("dx", KDPoint(x - 7, y + 2), KDFont::SmallFont, fg, bg);
+          break;
         case 9: case 10: case 11:
           text(i == 9 ? "∫" : i == 10 ? "Σ" : "Π", -13, -9);
           box(ctx, x - 9, y - 16, fg, 4); box(ctx, x - 9, y + 11, fg, 4);

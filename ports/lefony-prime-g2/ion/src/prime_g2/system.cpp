@@ -22,6 +22,7 @@ namespace {
 /* ARMv7 short-descriptor table. One section descriptor covers 1 MiB and the
  * 4096-entry table therefore describes the complete 32-bit address space. */
 uint32_t sBootloaderRecoveryVersion = 0;
+bool sBootloaderWakeMenuSupported = false;
 alignas(16384) uint32_t sTranslationTable[4096];
 alignas(1024) uint32_t sAppCodePages[256];
 alignas(1024) uint32_t sAppDataPages[256];
@@ -83,7 +84,10 @@ void initMemory() {
   volatile uint32_t *cap = reinterpret_cast<volatile uint32_t *>(0x80001000u);
   if (cap[0] == 0x4255464cu && cap[1] == ~0x4255464cu && cap[2] == 1)
     sBootloaderRecoveryVersion = 1;
+  sBootloaderWakeMenuSupported = sBootloaderRecoveryVersion == 1 &&
+    cap[3] == 0x574d464cu && cap[4] == ~0x574d464cu;
   cap[0] = cap[1] = cap[2] = 0;
+  cap[3] = cap[4] = 0;
 
   for (uint32_t &entry : sTranslationTable) entry = 0;
 
@@ -119,6 +123,7 @@ void initMemory() {
 }
 
 uint32_t bootloaderRecoveryVersion() { return sBootloaderRecoveryVersion; }
+bool bootloaderWakeMenuSupported() { return sBootloaderWakeMenuSupported; }
 
 bool validBootloaderRAMCapsule(const void *image, size_t length) {
   // Development-only, CRC-verified staging; fixed destination and entry.

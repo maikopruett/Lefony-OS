@@ -17,6 +17,7 @@ enum class MemoryType : uint8_t {
 
 void initMemory();
 uint32_t bootloaderRecoveryVersion();
+bool bootloaderWakeMenuSupported();
 bool validBootloaderRAMCapsule(const void *image, size_t length);
 [[noreturn]] void launchBootloaderRAM(const void *image, size_t length);
 void mapNativeApp(void *code, void *data);

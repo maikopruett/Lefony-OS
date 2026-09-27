@@ -1,0 +1,3 @@
+# Optional private-fixture research only; not needed by the default host suite.
+capstone==5.0.7
+unicorn==2.1.4

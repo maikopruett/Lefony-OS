@@ -1,0 +1,11 @@
+--- a/hw/display/imx6ul_lcdif.c
++++ b/hw/display/imx6ul_lcdif.c
+@@ -636,7 +636,7 @@
+             s->prime_panel_reset_released = false;
+             s->prime_reset_low_ns = now;
+             prime_ili9322_reset_registers(s);
+-        } else if (!s->prime_panel_reset && s->prime_panel_reset_seen_low) {
++        } else if (high && !s->prime_panel_reset && s->prime_panel_reset_seen_low) {
+             if (s->prime_reset_low_ns < 0 ||
+                 now - s->prime_reset_low_ns < PRIME_RESET_PHASE_NS) {
+                 s->prime_power_timing_bad = true;

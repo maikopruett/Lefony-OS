@@ -7,7 +7,7 @@ QEMU_COMMIT=c3d48b7d1e89604920e5b81b91140c2ad39a1943
 # Bump this whenever an already-applied patch changes semantics. Keeping the
 # patch-set revision in both paths prevents an old modified source tree or
 # Meson object from silently surviving a corrected hardware model.
-PATCHSET_REV=r75
+PATCHSET_REV=r88
 SOURCE_DIR=${PRIME_G2_QEMU_SOURCE_DIR:-"$REPO_DIR/build/qemu-prime-g2-source-$QEMU_VERSION-$PATCHSET_REV"}
 # Include the checkout identity: different clones must never share a Meson
 # source link or objects, even when the upstream and patch revision match.
@@ -179,7 +179,7 @@ elif ! git -C "$SOURCE_DIR" apply --reverse --check \
   git -C "$SOURCE_DIR" apply --check "$GPIO_PAD_STATUS_PATCH"
   git -C "$SOURCE_DIR" apply "$GPIO_PAD_STATUS_PATCH"
 fi
-if grep -q 'prime_gpio2_pulled_up' \
+if grep -qF 's->gpio[1].reset_psr = 0x00005554;' \
     "$SOURCE_DIR/hw/arm/fsl-imx6ul.c" 2>/dev/null; then
   : # Prime board pull resistors are already connected to GPIO2 inputs.
 elif ! git -C "$SOURCE_DIR" apply --reverse --check \
@@ -266,9 +266,45 @@ if ! git -C "$SOURCE_DIR" apply --reverse --check "$WATCHDOG_TIMEOUT_PATCH" >/de
 fi
 
 SNVS_LPGPR_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-snvs-lpgpr.patch"
-if ! git -C "$SOURCE_DIR" apply --reverse --check "$SNVS_LPGPR_PATCH" >/dev/null 2>&1; then
+if grep -qF "s->lpgpr = v;" "$SOURCE_DIR/hw/misc/imx7_snvs.c"; then
+  : # Later button-status patch extends the migration fields.
+elif ! git -C "$SOURCE_DIR" apply --reverse --check "$SNVS_LPGPR_PATCH" >/dev/null 2>&1; then
   git -C "$SOURCE_DIR" apply --check "$SNVS_LPGPR_PATCH"
   git -C "$SOURCE_DIR" apply "$SNVS_LPGPR_PATCH"
+fi
+
+SNVS_BUTTON_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-snvs-button-status.patch"
+if ! git -C "$SOURCE_DIR" apply --reverse --check "$SNVS_BUTTON_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$SNVS_BUTTON_PATCH"
+  git -C "$SOURCE_DIR" apply "$SNVS_BUTTON_PATCH"
+fi
+
+GPIO_KEYPAD_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-gpio-keypad.patch"
+if grep -qF 's->gpio[1].board_pad_sample = prime_g2_keypad_gpio;' "$SOURCE_DIR/hw/arm/fsl-imx6ul.c" &&
+   grep -qF 's->board_pad_sample(s->gdir, s->dr)' "$SOURCE_DIR/hw/gpio/imx_gpio.c"; then
+  : # Later I2C pull-ups extend this patch's board context.
+elif ! git -C "$SOURCE_DIR" apply --reverse --check "$GPIO_KEYPAD_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$GPIO_KEYPAD_PATCH"
+  git -C "$SOURCE_DIR" apply "$GPIO_KEYPAD_PATCH"
+fi
+
+I2C_PULLS_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-i2c-pulls.patch"
+if grep -qF 's->gpio[0].reset_psr |= 0xf0000000u;' "$SOURCE_DIR/hw/arm/fsl-imx6ul.c"; then
+  : # The keypad IRQ hook extends this patch's board context.
+elif ! git -C "$SOURCE_DIR" apply --reverse --check "$I2C_PULLS_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$I2C_PULLS_PATCH"
+  git -C "$SOURCE_DIR" apply "$I2C_PULLS_PATCH"
+fi
+
+GPIO_KEYPAD_IRQ_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-gpio-keypad-irq.patch"
+if ! git -C "$SOURCE_DIR" apply --reverse --check "$GPIO_KEYPAD_IRQ_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$GPIO_KEYPAD_IRQ_PATCH"
+  git -C "$SOURCE_DIR" apply "$GPIO_KEYPAD_IRQ_PATCH"
+fi
+PANEL_RESET_EDGE_PATCH="$REPO_DIR/vm/patches/qemu-prime-g2-panel-reset-edge.patch"
+if ! git -C "$SOURCE_DIR" apply --reverse --check "$PANEL_RESET_EDGE_PATCH" >/dev/null 2>&1; then
+  git -C "$SOURCE_DIR" apply --check "$PANEL_RESET_EDGE_PATCH"
+  git -C "$SOURCE_DIR" apply "$PANEL_RESET_EDGE_PATCH"
 fi
 
 # QEMU rejects source/build paths containing spaces. Stable short paths also

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "protocol": "lefony-dual-install-v1",
+  "layout_id": 5,
+  "layout_sha256": "56ec2952e4bad8d3995dcb3b6cb1468976b4f0756fc5abb599841e2172655234",
+  "model": 843534408,
+  "native_info": {
+    "request": 78,
+    "value": 4,
+    "bytes": 64,
+    "magic": 910771788,
+    "schema": 1,
+    "capability_flag": 16
+  },
+  "physical_migration_allowed": false,
+  "migration_source": "verified-stock-backup",
+  "raw_backup_bytes": 553648128,
+  "hp_filesystem_bytes": 217055232,
+  "lefony_app_bytes": 67108864,
+  "minimum_free_bytes": 2499805184,
+  "hp_profile": "hp-v15751-research-256-v4",
+  "modes": [
+    "keep-hp",
+    "replace-hp"
+  ],
+  "priorities": [
+    "lefony",
+    "hp"
+  ],
+  "phases": [
+    "inspect",
+    "backup",
+    "review",
+    "prepared",
+    "running",
+    "reconnect",
+    "verify",
+    "verified",
+    "boot-confirmed",
+    "recovery-required"
+  ],
+  "hp_images": [
+    {
+      "bytes": 8192864,
+      "sha256": "25d3d2d27e45fc3ce7dc8c4a111b31f8aefc14c4b21e8d8ee4b32251e31c1b82"
+    }
+  ]
+}

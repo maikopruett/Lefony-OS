@@ -1,5 +1,16 @@
 # Third-party sources and notices
 
+- **Optional HP research engines:** Capstone 5.0.7 and Unicorn 2.1.4 are pinned
+  in [research requirements](requirements-hp-research.txt). They are separate
+  local analysis dependencies and retain their upstream component and binding
+  licenses/notices. They are not bundled into Lefony firmware. Proprietary HP
+  inputs, decoded code and generated private reports are not redistributed.
+
+- **Roboto:** the boot menu bundles the Roboto variable font under SIL OFL 1.1.
+  See [font provenance](native/prime_g2/bootmenu/fonts/README.md) and the
+  [complete license](native/prime_g2/bootmenu/fonts/OFL.txt). Generated glyph
+  atlases retain this font license; the generator does not relicense them.
+
 - **Qt for Python / Qt WebEngine:** the desktop emulator wrapper uses PySide6
   6.11.2 and the Qt/Chromium runtime supplied in its upstream wheels. These
   retain their upstream LGPL/GPL and third-party licenses; see

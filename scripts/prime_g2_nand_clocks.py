@@ -64,7 +64,10 @@ def decode(capture, oscillator_hz=24000000):
             'unknown_or_stopped_reason': root_reason,
             # Do not collapse RUN/WAIT encodings into an unconditional bool.
             'ccgr4_gate_encoding': (ccgr4 >> gate4_bit) & 3,
-            'ccgr6_gate_encoding': (ccgr6 >> gate6_bit) & 3,
+            # Historical reports incorrectly called these NAND gates. On
+            # i.MX6ULL they do not gate the NAND roots; retain the raw bits
+            # under a corrected name for comparison with old captures.
+            'ccgr6_unrelated_encoding': (ccgr6 >> gate6_bit) & 3,
         }
     return {'oscillator_hz_assumed': oscillator_hz, 'pll2_locked_flag': bool(pll & (1 << 31)),
             'roots': roots,

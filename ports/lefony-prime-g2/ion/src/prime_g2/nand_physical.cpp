@@ -1,3 +1,4 @@
+#include "dual_boot_guard.h"
 #include "nand_physical.h"
 #include "storage_profile.h"
 #include "app_storage.h"
@@ -129,8 +130,9 @@ bool readyStatus(StorageProfile::Metric metric=StorageProfile::Metric::OtherRead
   return false;
 }
 }
-static bool appBlock(uint32_t block) { return block >= AppStorage::FirstBlock && block < AppStorage::FirstBlock + AppStorage::BlockCount; }
+static bool appBlock(uint32_t block) { return DualBoot::storageAllowed() && block >= AppStorage::FirstBlock && block < AppStorage::FirstBlock + AppStorage::BlockCount; }
 static bool usableInRange(uint32_t block, bool app) {
+  if (!app && !DualBoot::legacyUpdateAllowed()) return false;
   if ((app ? !appBlock(block) : (block < 32 || block >= 96)) || !writableGeometry()) return false;
   for (uint32_t page = block * 64; page < block * 64 + 2; ++page) {
     sCommand[0] = 0x00; sCommand[1] = 0; sCommand[2] = 8; // raw OOB column 2048
@@ -148,6 +150,7 @@ static bool usableInRange(uint32_t block, bool app) {
   return readyStatus();
 }
 static bool eraseInRange(uint32_t block, bool app) {
+  if (!app && !DualBoot::legacyUpdateAllowed()) return false;
   if ((app ? !appBlock(block) : (block < 32 || block >= 96)) || !writableGeometry()) return false;
   uint32_t page = block * 64;
   sCommand[0] = 0x60; sCommand[1] = page;
@@ -157,6 +160,7 @@ static bool eraseInRange(uint32_t block, bool app) {
   return transfer(false, 1) && readyStatus(StorageProfile::Metric::EraseWait);
 }
 static bool programInRange(uint32_t page, const uint8_t *data, bool app) {
+  if (!app && !DualBoot::legacyUpdateAllowed()) return false;
   if ((app ? !appBlock(page / 64) : (page < 2048 || page >= 6144)) || !data || !writableGeometry()) return false;
   sCommand[0] = 0x80; sCommand[1] = sCommand[2] = 0;
   sCommand[3] = page; sCommand[4] = page >> 8; sCommand[5] = page >> 16;

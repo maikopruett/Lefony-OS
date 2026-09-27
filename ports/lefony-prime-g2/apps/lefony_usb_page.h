@@ -6,6 +6,8 @@
 #include "../ion/src/prime_g2/usb_diagnostics.h"
 #include "../ion/src/prime_g2/lefony_build_identity.h"
 #include "../ion/src/prime_g2/app_management.h"
+#include "../ion/src/prime_g2/dual_boot_guard.h"
+#include "../ion/src/prime_g2/system.h"
 
 class LefonyUSBPage : public ViewController {
   class Content : public View {
@@ -78,7 +80,9 @@ class LefonyUSBPage : public ViewController {
           uint64_t(status.received) * 100 / status.total;
         drawProgress(ctx, percent, green);
       }
-      ctx->drawString("Display stays awake on USB power", KDPoint(16, 179),
+      const bool wakeMenu = PrimeG2::DualBoot::Enabled &&
+        PrimeG2::System::bootloaderWakeMenuSupported();
+      ctx->drawString(wakeMenu ? "Shift + On to turn off" : "Display stays awake on USB power", KDPoint(16, 179),
                       KDFont::SmallFont, KDColorBlack, KDColorWhite);
       ctx->drawString(LEFONY_BUILD_ID, KDPoint(16, 201), KDFont::SmallFont,
                       KDColor::RGB24(0x657184), KDColorWhite);
@@ -105,6 +109,10 @@ public:
   void viewWillAppear() override { shown = true; m_view.refresh(true); }
   void viewDidDisappear() override { shown = false; }
   bool handleEvent(Ion::Events::Event event) override {
+    if (event == Ion::Events::OnOff && PrimeG2::DualBoot::Enabled &&
+        PrimeG2::System::bootloaderWakeMenuSupported() && !m_view.appMode &&
+        PrimeG2::USBDiagnostics::transferStatus().state == 0 &&
+        !PrimeG2::USBDiagnostics::transferBusy()) return false;
     if (event == Ion::Events::Back && !m_view.appMode &&
         PrimeG2::USBDiagnostics::transferStatus().state == 0) {
       Container::activeApp()->dismissModalViewController();

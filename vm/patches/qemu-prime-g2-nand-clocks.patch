@@ -25,10 +25,10 @@ diff --git a/hw/misc/imx6ul_ccm.c b/hw/misc/imx6ul_ccm.c
 +    unsigned frac = lane & 63;
 +    unsigned div = ((s->ccm[CCM_CSCDR1] >> (bch ? 19 : 22)) & 7) + 1;
 +    unsigned gate4 = (s->ccm[CCM_CCGR4] >> (bch ? 26 : 28)) & 3;
-+    unsigned gate6 = (s->ccm[CCM_CCGR6] >> (bch ? 6 : 8)) & 3;
++    /* CCGR6 CG3/CG4 are not NAND gates on i.MX6ULL. */
 +    uint64_t parent;
 +    /* 00 off, 01 RUN, 11 all modes. 10 is not a supported gate encoding. */
-+    if (!(gate4 & 1) || !(gate6 & 1) || !(pll & (1u << 13)) ||
++    if (!(gate4 & 1) || !(pll & (1u << 13)) ||
 +        (lane & 128) || frac < 12 || frac > 35) {
 +        return 0;
 +    }
